@@ -423,6 +423,35 @@ export class DiemDanhNghiHocService {
       );
     }
 
+    const xepLopIds =
+      duLieu.danh_sach.map(
+        (item) =>
+          item.xep_lop_id,
+      );
+
+    if (
+      xepLopIds.some(
+        (id) =>
+          !Number.isInteger(id) ||
+          id <= 0,
+      )
+    ) {
+      throw new BadRequestException(
+        'Danh sách điểm danh có xếp lớp không hợp lệ',
+      );
+    }
+
+    if (
+      new Set(
+        xepLopIds,
+      ).size !==
+      xepLopIds.length
+    ) {
+      throw new BadRequestException(
+        'Danh sách điểm danh không được chứa trùng xếp lớp',
+      );
+    }
+
     const lopHoc =
       await this.prisma.lop_hoc.findUnique({
         where: {
@@ -926,24 +955,41 @@ export class DiemDanhNghiHocService {
         select: {
           hoc_sinh_id:
             true,
+
+          ngay_bat_dau:
+            true,
+
+          ngay_ket_thuc:
+            true,
         },
       });
 
-    const hocSinhIds = [
-      ...new Set(
-        danhSachXepLop.map(
-          (item) =>
-            item.hoc_sinh_id,
-        ),
-      ),
-    ];
+    const dieuKienTheoXepLop =
+      danhSachXepLop.map(
+        (xepLop) => ({
+          hoc_sinh_id:
+            xepLop.hoc_sinh_id,
+
+          ngay_ket_thuc: {
+            gte:
+              xepLop.ngay_bat_dau,
+          },
+
+          ...(xepLop.ngay_ket_thuc
+            ? {
+                ngay_bat_dau: {
+                  lte:
+                    xepLop.ngay_ket_thuc,
+                },
+              }
+            : {}),
+        }),
+      );
 
     return this.prisma.don_xin_nghi.findMany({
       where: {
-        hoc_sinh_id: {
-          in:
-            hocSinhIds,
-        },
+        OR:
+          dieuKienTheoXepLop,
 
         ...(trangThai?.trim()
           ? {
