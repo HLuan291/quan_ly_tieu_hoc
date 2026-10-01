@@ -4,23 +4,31 @@ const api = axios.create({
   baseURL: 'http://localhost:3000',
 });
 
-api.interceptors.request.use((config) => {
-  const token =
-    localStorage.getItem('access_token');
+api.interceptors.request.use(
+  (config) => {
+    const token =
+      localStorage.getItem(
+        'access_token',
+      );
 
-  if (token) {
-    config.headers.Authorization =
-      `Bearer ${token}`;
-  }
+    if (token) {
+      config.headers.Authorization =
+        `Bearer ${token}`;
+    }
 
-  return config;
-});
+    return config;
+  },
+);
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) =>
+    response,
 
   (error) => {
-    if (error.response?.status === 401) {
+    if (
+      error.response?.status ===
+      401
+    ) {
       localStorage.removeItem(
         'access_token',
       );
@@ -29,7 +37,25 @@ api.interceptors.response.use(
         '/dang_nhap';
     }
 
-    return Promise.reject(error);
+    const message =
+      error.response?.data
+        ?.message;
+
+    if (
+      error.response?.status ===
+        403 &&
+      message ===
+        'Bạn phải đổi mật khẩu trước khi sử dụng hệ thống' &&
+      window.location.pathname !==
+        '/doi_mat_khau'
+    ) {
+      window.location.href =
+        '/doi_mat_khau';
+    }
+
+    return Promise.reject(
+      error,
+    );
   },
 );
 
