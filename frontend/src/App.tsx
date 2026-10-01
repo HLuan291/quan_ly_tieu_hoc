@@ -13,6 +13,9 @@ import MainLayout
 import DangNhapPage
   from './pages/dang_nhap_page';
 
+import DoiMatKhauPage
+  from './pages/doi_mat_khau_page';
+
 import DashboardPage
   from './pages/DashboardPage';
 
@@ -26,22 +29,11 @@ function TrangTam({
 }) {
   return (
     <div>
-      <h1
-        className="
-          text-2xl
-          font-bold
-          text-slate-800
-        "
-      >
+      <h1 className="text-2xl font-bold text-slate-800">
         {ten}
       </h1>
 
-      <p
-        className="
-          mt-2
-          text-slate-500
-        "
-      >
+      <p className="mt-2 text-slate-500">
         Màn hình đang được hoàn thiện.
       </p>
     </div>
@@ -51,18 +43,10 @@ function TrangTam({
 export default function App() {
   return (
     <Routes>
-
       <Route
         path="/dang_nhap"
         element={
           <DangNhapPage />
-        }
-      />
-
-      <Route
-        path="/khong_co_quyen"
-        element={
-          <KhongCoQuyenPage />
         }
       />
 
@@ -72,11 +56,24 @@ export default function App() {
         }
       >
         <Route
+          path="/doi_mat_khau"
+          element={
+            <DoiMatKhauPage />
+          }
+        />
+
+        <Route
+          path="/khong_co_quyen"
+          element={
+            <KhongCoQuyenPage />
+          }
+        />
+
+        <Route
           element={
             <MainLayout />
           }
         >
-
           <Route
             path="/dashboard"
             element={
@@ -139,7 +136,6 @@ export default function App() {
               <TrangTam ten="Con của tôi" />
             }
           />
-
         </Route>
       </Route>
 
@@ -162,7 +158,6 @@ export default function App() {
           />
         }
       />
-
     </Routes>
   );
 }
