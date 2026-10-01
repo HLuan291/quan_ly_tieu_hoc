@@ -264,6 +264,28 @@ export class PhanCongGiangDayService {
   async ganMonHocChoKhoi(
     duLieu: GanMonHocChoKhoiDto,
   ) {
+    if (
+      !Number.isInteger(
+        duLieu.mon_hoc_id,
+      ) ||
+      duLieu.mon_hoc_id <= 0
+    ) {
+      throw new BadRequestException(
+        'Môn học không hợp lệ',
+      );
+    }
+
+    if (
+      !Number.isInteger(
+        duLieu.khoi_id,
+      ) ||
+      duLieu.khoi_id <= 0
+    ) {
+      throw new BadRequestException(
+        'Khối không hợp lệ',
+      );
+    }
+
     const [
       monHoc,
       khoi,
@@ -453,6 +475,28 @@ export class PhanCongGiangDayService {
   async phanCongGvcn(
     duLieu: PhanCongGvcnDto,
   ) {
+    if (
+      !Number.isInteger(
+        duLieu.giao_vien_id,
+      ) ||
+      duLieu.giao_vien_id <= 0
+    ) {
+      throw new BadRequestException(
+        'Giáo viên không hợp lệ',
+      );
+    }
+
+    if (
+      !Number.isInteger(
+        duLieu.lop_hoc_id,
+      ) ||
+      duLieu.lop_hoc_id <= 0
+    ) {
+      throw new BadRequestException(
+        'Lớp học không hợp lệ',
+      );
+    }
+
     const ngayBatDau =
       this.chuyenNgay(
         duLieu.ngay_bat_dau,
@@ -722,6 +766,39 @@ export class PhanCongGiangDayService {
   async phanCongMonHoc(
     duLieu: PhanCongMonHocDto,
   ) {
+    if (
+      !Number.isInteger(
+        duLieu.giao_vien_id,
+      ) ||
+      duLieu.giao_vien_id <= 0
+    ) {
+      throw new BadRequestException(
+        'Giáo viên không hợp lệ',
+      );
+    }
+
+    if (
+      !Number.isInteger(
+        duLieu.lop_hoc_id,
+      ) ||
+      duLieu.lop_hoc_id <= 0
+    ) {
+      throw new BadRequestException(
+        'Lớp học không hợp lệ',
+      );
+    }
+
+    if (
+      !Number.isInteger(
+        duLieu.mon_hoc_id,
+      ) ||
+      duLieu.mon_hoc_id <= 0
+    ) {
+      throw new BadRequestException(
+        'Môn học không hợp lệ',
+      );
+    }
+
     const loaiPhanCong =
       duLieu.loai_phan_cong
         ?.trim()
@@ -1004,6 +1081,25 @@ export class PhanCongGiangDayService {
     giaoVienId?: number,
     loaiPhanCong?: string,
   ) {
+    const loaiPhanCongTim =
+      loaiPhanCong
+        ?.trim()
+        .toUpperCase();
+
+    if (
+      loaiPhanCongTim &&
+      ![
+        'GVCN',
+        'GVBM',
+      ].includes(
+        loaiPhanCongTim,
+      )
+    ) {
+      throw new BadRequestException(
+        'Loại phân công phải là GVCN hoặc GVBM',
+      );
+    }
+
     return this.prisma
       .phan_cong_giao_vien
       .findMany({
@@ -1022,12 +1118,10 @@ export class PhanCongGiangDayService {
               }
             : {}),
 
-          ...(loaiPhanCong?.trim()
+          ...(loaiPhanCongTim
             ? {
                 loai_phan_cong:
-                  loaiPhanCong
-                    .trim()
-                    .toUpperCase(),
+                  loaiPhanCongTim,
               }
             : {}),
         },
@@ -1209,11 +1303,6 @@ export class PhanCongGiangDayService {
             .phan_cong_giao_vien
             .updateMany({
               where: {
-                id: {
-                  not:
-                    id,
-                },
-
                 giao_vien_id:
                   phanCong.giao_vien_id,
 
@@ -1223,7 +1312,15 @@ export class PhanCongGiangDayService {
                 loai_phan_cong:
                   'GVCN',
 
+                mon_hoc_id: {
+                  not:
+                    null,
+                },
+
                 ngay_bat_dau: {
+                  gte:
+                    phanCong.ngay_bat_dau,
+
                   lte:
                     ngayKetThuc,
                 },
