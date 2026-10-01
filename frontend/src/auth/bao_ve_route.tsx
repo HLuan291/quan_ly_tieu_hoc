@@ -1,6 +1,7 @@
 import {
   Navigate,
   Outlet,
+  useLocation,
 } from 'react-router';
 
 import {
@@ -16,6 +17,8 @@ interface Props {
 export default function BaoVeRoute({
   vaiTroChoPhep,
 }: Props) {
+  const location =
+    useLocation();
 
   if (!daDangNhap()) {
     return (
@@ -33,6 +36,19 @@ export default function BaoVeRoute({
     return (
       <Navigate
         to="/dang_nhap"
+        replace
+      />
+    );
+  }
+
+  if (
+    nguoiDung.phai_doi_mat_khau &&
+    location.pathname !==
+      '/doi_mat_khau'
+  ) {
+    return (
+      <Navigate
+        to="/doi_mat_khau"
         replace
       />
     );
