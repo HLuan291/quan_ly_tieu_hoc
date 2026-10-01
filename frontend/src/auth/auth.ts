@@ -18,6 +18,15 @@ export function layToken() {
   );
 }
 
+export function luuToken(
+  token: string,
+) {
+  localStorage.setItem(
+    'access_token',
+    token,
+  );
+}
+
 export function dangXuat() {
   localStorage.removeItem(
     'access_token',
@@ -69,9 +78,30 @@ export function docJwt():
           .join(''),
       );
 
-    return JSON.parse(
-      json,
-    ) as JwtPayload;
+    const payload =
+      JSON.parse(
+        json,
+      ) as Partial<JwtPayload>;
+
+    if (
+      !Number.isInteger(
+        payload.sub,
+      ) ||
+      ![
+        'ADMIN',
+        'GIAO_VIEN',
+        'PHU_HUYNH',
+      ].includes(
+        payload.vai_tro ?? '',
+      ) ||
+      typeof
+        payload.phai_doi_mat_khau !==
+        'boolean'
+    ) {
+      return null;
+    }
+
+    return payload as JwtPayload;
 
   } catch {
     return null;
