@@ -8,7 +8,7 @@ import BaoVeRoute
   from './auth/bao_ve_route';
 
 import MainLayout
-  from './layouts/MainLayout';
+  from './layouts/main_layout';
 
 import DangNhapPage
   from './pages/dang_nhap_page';
@@ -17,7 +17,7 @@ import DoiMatKhauPage
   from './pages/doi_mat_khau_page';
 
 import DashboardPage
-  from './pages/DashboardPage';
+  from './pages/dashboard_page';
 
 import KhongCoQuyenPage
   from './pages/khong_co_quyen_page';
