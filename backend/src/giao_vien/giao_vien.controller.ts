@@ -12,11 +12,17 @@ import {
   UseGuards,
 } from '@nestjs/common';
 
-import type { Request } from 'express';
+import type {
+  Request,
+} from 'express';
 
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import {
+  JwtAuthGuard,
+} from '../auth/jwt-auth.guard';
 
-import { GiaoVienService } from './giao_vien.service';
+import {
+  GiaoVienService,
+} from './giao_vien.service';
 
 import type {
   DuLieuCapNhatGiaoVien,
@@ -24,18 +30,97 @@ import type {
 } from './giao_vien.service';
 
 
-interface RequestCoNguoiDung extends Request {
+interface RequestCoNguoiDung
+  extends Request {
   nguoi_dung?: {
     sub: number;
     vai_tro: string;
     phai_doi_mat_khau: boolean;
   };
+}
+
+
+@UseGuards(JwtAuthGuard)
+@Controller('giao_vien')
+export class GiaoVienController {
+
+  constructor(
+    private readonly giaoVienService:
+      GiaoVienService,
+  ) {}
+
+
+  private kiemTraAdmin(
+    request: RequestCoNguoiDung,
+  ) {
+    if (
+      request.nguoi_dung?.vai_tro !==
+      'ADMIN'
+    ) {
+      throw new ForbiddenException(
+        'Chỉ Admin được thực hiện chức năng này',
+      );
+    }
+  }
+
+
   // =========================================
-  // CHỨC NĂNG 3: CẬP NHẬT GIÁO VIÊN
+  // 1. THÊM GIÁO VIÊN
+  // POST /giao_vien
+  // =========================================
+
+  @Post()
+  taoGiaoVien(
+    @Req()
+    request: RequestCoNguoiDung,
+
+    @Body()
+    body: DuLieuTaoGiaoVien,
+  ) {
+    this.kiemTraAdmin(
+      request,
+    );
+
+    return this.giaoVienService
+      .taoGiaoVien(
+        body,
+      );
+  }
+
+
+  // =========================================
+  // 2. XEM / TÌM DANH SÁCH GIÁO VIÊN
+  // GET /giao_vien
+  // =========================================
+
+  @Get()
+  layDanhSachGiaoVien(
+    @Req()
+    request: RequestCoNguoiDung,
+
+    @Query('tu_khoa')
+    tuKhoa?: string,
+
+    @Query('trang_thai')
+    trangThai?: string,
+  ) {
+    this.kiemTraAdmin(
+      request,
+    );
+
+    return this.giaoVienService
+      .layDanhSachGiaoVien(
+        tuKhoa,
+        trangThai,
+      );
+  }
+
+
+  // =========================================
+  // 3. CẬP NHẬT GIÁO VIÊN
   // PATCH /giao_vien/:id
   // =========================================
 
-  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   capNhatGiaoVien(
     @Req()
@@ -50,27 +135,23 @@ interface RequestCoNguoiDung extends Request {
     @Body()
     body: DuLieuCapNhatGiaoVien,
   ) {
-    if (
-      request.nguoi_dung?.vai_tro !== 'ADMIN'
-    ) {
-      throw new ForbiddenException(
-        'Chỉ Admin được cập nhật giáo viên',
-      );
-    }
-
-    return this.giaoVienService.capNhatGiaoVien(
-      id,
-      body,
+    this.kiemTraAdmin(
+      request,
     );
+
+    return this.giaoVienService
+      .capNhatGiaoVien(
+        id,
+        body,
+      );
   }
 
 
   // =========================================
-  // CHỨC NĂNG 4: CẤP LẠI MẬT KHẨU GIÁO VIÊN
+  // 4. CẤP LẠI MẬT KHẨU GIÁO VIÊN
   // POST /giao_vien/:id/cap_lai_mat_khau
   // =========================================
 
-  @UseGuards(JwtAuthGuard)
   @Post(':id/cap_lai_mat_khau')
   capLaiMatKhauGiaoVien(
     @Req()
@@ -82,90 +163,13 @@ interface RequestCoNguoiDung extends Request {
     )
     id: number,
   ) {
-    if (
-      request.nguoi_dung?.vai_tro !== 'ADMIN'
-    ) {
-      throw new ForbiddenException(
-        'Chỉ Admin được cấp lại mật khẩu giáo viên',
-      );
-    }
-
-    return this.giaoVienService.capLaiMatKhauGiaoVien(
-      id,
+    this.kiemTraAdmin(
+      request,
     );
-  }
 
-
-}
-
-
-@Controller('giao_vien')
-export class GiaoVienController {
-
-  constructor(
-    private readonly giaoVienService: GiaoVienService,
-  ) {}
-
-
-  // =========================================
-  // CHỨC NĂNG 1: THÊM GIÁO VIÊN
-  // POST /giao_vien
-  // =========================================
-
-  @UseGuards(JwtAuthGuard)
-  @Post()
-  taoGiaoVien(
-    @Req()
-    request: RequestCoNguoiDung,
-
-    @Body()
-    body: DuLieuTaoGiaoVien,
-  ) {
-
-    if (
-      request.nguoi_dung?.vai_tro !== 'ADMIN'
-    ) {
-      throw new ForbiddenException(
-        'Chỉ Admin được thêm giáo viên',
+    return this.giaoVienService
+      .capLaiMatKhauGiaoVien(
+        id,
       );
-    }
-
-    return this.giaoVienService.taoGiaoVien(
-      body,
-    );
   }
-
-
-  // =========================================
-  // CHỨC NĂNG 2: XEM / TÌM DANH SÁCH GIÁO VIÊN
-  // GET /giao_vien
-  // =========================================
-
-  @UseGuards(JwtAuthGuard)
-  @Get()
-  layDanhSachGiaoVien(
-    @Req()
-    request: RequestCoNguoiDung,
-
-    @Query('tu_khoa')
-    tuKhoa?: string,
-
-    @Query('trang_thai')
-    trangThai?: string,
-  ) {
-
-    if (
-      request.nguoi_dung?.vai_tro !== 'ADMIN'
-    ) {
-      throw new ForbiddenException(
-        'Chỉ Admin được xem danh sách giáo viên',
-      );
-    }
-
-    return this.giaoVienService.layDanhSachGiaoVien(
-      tuKhoa,
-      trangThai,
-    );
-  }
-
 }
