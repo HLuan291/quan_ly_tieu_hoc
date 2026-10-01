@@ -18,6 +18,12 @@ interface RequestCoNguoiDung extends Request {
   };
 }
 
+interface JwtPayload {
+  sub: number;
+  vai_tro: string;
+  phai_doi_mat_khau?: boolean;
+}
+
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   constructor(
@@ -55,18 +61,28 @@ export class JwtAuthGuard implements CanActivate {
     }
 
     try {
-      // Kiểm tra chữ ký và hạn JWT
       const payload =
-        await this.jwtService.verifyAsync<{
-          sub: number;
-          vai_tro: string;
-        }>(token);
+        await this.jwtService
+          .verifyAsync<JwtPayload>(
+            token,
+          );
 
-      // Kiểm tra tài khoản vẫn còn tồn tại
+      if (
+        !Number.isInteger(
+          payload.sub,
+        ) ||
+        payload.sub <= 0
+      ) {
+        throw new UnauthorizedException(
+          'Token không hợp lệ',
+        );
+      }
+
       const taiKhoan =
         await this.prisma.tai_khoan.findUnique({
           where: {
-            id: payload.sub,
+            id:
+              payload.sub,
           },
         });
 
@@ -76,8 +92,6 @@ export class JwtAuthGuard implements CanActivate {
         );
       }
 
-      // Token cũ không được tiếp tục dùng
-      // nếu tài khoản đã bị khóa
       if (
         taiKhoan.trang_thai !==
         'HOAT_DONG'
@@ -87,10 +101,9 @@ export class JwtAuthGuard implements CanActivate {
         );
       }
 
-      // Gắn thông tin người đang đăng nhập
-      // vào request hiện tại
       request.nguoi_dung = {
-        sub: taiKhoan.id,
+        sub:
+          taiKhoan.id,
 
         vai_tro:
           taiKhoan.vai_tro,
@@ -98,6 +111,20 @@ export class JwtAuthGuard implements CanActivate {
         phai_doi_mat_khau:
           taiKhoan.phai_doi_mat_khau,
       };
+
+      const laApiDoiMatKhau =
+        request.method === 'POST' &&
+        request.path ===
+          '/auth/doi-mat-khau';
+
+      if (
+        taiKhoan.phai_doi_mat_khau &&
+        !laApiDoiMatKhau
+      ) {
+        throw new ForbiddenException(
+          'Bạn phải đổi mật khẩu trước khi sử dụng hệ thống',
+        );
+      }
 
       return true;
     } catch (error) {
