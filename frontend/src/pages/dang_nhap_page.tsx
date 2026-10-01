@@ -1,11 +1,30 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  useState,
+} from 'react';
+
+import {
+  useNavigate,
+} from 'react-router';
+
+import {
+  useForm,
+} from 'react-hook-form';
+
+import {
+  z,
+} from 'zod';
+
+import {
+  zodResolver,
+} from '@hookform/resolvers/zod';
+
 import axios from 'axios';
 
 import api from '../api/api';
+
+import {
+  luuToken,
+} from '../auth/auth';
 
 const schema = z.object({
   ten_dang_nhap_hoac_so_dien_thoai: z
@@ -28,6 +47,10 @@ type FormData =
 
 interface LoginResponse {
   access_token: string;
+
+  tai_khoan: {
+    phai_doi_mat_khau: boolean;
+  };
 }
 
 export default function DangNhapPage() {
@@ -68,13 +91,15 @@ export default function DangNhapPage() {
           duLieu,
         );
 
-      localStorage.setItem(
-        'access_token',
+      luuToken(
         response.data.access_token,
       );
 
       navigate(
-        '/dashboard',
+        response.data.tai_khoan
+          .phai_doi_mat_khau
+          ? '/doi_mat_khau'
+          : '/dashboard',
         {
           replace: true,
         },
@@ -194,9 +219,7 @@ export default function DangNhapPage() {
                 outline-none
                 focus:border-blue-500
               "
-              placeholder="
-                Nhập tài khoản hoặc số điện thoại
-              "
+              placeholder="Nhập tài khoản hoặc số điện thoại"
             />
 
             {errors
@@ -245,9 +268,7 @@ export default function DangNhapPage() {
                 outline-none
                 focus:border-blue-500
               "
-              placeholder="
-                Nhập mật khẩu
-              "
+              placeholder="Nhập mật khẩu"
             />
 
             {errors.mat_khau && (
