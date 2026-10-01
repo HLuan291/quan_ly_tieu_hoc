@@ -117,6 +117,30 @@ export class HoSoHocSinhService {
   }
 
 
+  private kiemTraNamSinhPhuHuynh(
+    namSinh: number | null | undefined,
+  ) {
+    if (
+      namSinh === undefined ||
+      namSinh === null
+    ) {
+      return;
+    }
+
+    if (
+      !Number.isInteger(
+        namSinh,
+      ) ||
+      namSinh < 1900 ||
+      namSinh > 2100
+    ) {
+      throw new BadRequestException(
+        'Năm sinh phụ huynh phải là số nguyên từ 1900 đến 2100',
+      );
+    }
+  }
+
+
   private async taoMaHocSinh() {
 
     const hocSinhCuoi =
@@ -478,6 +502,10 @@ export class HoSoHocSinhService {
           phuHuynh
             .so_dien_thoai
             .trim(),
+        );
+
+        this.kiemTraNamSinhPhuHuynh(
+          phuHuynh.nam_sinh,
         );
       }
     }
@@ -1169,10 +1197,90 @@ export class HoSoHocSinhService {
     }
 
 
+    const cacTruongChuoiBatBuoc = [
+      [
+        'Họ tên',
+        duLieu.ho_ten,
+      ],
+      [
+        'Giới tính',
+        duLieu.gioi_tinh,
+      ],
+      [
+        'Dân tộc',
+        duLieu.dan_toc,
+      ],
+      [
+        'Quốc tịch',
+        duLieu.quoc_tich,
+      ],
+      [
+        'Nơi sinh',
+        duLieu.noi_sinh,
+      ],
+      [
+        'Địa chỉ thường trú',
+        duLieu.dia_chi_thuong_tru,
+      ],
+      [
+        'Địa chỉ hiện tại',
+        duLieu.dia_chi_hien_tai,
+      ],
+    ] as const;
+
+
+    for (
+      const [
+        tenTruong,
+        giaTri,
+      ]
+      of cacTruongChuoiBatBuoc
+    ) {
+      if (
+        giaTri !== undefined &&
+        !giaTri.trim()
+      ) {
+        throw new BadRequestException(
+          `${tenTruong} không được để trống`,
+        );
+      }
+    }
+
+
+    if (
+      duLieu.ngay_sinh !== undefined &&
+      !duLieu.ngay_sinh.trim()
+    ) {
+      throw new BadRequestException(
+        'Ngày sinh không được để trống',
+      );
+    }
+
+
+    if (
+      duLieu.ngay_nhap_hoc !== undefined &&
+      !duLieu.ngay_nhap_hoc.trim()
+    ) {
+      throw new BadRequestException(
+        'Ngày nhập học không được để trống',
+      );
+    }
+
+
     const soDienThoai =
       duLieu
         .so_dien_thoai_lien_he
         ?.trim();
+
+
+    if (
+      duLieu.so_dien_thoai_lien_he !== undefined &&
+      !soDienThoai
+    ) {
+      throw new BadRequestException(
+        'Số điện thoại liên hệ không được để trống',
+      );
+    }
 
 
     if (soDienThoai) {
@@ -1719,9 +1827,34 @@ export class HoSoHocSinhService {
     }
 
 
+    if (
+      duLieu.ho_ten !== undefined &&
+      !duLieu.ho_ten.trim()
+    ) {
+      throw new BadRequestException(
+        'Họ tên phụ huynh không được để trống',
+      );
+    }
+
+
+    this.kiemTraNamSinhPhuHuynh(
+      duLieu.nam_sinh,
+    );
+
+
     const soDienThoai =
       duLieu.so_dien_thoai
         ?.trim();
+
+
+    if (
+      duLieu.so_dien_thoai !== undefined &&
+      !soDienThoai
+    ) {
+      throw new BadRequestException(
+        'Số điện thoại phụ huynh không được để trống',
+      );
+    }
 
 
     if (soDienThoai) {
@@ -2034,6 +2167,9 @@ export class HoSoHocSinhService {
 
         phai_doi_mat_khau:
           true,
+
+        ngay_doi_mat_khau:
+          null,
       },
     });
 
@@ -2086,6 +2222,15 @@ export class HoSoHocSinhService {
     }
 
 
+    let taiKhoanMoi:
+      | {
+          ten_dang_nhap: string;
+          mat_khau_ban_dau: string;
+        }
+      | null =
+      null;
+
+
     const ketQua =
       await this.prisma.$transaction(
         async (tx) => {
@@ -2135,6 +2280,11 @@ export class HoSoHocSinhService {
             );
 
 
+            this.kiemTraNamSinhPhuHuynh(
+              duLieu.nam_sinh,
+            );
+
+
             phuHuynh =
               await tx.phu_huynh.create({
                 data: {
@@ -2153,6 +2303,96 @@ export class HoSoHocSinhService {
                     null,
                 },
               });
+          }
+
+
+          if (
+            duLieu.tao_tai_khoan &&
+            !phuHuynh.tai_khoan_id
+          ) {
+            const taiKhoanTrung =
+              await tx.tai_khoan.findUnique({
+                where: {
+                  so_dien_thoai:
+                    phuHuynh.so_dien_thoai,
+                },
+              });
+
+
+            if (taiKhoanTrung) {
+              throw new ConflictException(
+                'Số điện thoại đã được tài khoản khác sử dụng',
+              );
+            }
+
+
+            const tenDangNhap =
+              `ph${String(
+                phuHuynh.id,
+              ).padStart(
+                6,
+                '0',
+              )}`;
+
+
+            const matKhauBanDau =
+              `Ph@${randomBytes(
+                4,
+              ).toString(
+                'hex',
+              )}`;
+
+
+            const matKhauBam =
+              await argon2.hash(
+                matKhauBanDau,
+              );
+
+
+            const taiKhoan =
+              await tx.tai_khoan.create({
+                data: {
+                  ten_dang_nhap:
+                    tenDangNhap,
+
+                  so_dien_thoai:
+                    phuHuynh.so_dien_thoai,
+
+                  mat_khau_bam:
+                    matKhauBam,
+
+                  vai_tro:
+                    'PHU_HUYNH',
+
+                  trang_thai:
+                    'HOAT_DONG',
+
+                  phai_doi_mat_khau:
+                    true,
+                },
+              });
+
+
+            await tx.phu_huynh.update({
+              where: {
+                id:
+                  phuHuynh.id,
+              },
+
+              data: {
+                tai_khoan_id:
+                  taiKhoan.id,
+              },
+            });
+
+
+            taiKhoanMoi = {
+              ten_dang_nhap:
+                tenDangNhap,
+
+              mat_khau_ban_dau:
+                matKhauBanDau,
+            };
           }
 
 
@@ -2201,6 +2441,9 @@ export class HoSoHocSinhService {
 
       lien_ket:
         ketQua,
+
+      tai_khoan_phu_huynh_moi:
+        taiKhoanMoi,
     };
   }
 
