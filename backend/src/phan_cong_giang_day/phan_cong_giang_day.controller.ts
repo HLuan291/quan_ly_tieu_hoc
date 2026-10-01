@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   ForbiddenException,
@@ -77,6 +78,32 @@ export class PhanCongGiangDayController {
         'Chỉ Admin được thực hiện chức năng này',
       );
     }
+  }
+
+  private chuyenQuerySoNguyenDuong(
+    giaTri: string | undefined,
+    tenTruong: string,
+  ): number | undefined {
+    if (
+      giaTri === undefined ||
+      giaTri.trim() === ''
+    ) {
+      return undefined;
+    }
+
+    const so =
+      Number(giaTri);
+
+    if (
+      !Number.isInteger(so) ||
+      so <= 0
+    ) {
+      throw new BadRequestException(
+        `${tenTruong} không hợp lệ`,
+      );
+    }
+
+    return so;
   }
 
   // ==================================================
@@ -170,9 +197,10 @@ export class PhanCongGiangDayController {
 
     return this.service
       .layDanhSachMonHocKhoi(
-        khoiId
-          ? Number(khoiId)
-          : undefined,
+        this.chuyenQuerySoNguyenDuong(
+          khoiId,
+          'Khối',
+        ),
       );
   }
 
@@ -249,13 +277,15 @@ export class PhanCongGiangDayController {
 
     return this.service
       .layDanhSachPhanCong(
-        lopHocId
-          ? Number(lopHocId)
-          : undefined,
+        this.chuyenQuerySoNguyenDuong(
+          lopHocId,
+          'Lớp học',
+        ),
 
-        giaoVienId
-          ? Number(giaoVienId)
-          : undefined,
+        this.chuyenQuerySoNguyenDuong(
+          giaoVienId,
+          'Giáo viên',
+        ),
 
         loaiPhanCong,
       );
