@@ -905,12 +905,15 @@ export class DanhGiaHocTapService {
         taiKhoanId,
       );
 
-    await this.kiemTraQuyenDanhGiaMon(
-      giaoVien.id,
-      duLieu.hoc_sinh_id,
-      duLieu.mon_hoc_id,
-      duLieu.dot_danh_gia_id,
-    );
+    const {
+      xepLop,
+    } =
+      await this.kiemTraQuyenDanhGiaMon(
+        giaoVien.id,
+        duLieu.hoc_sinh_id,
+        duLieu.mon_hoc_id,
+        duLieu.dot_danh_gia_id,
+      );
 
     const mucDanhGia =
       duLieu.muc_danh_gia?.trim();
@@ -928,6 +931,9 @@ export class DanhGiaHocTapService {
           where: {
             dot_danh_gia_id:
               duLieu.dot_danh_gia_id,
+
+            khoi_id:
+              xepLop.lop_hoc.khoi_id,
 
             mon_hoc_id:
               duLieu.mon_hoc_id,
@@ -1062,12 +1068,24 @@ export class DanhGiaHocTapService {
       );
     }
 
-    await this.kiemTraQuyenDanhGiaMon(
-      giaoVien.id,
-      duLieu.hoc_sinh_id,
-      cauHinh.mon_hoc_id,
-      cauHinh.dot_danh_gia_id,
-    );
+    const {
+      xepLop,
+    } =
+      await this.kiemTraQuyenDanhGiaMon(
+        giaoVien.id,
+        duLieu.hoc_sinh_id,
+        cauHinh.mon_hoc_id,
+        cauHinh.dot_danh_gia_id,
+      );
+
+    if (
+      cauHinh.khoi_id !==
+      xepLop.lop_hoc.khoi_id
+    ) {
+      throw new BadRequestException(
+        'Cấu hình điểm không thuộc khối của học sinh',
+      );
+    }
 
     const daCo =
       await this.prisma
@@ -1202,12 +1220,33 @@ export class DanhGiaHocTapService {
       );
     }
 
-    await this.kiemTraQuyenDanhGiaMon(
-      giaoVien.id,
-      diemHienTai.hoc_sinh_id,
-      diemHienTai.cau_hinh_diem.mon_hoc_id,
-      diemHienTai.cau_hinh_diem.dot_danh_gia_id,
-    );
+    if (
+      diemHienTai.cau_hinh_diem.cach_nhap !==
+      'NHAP_TAY'
+    ) {
+      throw new BadRequestException(
+        'Loại điểm này được hệ thống tự tính, không được nhập kiểm tra lại',
+      );
+    }
+
+    const {
+      xepLop,
+    } =
+      await this.kiemTraQuyenDanhGiaMon(
+        giaoVien.id,
+        diemHienTai.hoc_sinh_id,
+        diemHienTai.cau_hinh_diem.mon_hoc_id,
+        diemHienTai.cau_hinh_diem.dot_danh_gia_id,
+      );
+
+    if (
+      diemHienTai.cau_hinh_diem.khoi_id !==
+      xepLop.lop_hoc.khoi_id
+    ) {
+      throw new BadRequestException(
+        'Cấu hình điểm không thuộc khối của học sinh',
+      );
+    }
 
     const lanCuoi =
       diemHienTai
@@ -1460,8 +1499,84 @@ export class DanhGiaHocTapService {
   }
 
   // ==================================================
-  // 13. GV XEM KẾT QUẢ CỦA HS THEO ĐỢT
+  // 13. ADMIN / GV XEM KẾT QUẢ CỦA HS THEO ĐỢT
+  // GV chỉ được xem HS thuộc lớp mình được phân công
+  // trong năm học của đợt đánh giá.
   // ==================================================
+
+  async layKetQuaHocSinhTheoDotChoNhanVien(
+    taiKhoanId: number,
+    vaiTro: string,
+    hocSinhId: number,
+    dotDanhGiaId: number,
+  ) {
+    if (vaiTro === 'ADMIN') {
+      return this.layKetQuaHocSinhTheoDot(
+        hocSinhId,
+        dotDanhGiaId,
+      );
+    }
+
+    if (vaiTro !== 'GIAO_VIEN') {
+      throw new ForbiddenException(
+        'Bạn không có quyền xem kết quả học sinh',
+      );
+    }
+
+    const giaoVien =
+      await this.layGiaoVienTuTaiKhoan(
+        taiKhoanId,
+      );
+
+    const dot =
+      await this.prisma.dot_danh_gia.findUnique({
+        where: {
+          id:
+            dotDanhGiaId,
+        },
+
+        select: {
+          nam_hoc_id:
+            true,
+        },
+      });
+
+    if (!dot) {
+      throw new NotFoundException(
+        'Không tìm thấy đợt đánh giá',
+      );
+    }
+
+    const xepLop =
+      await this.layLopHocSinhTrongNam(
+        hocSinhId,
+        dot.nam_hoc_id,
+      );
+
+    const phanCong =
+      await this.prisma
+        .phan_cong_giao_vien
+        .findFirst({
+          where: {
+            giao_vien_id:
+              giaoVien.id,
+
+            lop_hoc_id:
+              xepLop.lop_hoc_id,
+          },
+        });
+
+    if (!phanCong) {
+      throw new ForbiddenException(
+        'Bạn không được phân công tại lớp của học sinh này',
+      );
+    }
+
+    return this.layKetQuaHocSinhTheoDot(
+      hocSinhId,
+      dotDanhGiaId,
+    );
+  }
 
   async layKetQuaHocSinhTheoDot(
     hocSinhId: number,
