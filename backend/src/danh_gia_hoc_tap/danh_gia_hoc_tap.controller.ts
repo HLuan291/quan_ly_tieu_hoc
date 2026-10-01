@@ -453,7 +453,9 @@ export class DanhGiaHocTapController {
     }
 
     return this.service
-      .layKetQuaHocSinhTheoDot(
+      .layKetQuaHocSinhTheoDotChoNhanVien(
+        nguoiDung.sub,
+        nguoiDung.vai_tro,
         hocSinhId,
         dotDanhGiaId,
       );
