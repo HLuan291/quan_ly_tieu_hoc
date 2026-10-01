@@ -333,11 +333,11 @@ export class ToChucLopHocService {
           ten_lop:
             tenLop,
 
-         ghi_chu:
-  duLieu.ghi_chu
-    ?.trim() ||
-  null,
-        } ,
+          ghi_chu:
+            duLieu.ghi_chu
+              ?.trim() ||
+            null,
+        },
       });
 
     return {
@@ -631,6 +631,28 @@ export class ToChucLopHocService {
   async xepHocSinhVaoLop(
     duLieu: XepHocSinhVaoLopDto,
   ) {
+    if (
+      !Number.isInteger(
+        duLieu.hoc_sinh_id,
+      ) ||
+      duLieu.hoc_sinh_id <= 0
+    ) {
+      throw new BadRequestException(
+        'Học sinh không hợp lệ',
+      );
+    }
+
+    if (
+      !Number.isInteger(
+        duLieu.lop_hoc_id,
+      ) ||
+      duLieu.lop_hoc_id <= 0
+    ) {
+      throw new BadRequestException(
+        'Lớp học không hợp lệ',
+      );
+    }
+
     const ngayBatDau =
       this.chuyenNgay(
         duLieu.ngay_bat_dau,
@@ -676,6 +698,15 @@ export class ToChucLopHocService {
     if (!hocSinh) {
       throw new NotFoundException(
         'Không tìm thấy học sinh',
+      );
+    }
+
+    if (
+      hocSinh.trang_thai !==
+      'DANG_HOC'
+    ) {
+      throw new BadRequestException(
+        'Chỉ học sinh đang học mới được xếp lớp',
       );
     }
 
@@ -851,6 +882,25 @@ export class ToChucLopHocService {
     ) {
       throw new BadRequestException(
         'Không có dữ liệu cần cập nhật',
+      );
+    }
+
+    if (
+      duLieu.ngay_bat_dau !== undefined &&
+      !duLieu.ngay_bat_dau.trim()
+    ) {
+      throw new BadRequestException(
+        'Ngày bắt đầu không được để trống',
+      );
+    }
+
+    if (
+      typeof duLieu.ngay_ket_thuc ===
+        'string' &&
+      !duLieu.ngay_ket_thuc.trim()
+    ) {
+      throw new BadRequestException(
+        'Ngày kết thúc không được để trống. Dùng null nếu muốn bỏ ngày kết thúc',
       );
     }
 
