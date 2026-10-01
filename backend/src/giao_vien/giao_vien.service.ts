@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { randomBytes } from 'crypto';
 import * as argon2 from 'argon2';
@@ -18,11 +19,77 @@ export interface DuLieuTaoGiaoVien {
   trinh_do_chuyen_mon: string;
 }
 
+export interface DuLieuCapNhatGiaoVien {
+  ho_ten?: string;
+  ngay_sinh?: string;
+  gioi_tinh?: string;
+  so_dien_thoai?: string;
+  email?: string;
+  dia_chi_lien_he?: string;
+  ngay_vao_truong?: string;
+  trinh_do_chuyen_mon?: string;
+}
+
 @Injectable()
 export class GiaoVienService {
   constructor(
     private readonly prisma: PrismaService,
   ) {}
+
+  private chuyenNgay(
+    giaTri: string,
+    tenTruong: string,
+  ): Date {
+    const ngay =
+      new Date(
+        `${giaTri}T00:00:00.000Z`,
+      );
+
+    if (
+      !/^\d{4}-\d{2}-\d{2}$/.test(
+        giaTri,
+      ) ||
+      Number.isNaN(
+        ngay.getTime(),
+      ) ||
+      ngay.toISOString().slice(0, 10) !==
+        giaTri
+    ) {
+      throw new BadRequestException(
+        `${tenTruong} không hợp lệ`,
+      );
+    }
+
+    return ngay;
+  }
+
+  private kiemTraSoDienThoai(
+    soDienThoai: string,
+  ) {
+    if (
+      !/^\d{10,15}$/.test(
+        soDienThoai,
+      )
+    ) {
+      throw new BadRequestException(
+        'Số điện thoại phải gồm từ 10 đến 15 chữ số',
+      );
+    }
+  }
+
+  private kiemTraEmail(
+    email: string,
+  ) {
+    if (
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+        email,
+      )
+    ) {
+      throw new BadRequestException(
+        'Email không hợp lệ',
+      );
+    }
+  }
 
   // =========================================
   // BƯỚC 1: TẠO MÃ GIÁO VIÊN
@@ -50,6 +117,17 @@ export class GiaoVienService {
         '',
       ),
     );
+
+    if (
+      !Number.isInteger(
+        soCu,
+      ) ||
+      soCu < 1
+    ) {
+      throw new BadRequestException(
+        'Mã giáo viên hiện tại không hợp lệ',
+      );
+    }
 
     const soMoi = soCu + 1;
 
@@ -87,6 +165,40 @@ export class GiaoVienService {
 
     const soDienThoai =
       duLieu.so_dien_thoai.trim();
+
+    const email =
+      duLieu.email
+        .trim()
+        .toLowerCase();
+
+    this.kiemTraSoDienThoai(
+      soDienThoai,
+    );
+
+    this.kiemTraEmail(
+      email,
+    );
+
+    const ngaySinh =
+      this.chuyenNgay(
+        duLieu.ngay_sinh,
+        'Ngày sinh',
+      );
+
+    const ngayVaoTruong =
+      this.chuyenNgay(
+        duLieu.ngay_vao_truong,
+        'Ngày vào trường',
+      );
+
+    if (
+      ngayVaoTruong <
+      ngaySinh
+    ) {
+      throw new BadRequestException(
+        'Ngày vào trường không được trước ngày sinh',
+      );
+    }
 
     // -----------------------------------------
     // 2.2 KIỂM TRA SỐ ĐIỆN THOẠI
@@ -181,9 +293,7 @@ export class GiaoVienService {
                   duLieu.ho_ten.trim(),
 
                 ngay_sinh:
-                  new Date(
-                    `${duLieu.ngay_sinh}T00:00:00.000Z`,
-                  ),
+                  ngaySinh,
 
                 gioi_tinh:
                   duLieu.gioi_tinh.trim(),
@@ -192,17 +302,13 @@ export class GiaoVienService {
                   soDienThoai,
 
                 email:
-                  duLieu.email
-                    .trim()
-                    .toLowerCase(),
+                  email,
 
                 dia_chi_lien_he:
                   duLieu.dia_chi_lien_he.trim(),
 
                 ngay_vao_truong:
-                  new Date(
-                    `${duLieu.ngay_vao_truong}T00:00:00.000Z`,
-                  ),
+                  ngayVaoTruong,
 
                 trinh_do_chuyen_mon:
                   duLieu.trinh_do_chuyen_mon.trim(),
@@ -361,4 +467,348 @@ export class GiaoVienService {
       danhSach,
   };
 }
+
+  // =========================================
+  // BƯỚC 5: CẬP NHẬT HỒ SƠ GIÁO VIÊN
+  // Số điện thoại đồng bộ với tài khoản.
+  // =========================================
+
+  async capNhatGiaoVien(
+    id: number,
+    duLieu: DuLieuCapNhatGiaoVien,
+  ) {
+    const giaoVien =
+      await this.prisma.giao_vien.findUnique({
+        where: {
+          id,
+        },
+      });
+
+    if (!giaoVien) {
+      throw new NotFoundException(
+        'Không tìm thấy giáo viên',
+      );
+    }
+
+    if (
+      Object.values(
+        duLieu,
+      ).every(
+        (giaTri) =>
+          giaTri === undefined,
+      )
+    ) {
+      throw new BadRequestException(
+        'Không có dữ liệu cần cập nhật',
+      );
+    }
+
+    const truongChuoiBatBuoc = [
+      [
+        'Họ tên',
+        duLieu.ho_ten,
+      ],
+      [
+        'Giới tính',
+        duLieu.gioi_tinh,
+      ],
+      [
+        'Địa chỉ liên hệ',
+        duLieu.dia_chi_lien_he,
+      ],
+      [
+        'Trình độ chuyên môn',
+        duLieu.trinh_do_chuyen_mon,
+      ],
+    ] as const;
+
+    for (
+      const [
+        tenTruong,
+        giaTri,
+      ]
+      of truongChuoiBatBuoc
+    ) {
+      if (
+        giaTri !== undefined &&
+        !giaTri.trim()
+      ) {
+        throw new BadRequestException(
+          `${tenTruong} không được để trống`,
+        );
+      }
+    }
+
+    let ngaySinh =
+      giaoVien.ngay_sinh;
+
+    if (
+      duLieu.ngay_sinh !== undefined
+    ) {
+      if (!duLieu.ngay_sinh.trim()) {
+        throw new BadRequestException(
+          'Ngày sinh không được để trống',
+        );
+      }
+
+      ngaySinh =
+        this.chuyenNgay(
+          duLieu.ngay_sinh,
+          'Ngày sinh',
+        );
+    }
+
+    let ngayVaoTruong =
+      giaoVien.ngay_vao_truong;
+
+    if (
+      duLieu.ngay_vao_truong !==
+      undefined
+    ) {
+      if (
+        !duLieu.ngay_vao_truong.trim()
+      ) {
+        throw new BadRequestException(
+          'Ngày vào trường không được để trống',
+        );
+      }
+
+      ngayVaoTruong =
+        this.chuyenNgay(
+          duLieu.ngay_vao_truong,
+          'Ngày vào trường',
+        );
+    }
+
+    if (
+      ngayVaoTruong <
+      ngaySinh
+    ) {
+      throw new BadRequestException(
+        'Ngày vào trường không được trước ngày sinh',
+      );
+    }
+
+    const soDienThoai =
+      duLieu.so_dien_thoai
+        ?.trim();
+
+    if (
+      duLieu.so_dien_thoai !==
+        undefined &&
+      !soDienThoai
+    ) {
+      throw new BadRequestException(
+        'Số điện thoại không được để trống',
+      );
+    }
+
+    if (soDienThoai) {
+      this.kiemTraSoDienThoai(
+        soDienThoai,
+      );
+
+      if (
+        soDienThoai !==
+        giaoVien.so_dien_thoai
+      ) {
+        const taiKhoanTrung =
+          await this.prisma
+            .tai_khoan
+            .findUnique({
+              where: {
+                so_dien_thoai:
+                  soDienThoai,
+              },
+            });
+
+        if (
+          taiKhoanTrung &&
+          taiKhoanTrung.id !==
+            giaoVien.tai_khoan_id
+        ) {
+          throw new ConflictException(
+            'Số điện thoại đã được sử dụng',
+          );
+        }
+      }
+    }
+
+    const email =
+      duLieu.email
+        ?.trim()
+        .toLowerCase();
+
+    if (
+      duLieu.email !== undefined &&
+      !email
+    ) {
+      throw new BadRequestException(
+        'Email không được để trống',
+      );
+    }
+
+    if (email) {
+      this.kiemTraEmail(
+        email,
+      );
+    }
+
+    const ketQua =
+      await this.prisma.$transaction(
+        async (tx) => {
+          if (
+            soDienThoai &&
+            soDienThoai !==
+              giaoVien.so_dien_thoai
+          ) {
+            await tx.tai_khoan.update({
+              where: {
+                id:
+                  giaoVien.tai_khoan_id,
+              },
+
+              data: {
+                so_dien_thoai:
+                  soDienThoai,
+              },
+            });
+          }
+
+          return tx.giao_vien.update({
+            where: {
+              id,
+            },
+
+            data: {
+              ...(duLieu.ho_ten !==
+                undefined
+                ? {
+                    ho_ten:
+                      duLieu.ho_ten.trim(),
+                  }
+                : {}),
+
+              ngay_sinh:
+                ngaySinh,
+
+              ...(duLieu.gioi_tinh !==
+                undefined
+                ? {
+                    gioi_tinh:
+                      duLieu.gioi_tinh.trim(),
+                  }
+                : {}),
+
+              ...(soDienThoai
+                ? {
+                    so_dien_thoai:
+                      soDienThoai,
+                  }
+                : {}),
+
+              ...(email
+                ? {
+                    email,
+                  }
+                : {}),
+
+              ...(duLieu.dia_chi_lien_he !==
+                undefined
+                ? {
+                    dia_chi_lien_he:
+                      duLieu.dia_chi_lien_he.trim(),
+                  }
+                : {}),
+
+              ngay_vao_truong:
+                ngayVaoTruong,
+
+              ...(duLieu.trinh_do_chuyen_mon !==
+                undefined
+                ? {
+                    trinh_do_chuyen_mon:
+                      duLieu.trinh_do_chuyen_mon.trim(),
+                  }
+                : {}),
+
+              ngay_cap_nhat:
+                new Date(),
+            },
+          });
+        },
+      );
+
+    return {
+      thong_bao:
+        'Cập nhật giáo viên thành công',
+
+      giao_vien:
+        ketQua,
+    };
+  }
+
+
+  // =========================================
+  // BƯỚC 6: CẤP LẠI MẬT KHẨU GIÁO VIÊN
+  // =========================================
+
+  async capLaiMatKhauGiaoVien(
+    id: number,
+  ) {
+    const giaoVien =
+      await this.prisma.giao_vien.findUnique({
+        where: {
+          id,
+        },
+      });
+
+    if (!giaoVien) {
+      throw new NotFoundException(
+        'Không tìm thấy giáo viên',
+      );
+    }
+
+    const matKhauMoi =
+      `Gv@${randomBytes(
+        4,
+      ).toString(
+        'hex',
+      )}`;
+
+    const matKhauBam =
+      await argon2.hash(
+        matKhauMoi,
+      );
+
+    await this.prisma.tai_khoan.update({
+      where: {
+        id:
+          giaoVien.tai_khoan_id,
+      },
+
+      data: {
+        mat_khau_bam:
+          matKhauBam,
+
+        phai_doi_mat_khau:
+          true,
+
+        ngay_doi_mat_khau:
+          null,
+      },
+    });
+
+    return {
+      thong_bao:
+        'Cấp lại mật khẩu giáo viên thành công',
+
+      mat_khau_moi:
+        matKhauMoi,
+
+      phai_doi_mat_khau:
+        true,
+    };
+  }
+
 }
