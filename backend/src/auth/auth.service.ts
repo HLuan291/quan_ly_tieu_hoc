@@ -20,7 +20,6 @@ export class AuthService {
     tenDangNhapHoacSoDienThoai: string,
     matKhau: string,
   ) {
-    // Kiểm tra dữ liệu gửi lên
     if (!tenDangNhapHoacSoDienThoai || !matKhau) {
       throw new BadRequestException(
         'Vui lòng nhập đầy đủ thông tin đăng nhập',
@@ -30,50 +29,52 @@ export class AuthService {
     const giaTriDangNhap =
       tenDangNhapHoacSoDienThoai.trim();
 
-    // Tìm bằng tên đăng nhập hoặc số điện thoại
     const taiKhoan =
       await this.prisma.tai_khoan.findFirst({
         where: {
           OR: [
             {
-              ten_dang_nhap: giaTriDangNhap,
+              ten_dang_nhap:
+                giaTriDangNhap,
             },
             {
-              so_dien_thoai: giaTriDangNhap,
+              so_dien_thoai:
+                giaTriDangNhap,
             },
           ],
         },
       });
 
-    // Không tìm thấy tài khoản
     if (!taiKhoan) {
       throw new UnauthorizedException(
         'Tên đăng nhập, số điện thoại hoặc mật khẩu không đúng',
       );
     }
 
-    // Phụ huynh chỉ đăng nhập bằng số điện thoại
     if (
       taiKhoan.vai_tro === 'PHU_HUYNH' &&
-      giaTriDangNhap !== taiKhoan.so_dien_thoai
+      giaTriDangNhap !==
+        taiKhoan.so_dien_thoai
     ) {
       throw new UnauthorizedException(
         'Tên đăng nhập, số điện thoại hoặc mật khẩu không đúng',
       );
     }
 
-    // Kiểm tra trạng thái tài khoản
-    if (taiKhoan.trang_thai !== 'HOAT_DONG') {
+    if (
+      taiKhoan.trang_thai !==
+      'HOAT_DONG'
+    ) {
       throw new ForbiddenException(
         'Tài khoản đã bị khóa',
       );
     }
 
-    // Kiểm tra mật khẩu bằng Argon2
-    const matKhauDung = await argon2.verify(
-      taiKhoan.mat_khau_bam,
-      matKhau,
-    );
+    const matKhauDung =
+      await argon2.verify(
+        taiKhoan.mat_khau_bam,
+        matKhau,
+      );
 
     if (!matKhauDung) {
       throw new UnauthorizedException(
@@ -81,30 +82,38 @@ export class AuthService {
       );
     }
 
-    // Dữ liệu đưa vào JWT
     const payload = {
-      sub: taiKhoan.id,
-      vai_tro: taiKhoan.vai_tro,
+      sub:
+        taiKhoan.id,
+
+      vai_tro:
+        taiKhoan.vai_tro,
+
+      phai_doi_mat_khau:
+        taiKhoan.phai_doi_mat_khau,
     };
 
-    // Ghi nhận lần đăng nhập gần nhất
     await this.prisma.tai_khoan.update({
       where: {
-        id: taiKhoan.id,
+        id:
+          taiKhoan.id,
       },
 
       data: {
-        lan_dang_nhap_cuoi: new Date(),
+        lan_dang_nhap_cuoi:
+          new Date(),
       },
     });
 
-    // Trả kết quả cho frontend
     return {
       access_token:
-        await this.jwtService.signAsync(payload),
+        await this.jwtService.signAsync(
+          payload,
+        ),
 
       tai_khoan: {
-        id: taiKhoan.id,
+        id:
+          taiKhoan.id,
 
         ten_dang_nhap:
           taiKhoan.ten_dang_nhap,
@@ -138,11 +147,11 @@ export class AuthService {
       );
     }
 
-    // Tìm tài khoản đang đăng nhập
     const taiKhoan =
       await this.prisma.tai_khoan.findUnique({
         where: {
-          id: taiKhoanId,
+          id:
+            taiKhoanId,
         },
       });
 
@@ -152,13 +161,15 @@ export class AuthService {
       );
     }
 
-    if (taiKhoan.trang_thai !== 'HOAT_DONG') {
+    if (
+      taiKhoan.trang_thai !==
+      'HOAT_DONG'
+    ) {
       throw new ForbiddenException(
         'Tài khoản đã bị khóa',
       );
     }
 
-    // Kiểm tra mật khẩu hiện tại
     const matKhauCuDung =
       await argon2.verify(
         taiKhoan.mat_khau_bam,
@@ -171,7 +182,6 @@ export class AuthService {
       );
     }
 
-    // Không cho dùng lại mật khẩu hiện tại
     const trungMatKhauCu =
       await argon2.verify(
         taiKhoan.mat_khau_bam,
@@ -184,30 +194,51 @@ export class AuthService {
       );
     }
 
-    // Băm mật khẩu mới
     const matKhauBamMoi =
-      await argon2.hash(matKhauMoi);
+      await argon2.hash(
+        matKhauMoi,
+      );
 
-    // Cập nhật database
     await this.prisma.tai_khoan.update({
       where: {
-        id: taiKhoanId,
+        id:
+          taiKhoanId,
       },
 
       data: {
-        mat_khau_bam: matKhauBamMoi,
+        mat_khau_bam:
+          matKhauBamMoi,
 
-        phai_doi_mat_khau: false,
+        phai_doi_mat_khau:
+          false,
 
-        ngay_doi_mat_khau: new Date(),
+        ngay_doi_mat_khau:
+          new Date(),
       },
     });
+
+    const payloadMoi = {
+      sub:
+        taiKhoan.id,
+
+      vai_tro:
+        taiKhoan.vai_tro,
+
+      phai_doi_mat_khau:
+        false,
+    };
 
     return {
       thong_bao:
         'Đổi mật khẩu thành công',
 
-      phai_doi_mat_khau: false,
+      access_token:
+        await this.jwtService.signAsync(
+          payloadMoi,
+        ),
+
+      phai_doi_mat_khau:
+        false,
     };
   }
 }
