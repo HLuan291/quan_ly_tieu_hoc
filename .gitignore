@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+backend/node_modules/
+frontend/node_modules/
+
+# Build
+dist/
+backend/dist/
+frontend/dist/
+
+# Environment / secrets
+.env
+.env.*
+backend/.env
+frontend/.env
+
+# Cho phép file mẫu
+!.env.example
+!backend/.env.example
+!frontend/.env.example
+
+# Logs
+*.log
+
+# Editor / OS
+.vscode/
+.DS_Store
+Thumbs.dbgit init
+git status

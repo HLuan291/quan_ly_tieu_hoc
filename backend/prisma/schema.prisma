@@ -1,0 +1,416 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model cau_hinh_danh_gia_mon {
+  id              Int          @id @default(autoincrement()) @db.UnsignedInt
+  dot_danh_gia_id Int          @db.UnsignedInt
+  khoi_id         Int          @db.UnsignedInt
+  mon_hoc_id      Int          @db.UnsignedInt
+  dot_danh_gia    dot_danh_gia @relation(fields: [dot_danh_gia_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_chdgm_dot")
+  khoi            khoi         @relation(fields: [khoi_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_chdgm_khoi")
+  mon_hoc         mon_hoc      @relation(fields: [mon_hoc_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_chdgm_mon")
+
+  @@unique([dot_danh_gia_id, khoi_id, mon_hoc_id], map: "uq_chdgm_dot_khoi_mon")
+  @@index([khoi_id], map: "fk_chdgm_khoi")
+  @@index([mon_hoc_id], map: "fk_chdgm_mon")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model cau_hinh_diem {
+  id                    Int                     @id @default(autoincrement()) @db.UnsignedInt
+  dot_danh_gia_id       Int                     @db.UnsignedInt
+  khoi_id               Int                     @db.UnsignedInt
+  mon_hoc_id            Int                     @db.UnsignedInt
+  ma_loai_diem          String                  @db.VarChar(30)
+  ten_hien_thi          String                  @db.VarChar(100)
+  bat_buoc              Boolean                 @default(true)
+  thu_tu_hien_thi       Int                     @db.UnsignedTinyInt
+  cach_nhap             String                  @db.VarChar(20)
+  dot_danh_gia          dot_danh_gia            @relation(fields: [dot_danh_gia_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_chd_dot")
+  khoi                  khoi                    @relation(fields: [khoi_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_chd_khoi")
+  mon_hoc               mon_hoc                 @relation(fields: [mon_hoc_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_chd_mon")
+  diem_kiem_tra_dinh_ky diem_kiem_tra_dinh_ky[]
+
+  @@unique([dot_danh_gia_id, khoi_id, mon_hoc_id, ma_loai_diem], map: "uq_chd_dot_khoi_mon_loai")
+  @@index([khoi_id], map: "fk_chd_khoi")
+  @@index([mon_hoc_id], map: "fk_chd_mon")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model diem_danh {
+  id                    Int       @id @default(autoincrement()) @db.UnsignedInt
+  xep_lop_id            Int       @db.UnsignedInt
+  ngay_hoc              DateTime  @db.Date
+  buoi_hoc              String    @db.VarChar(10)
+  trang_thai            String    @db.VarChar(30)
+  ghi_chu               String?   @db.Text
+  giao_vien_cap_nhat_id Int       @db.UnsignedInt
+  ngay_tao              DateTime  @default(now()) @db.DateTime(0)
+  ngay_cap_nhat         DateTime  @default(now()) @db.DateTime(0)
+  giao_vien             giao_vien @relation(fields: [giao_vien_cap_nhat_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_dd_gv")
+  xep_lop               xep_lop   @relation(fields: [xep_lop_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_dd_xl")
+
+  @@unique([xep_lop_id, ngay_hoc, buoi_hoc], map: "uq_dd_xl_ngay_buoi")
+  @@index([giao_vien_cap_nhat_id], map: "fk_dd_gv")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model diem_kiem_tra_dinh_ky {
+  id                    Int                    @id @default(autoincrement()) @db.UnsignedInt
+  hoc_sinh_id           Int                    @db.UnsignedInt
+  cau_hinh_diem_id      Int                    @db.UnsignedInt
+  diem                  Decimal                @db.Decimal(4, 1)
+  giao_vien_cap_nhat_id Int?                   @db.UnsignedInt
+  ngay_tao              DateTime               @default(now()) @db.DateTime(0)
+  ngay_cap_nhat         DateTime               @default(now()) @db.DateTime(0)
+  cau_hinh_diem         cau_hinh_diem          @relation(fields: [cau_hinh_diem_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_dkt_chd")
+  giao_vien             giao_vien?             @relation(fields: [giao_vien_cap_nhat_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_dkt_gv")
+  hoc_sinh              hoc_sinh               @relation(fields: [hoc_sinh_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_dkt_hs")
+  lan_kiem_tra_dinh_ky  lan_kiem_tra_dinh_ky[]
+
+  @@unique([hoc_sinh_id, cau_hinh_diem_id], map: "uq_dkt_hs_chd")
+  @@index([cau_hinh_diem_id], map: "fk_dkt_chd")
+  @@index([giao_vien_cap_nhat_id], map: "fk_dkt_gv")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model don_xin_nghi {
+  id                 Int        @id @default(autoincrement()) @db.UnsignedInt
+  hoc_sinh_id        Int        @db.UnsignedInt
+  phu_huynh_id       Int        @db.UnsignedInt
+  ngay_bat_dau       DateTime   @db.Date
+  ngay_ket_thuc      DateTime   @db.Date
+  buoi_nghi          String     @db.VarChar(10)
+  ly_do              String     @db.Text
+  trang_thai         String     @default("CHO_DUYET") @db.VarChar(20)
+  giao_vien_duyet_id Int?       @db.UnsignedInt
+  ly_do_tu_choi      String?    @db.Text
+  ngay_gui           DateTime   @default(now()) @db.DateTime(0)
+  ngay_xu_ly         DateTime?  @db.DateTime(0)
+  giao_vien          giao_vien? @relation(fields: [giao_vien_duyet_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_dxn_gv")
+  hoc_sinh           hoc_sinh   @relation(fields: [hoc_sinh_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_dxn_hs")
+  phu_huynh          phu_huynh  @relation(fields: [phu_huynh_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_dxn_ph")
+
+  @@index([giao_vien_duyet_id], map: "fk_dxn_gv")
+  @@index([hoc_sinh_id], map: "fk_dxn_hs")
+  @@index([phu_huynh_id], map: "fk_dxn_ph")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model dot_danh_gia {
+  id                         Int                          @id @default(autoincrement()) @db.UnsignedInt
+  nam_hoc_id                 Int                          @db.UnsignedInt
+  ma_dot                     String                       @db.VarChar(20)
+  ten_dot                    String                       @db.VarChar(100)
+  hoc_ky                     String                       @db.VarChar(10)
+  thu_tu                     Int                          @db.UnsignedTinyInt
+  ngay_tao                   DateTime                     @default(now()) @db.DateTime(0)
+  ngay_cap_nhat              DateTime                     @default(now()) @db.DateTime(0)
+  cau_hinh_danh_gia_mon      cau_hinh_danh_gia_mon[]
+  cau_hinh_diem              cau_hinh_diem[]
+  nam_hoc                    nam_hoc                      @relation(fields: [nam_hoc_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_dot_nam")
+  ket_qua_mon_hoc            ket_qua_mon_hoc[]
+  ket_qua_nang_luc_pham_chat ket_qua_nang_luc_pham_chat[]
+  tong_ket_giao_duc          tong_ket_giao_duc[]
+
+  @@unique([nam_hoc_id, ma_dot], map: "uq_dot_nam_ma")
+  @@unique([nam_hoc_id, thu_tu], map: "uq_dot_nam_thutu")
+}
+
+model giao_vien {
+  id                         Int                          @id @default(autoincrement()) @db.UnsignedInt
+  ma_giao_vien               String                       @unique(map: "ma_giao_vien") @db.VarChar(20)
+  ho_ten                     String                       @db.VarChar(100)
+  ngay_sinh                  DateTime                     @db.Date
+  gioi_tinh                  String                       @db.VarChar(10)
+  so_dien_thoai              String                       @db.VarChar(15)
+  email                      String                       @db.VarChar(100)
+  dia_chi_lien_he            String                       @db.VarChar(255)
+  ngay_vao_truong            DateTime                     @db.Date
+  trinh_do_chuyen_mon        String                       @db.VarChar(100)
+  trang_thai                 String                       @default("HOAT_DONG") @db.VarChar(20)
+  tai_khoan_id               Int                          @unique(map: "tai_khoan_id") @db.UnsignedInt
+  ngay_tao                   DateTime                     @default(now()) @db.DateTime(0)
+  ngay_cap_nhat              DateTime                     @default(now()) @db.DateTime(0)
+  diem_danh                  diem_danh[]
+  diem_kiem_tra_dinh_ky      diem_kiem_tra_dinh_ky[]
+  don_xin_nghi               don_xin_nghi[]
+  tai_khoan                  tai_khoan                    @relation(fields: [tai_khoan_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_gv_tk")
+  ket_qua_mon_hoc            ket_qua_mon_hoc[]
+  ket_qua_nang_luc_pham_chat ket_qua_nang_luc_pham_chat[]
+  lan_kiem_tra_dinh_ky       lan_kiem_tra_dinh_ky[]
+  phan_cong_giao_vien        phan_cong_giao_vien[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model hoc_sinh {
+  id                         Int                          @id @default(autoincrement()) @db.UnsignedInt
+  ma_hoc_sinh                String                       @unique(map: "ma_hoc_sinh") @db.VarChar(20)
+  ho_ten                     String                       @db.VarChar(100)
+  ngay_sinh                  DateTime                     @db.Date
+  gioi_tinh                  String                       @db.VarChar(10)
+  dan_toc                    String                       @db.VarChar(50)
+  quoc_tich                  String                       @db.VarChar(50)
+  noi_sinh                   String                       @db.VarChar(255)
+  so_dien_thoai_lien_he      String                       @db.VarChar(15)
+  dia_chi_thuong_tru         String                       @db.VarChar(255)
+  dia_chi_hien_tai           String                       @db.VarChar(255)
+  ngay_nhap_hoc              DateTime                     @db.Date
+  trang_thai                 String                       @default("DANG_HOC") @db.VarChar(20)
+  ghi_chu                    String?                      @db.Text
+  ngay_tao                   DateTime                     @default(now()) @db.DateTime(0)
+  ngay_cap_nhat              DateTime                     @default(now()) @db.DateTime(0)
+  chieu_cao_cm               Decimal?                     @db.Decimal(5, 1)
+  can_nang_kg                Decimal?                     @db.Decimal(5, 2)
+  ngay_do                    DateTime?                    @db.Date
+  diem_kiem_tra_dinh_ky      diem_kiem_tra_dinh_ky[]
+  don_xin_nghi               don_xin_nghi[]
+  ket_qua_mon_hoc            ket_qua_mon_hoc[]
+  ket_qua_nang_luc_pham_chat ket_qua_nang_luc_pham_chat[]
+  phu_huynh_hoc_sinh         phu_huynh_hoc_sinh[]
+  tong_ket_giao_duc          tong_ket_giao_duc[]
+  xep_lop                    xep_lop[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model ket_qua_mon_hoc {
+  id                    Int          @id @default(autoincrement()) @db.UnsignedInt
+  hoc_sinh_id           Int          @db.UnsignedInt
+  mon_hoc_id            Int          @db.UnsignedInt
+  dot_danh_gia_id       Int          @db.UnsignedInt
+  muc_danh_gia          String       @db.VarChar(30)
+  nhan_xet              String?      @db.Text
+  giao_vien_cap_nhat_id Int          @db.UnsignedInt
+  ngay_tao              DateTime     @default(now()) @db.DateTime(0)
+  ngay_cap_nhat         DateTime     @default(now()) @db.DateTime(0)
+  dot_danh_gia          dot_danh_gia @relation(fields: [dot_danh_gia_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_kqmh_dot")
+  giao_vien             giao_vien    @relation(fields: [giao_vien_cap_nhat_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_kqmh_gv")
+  hoc_sinh              hoc_sinh     @relation(fields: [hoc_sinh_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_kqmh_hs")
+  mon_hoc               mon_hoc      @relation(fields: [mon_hoc_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_kqmh_mon")
+
+  @@unique([hoc_sinh_id, mon_hoc_id, dot_danh_gia_id], map: "uq_kqmh_hs_mon_dot")
+  @@index([dot_danh_gia_id], map: "fk_kqmh_dot")
+  @@index([giao_vien_cap_nhat_id], map: "fk_kqmh_gv")
+  @@index([mon_hoc_id], map: "fk_kqmh_mon")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model ket_qua_nang_luc_pham_chat {
+  id                    Int               @id @default(autoincrement()) @db.UnsignedInt
+  hoc_sinh_id           Int               @db.UnsignedInt
+  dot_danh_gia_id       Int               @db.UnsignedInt
+  tieu_chi_danh_gia_id  Int               @db.UnsignedInt
+  muc_danh_gia          String            @db.VarChar(20)
+  nhan_xet              String?           @db.Text
+  giao_vien_cap_nhat_id Int               @db.UnsignedInt
+  ngay_tao              DateTime          @default(now()) @db.DateTime(0)
+  ngay_cap_nhat         DateTime          @default(now()) @db.DateTime(0)
+  dot_danh_gia          dot_danh_gia      @relation(fields: [dot_danh_gia_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_kqnlpc_dot")
+  giao_vien             giao_vien         @relation(fields: [giao_vien_cap_nhat_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_kqnlpc_gv")
+  hoc_sinh              hoc_sinh          @relation(fields: [hoc_sinh_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_kqnlpc_hs")
+  tieu_chi_danh_gia     tieu_chi_danh_gia @relation(fields: [tieu_chi_danh_gia_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_kqnlpc_tc")
+
+  @@unique([hoc_sinh_id, dot_danh_gia_id, tieu_chi_danh_gia_id], map: "uq_kqnlpc_hs_dot_tc")
+  @@index([dot_danh_gia_id], map: "fk_kqnlpc_dot")
+  @@index([giao_vien_cap_nhat_id], map: "fk_kqnlpc_gv")
+  @@index([tieu_chi_danh_gia_id], map: "fk_kqnlpc_tc")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model khoi {
+  id                    Int                     @id @default(autoincrement()) @db.UnsignedInt
+  ten_khoi              String                  @db.VarChar(20)
+  so_khoi               Int                     @unique(map: "so_khoi") @db.UnsignedTinyInt
+  cau_hinh_danh_gia_mon cau_hinh_danh_gia_mon[]
+  cau_hinh_diem         cau_hinh_diem[]
+  lop_hoc               lop_hoc[]
+  mon_hoc_khoi          mon_hoc_khoi[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model lan_kiem_tra_dinh_ky {
+  id                       Int                   @id @default(autoincrement()) @db.UnsignedInt
+  diem_kiem_tra_dinh_ky_id Int                   @db.UnsignedInt
+  lan_thu                  Int                   @db.UnsignedSmallInt
+  diem                     Decimal               @db.Decimal(4, 1)
+  ngay_kiem_tra            DateTime              @db.Date
+  ly_do_kiem_tra_lai       String?               @db.Text
+  giao_vien_nhap_id        Int                   @db.UnsignedInt
+  ngay_tao                 DateTime              @default(now()) @db.DateTime(0)
+  diem_kiem_tra_dinh_ky    diem_kiem_tra_dinh_ky @relation(fields: [diem_kiem_tra_dinh_ky_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_lkt_diem")
+  giao_vien                giao_vien             @relation(fields: [giao_vien_nhap_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_lkt_gv")
+
+  @@unique([diem_kiem_tra_dinh_ky_id, lan_thu], map: "uq_lkt_diem_lan")
+  @@index([giao_vien_nhap_id], map: "fk_lkt_gv")
+}
+
+model lop_hoc {
+  id                  Int                   @id @default(autoincrement()) @db.UnsignedInt
+  nam_hoc_id          Int                   @db.UnsignedInt
+  khoi_id             Int                   @db.UnsignedInt
+  ten_lop             String                @db.VarChar(30)
+  ghi_chu             String?               @db.Text
+  ngay_tao            DateTime              @default(now()) @db.DateTime(0)
+  ngay_cap_nhat       DateTime              @default(now()) @db.DateTime(0)
+  khoi                khoi                  @relation(fields: [khoi_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_lop_khoi")
+  nam_hoc             nam_hoc               @relation(fields: [nam_hoc_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_lop_nam")
+  phan_cong_giao_vien phan_cong_giao_vien[]
+  xep_lop             xep_lop[]
+
+  @@unique([nam_hoc_id, ten_lop], map: "uq_lop_nam_ten")
+  @@index([khoi_id], map: "fk_lop_khoi")
+}
+
+model mon_hoc {
+  id                    Int                     @id @default(autoincrement()) @db.UnsignedInt
+  ma_mon_hoc            String                  @unique(map: "ma_mon_hoc") @db.VarChar(20)
+  ten_mon_hoc           String                  @db.VarChar(100)
+  trang_thai            String                  @default("HOAT_DONG") @db.VarChar(20)
+  ngay_tao              DateTime                @default(now()) @db.DateTime(0)
+  ngay_cap_nhat         DateTime                @default(now()) @db.DateTime(0)
+  cau_hinh_danh_gia_mon cau_hinh_danh_gia_mon[]
+  cau_hinh_diem         cau_hinh_diem[]
+  ket_qua_mon_hoc       ket_qua_mon_hoc[]
+  mon_hoc_khoi          mon_hoc_khoi[]
+  phan_cong_giao_vien   phan_cong_giao_vien[]
+}
+
+model mon_hoc_khoi {
+  id            Int     @id @default(autoincrement()) @db.UnsignedInt
+  mon_hoc_id    Int     @db.UnsignedInt
+  khoi_id       Int     @db.UnsignedInt
+  mac_dinh_gvcn Boolean @default(false)
+  khoi          khoi    @relation(fields: [khoi_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_mhk_khoi")
+  mon_hoc       mon_hoc @relation(fields: [mon_hoc_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_mhk_mon")
+
+  @@unique([mon_hoc_id, khoi_id], map: "uq_mhk")
+  @@index([khoi_id], map: "fk_mhk_khoi")
+}
+
+model nam_hoc {
+  id            Int            @id @default(autoincrement()) @db.UnsignedInt
+  ten_nam_hoc   String         @unique(map: "ten_nam_hoc") @db.VarChar(20)
+  trang_thai    String         @default("CHUA_BAT_DAU") @db.VarChar(20)
+  ngay_tao      DateTime       @default(now()) @db.DateTime(0)
+  ngay_cap_nhat DateTime       @default(now()) @db.DateTime(0)
+  dot_danh_gia  dot_danh_gia[]
+  lop_hoc       lop_hoc[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model phan_cong_giao_vien {
+  id              Int       @id @default(autoincrement()) @db.UnsignedInt
+  giao_vien_id    Int       @db.UnsignedInt
+  lop_hoc_id      Int       @db.UnsignedInt
+  mon_hoc_id      Int?      @db.UnsignedInt
+  loai_phan_cong  String    @db.VarChar(20)
+  nguon_phan_cong String?   @db.VarChar(20)
+  ngay_bat_dau    DateTime  @db.Date
+  ngay_ket_thuc   DateTime? @db.Date
+  ngay_tao        DateTime  @default(now()) @db.DateTime(0)
+  giao_vien       giao_vien @relation(fields: [giao_vien_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_pc_gv")
+  lop_hoc         lop_hoc   @relation(fields: [lop_hoc_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_pc_lop")
+  mon_hoc         mon_hoc?  @relation(fields: [mon_hoc_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_pc_mon")
+
+  @@index([giao_vien_id], map: "fk_pc_gv")
+  @@index([lop_hoc_id], map: "fk_pc_lop")
+  @@index([mon_hoc_id], map: "fk_pc_mon")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model phu_huynh {
+  id                 Int                  @id @default(autoincrement()) @db.UnsignedInt
+  ho_ten             String               @db.VarChar(100)
+  nam_sinh           Int?                 @db.UnsignedSmallInt
+  so_dien_thoai      String               @db.VarChar(15)
+  nghe_nghiep        String?              @db.VarChar(100)
+  tai_khoan_id       Int?                 @unique(map: "tai_khoan_id") @db.UnsignedInt
+  ngay_tao           DateTime             @default(now()) @db.DateTime(0)
+  ngay_cap_nhat      DateTime             @default(now()) @db.DateTime(0)
+  don_xin_nghi       don_xin_nghi[]
+  tai_khoan          tai_khoan?           @relation(fields: [tai_khoan_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_ph_tk")
+  phu_huynh_hoc_sinh phu_huynh_hoc_sinh[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model phu_huynh_hoc_sinh {
+  id            Int       @id @default(autoincrement()) @db.UnsignedInt
+  phu_huynh_id  Int       @db.UnsignedInt
+  hoc_sinh_id   Int       @db.UnsignedInt
+  moi_quan_he   String    @db.VarChar(20)
+  ngay_lien_ket DateTime  @default(now()) @db.DateTime(0)
+  hoc_sinh      hoc_sinh  @relation(fields: [hoc_sinh_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_phhs_hs")
+  phu_huynh     phu_huynh @relation(fields: [phu_huynh_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_phhs_ph")
+
+  @@unique([phu_huynh_id, hoc_sinh_id], map: "uq_phhs")
+  @@index([hoc_sinh_id], map: "fk_phhs_hs")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model tai_khoan {
+  id                 Int        @id @default(autoincrement()) @db.UnsignedInt
+  ten_dang_nhap      String     @unique(map: "ten_dang_nhap") @db.VarChar(50)
+  so_dien_thoai      String     @unique(map: "so_dien_thoai") @db.VarChar(15)
+  mat_khau_bam       String     @db.VarChar(255)
+  vai_tro            String     @db.VarChar(20)
+  trang_thai         String     @default("HOAT_DONG") @db.VarChar(20)
+  phai_doi_mat_khau  Boolean    @default(true)
+  lan_dang_nhap_cuoi DateTime?  @db.DateTime(0)
+  ngay_doi_mat_khau  DateTime?  @db.DateTime(0)
+  ngay_tao           DateTime   @default(now()) @db.DateTime(0)
+  ngay_cap_nhat      DateTime   @default(now()) @db.DateTime(0)
+  giao_vien          giao_vien?
+  phu_huynh          phu_huynh?
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model tieu_chi_danh_gia {
+  id                         Int                          @id @default(autoincrement()) @db.UnsignedInt
+  ma_tieu_chi                String                       @unique(map: "ma_tieu_chi") @db.VarChar(30)
+  ten_tieu_chi               String                       @db.VarChar(100)
+  nhom_danh_gia              String                       @db.VarChar(30)
+  thu_tu_hien_thi            Int                          @db.UnsignedTinyInt
+  trang_thai                 String                       @default("HOAT_DONG") @db.VarChar(20)
+  ket_qua_nang_luc_pham_chat ket_qua_nang_luc_pham_chat[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model tong_ket_giao_duc {
+  id                     Int          @id @default(autoincrement()) @db.UnsignedInt
+  hoc_sinh_id            Int          @db.UnsignedInt
+  dot_danh_gia_id        Int          @db.UnsignedInt
+  muc_ket_qua_giao_duc   String?      @db.VarChar(30)
+  ket_qua_hoan_thanh_lop String?      @db.VarChar(30)
+  ngay_xet               DateTime?    @db.DateTime(0)
+  ngay_tao               DateTime     @default(now()) @db.DateTime(0)
+  ngay_cap_nhat          DateTime     @default(now()) @db.DateTime(0)
+  dot_danh_gia           dot_danh_gia @relation(fields: [dot_danh_gia_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_tkgd_dot")
+  hoc_sinh               hoc_sinh     @relation(fields: [hoc_sinh_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_tkgd_hs")
+
+  @@unique([hoc_sinh_id, dot_danh_gia_id], map: "uq_tkgd_hs_dot")
+  @@index([dot_danh_gia_id], map: "fk_tkgd_dot")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model xep_lop {
+  id            Int         @id @default(autoincrement()) @db.UnsignedInt
+  hoc_sinh_id   Int         @db.UnsignedInt
+  lop_hoc_id    Int         @db.UnsignedInt
+  ngay_xep_lop  DateTime    @default(now()) @db.DateTime(0)
+  ngay_bat_dau  DateTime    @db.Date
+  ngay_ket_thuc DateTime?   @db.Date
+  trang_thai    String      @default("DANG_HOC") @db.VarChar(20)
+  ghi_chu       String?     @db.Text
+  diem_danh     diem_danh[]
+  hoc_sinh      hoc_sinh    @relation(fields: [hoc_sinh_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_xl_hs")
+  lop_hoc       lop_hoc     @relation(fields: [lop_hoc_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_xl_lop")
+
+  @@index([hoc_sinh_id], map: "fk_xl_hs")
+  @@index([lop_hoc_id], map: "fk_xl_lop")
+}
