@@ -9,7 +9,7 @@ import type {
   FormEvent,
 } from 'react';
 
-import api from '../api/api';
+import Api from '../api/api';
 
 import {
   DocJwt,
@@ -188,7 +188,7 @@ export default function PhanCongPage() {
             'GIAO_VIEN'
           ) {
             const Response =
-              await api.get<PhanCongCuaToiResponse>(
+              await Api.get<PhanCongCuaToiResponse>(
                 '/phan_cong_giang_day/phan_cong/cua_toi',
               );
 
@@ -212,29 +212,29 @@ export default function PhanCongPage() {
             PhanCongResponse,
           ] =
             await Promise.all([
-              api.get<{
+              Api.get<{
                 danh_sach: GiaoVien[];
               }>(
                 '/giao_vien',
               ),
 
-              api.get<Khoi[]>(
+              Api.get<Khoi[]>(
                 '/to_chuc_lop_hoc/khoi',
               ),
 
-              api.get<LopHoc[]>(
+              Api.get<LopHoc[]>(
                 '/to_chuc_lop_hoc/lop_hoc',
               ),
 
-              api.get<MonHoc[]>(
+              Api.get<MonHoc[]>(
                 '/phan_cong_giang_day/mon_hoc',
               ),
 
-              api.get<MonHocKhoi[]>(
+              Api.get<MonHocKhoi[]>(
                 '/phan_cong_giang_day/mon_hoc_khoi',
               ),
 
-              api.get<PhanCong[]>(
+              Api.get<PhanCong[]>(
                 '/phan_cong_giang_day/phan_cong',
               ),
             ]);
@@ -346,7 +346,7 @@ export default function PhanCongPage() {
     try {
       SetLoi('');
 
-      await api.post(
+      await Api.post(
         '/phan_cong_giang_day/mon_hoc',
         {
           ma_mon_hoc:
@@ -377,7 +377,7 @@ export default function PhanCongPage() {
     try {
       SetLoi('');
 
-      await api.post(
+      await Api.post(
         '/phan_cong_giang_day/mon_hoc_khoi',
         {
           mon_hoc_id:
@@ -417,7 +417,7 @@ export default function PhanCongPage() {
         LoaiPhanCong ===
         'GVCN_CHINH'
       ) {
-        await api.post(
+        await Api.post(
           '/phan_cong_giang_day/phan_cong/gvcn',
           {
             giao_vien_id:
@@ -435,7 +435,7 @@ export default function PhanCongPage() {
           },
         );
       } else {
-        await api.post(
+        await Api.post(
           '/phan_cong_giang_day/phan_cong/mon_hoc',
           {
             giao_vien_id:
@@ -489,7 +489,7 @@ export default function PhanCongPage() {
     try {
       SetLoi('');
 
-      await api.patch(
+      await Api.patch(
         `/phan_cong_giang_day/phan_cong/${Item.id}/ket_thuc`,
         {
           ngay_ket_thuc:
