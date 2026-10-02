@@ -1,10 +1,10 @@
 import {
-  docJwt,
+  DocJwt,
 } from '../auth/auth';
 
 export default function DashboardPage() {
   const nguoiDung =
-    docJwt();
+    DocJwt();
 
   return (
     <div>
