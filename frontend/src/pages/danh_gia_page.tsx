@@ -175,8 +175,8 @@ export default function DanhGiaPage() {
   ] = useState('');
 
   const [
-    diem,
-    SetDiem,
+    DiemNhap,
+    SetDiemNhap,
   ] = useState('');
 
   const [
@@ -289,22 +289,22 @@ export default function DanhGiaPage() {
         try {
           SetLoi('');
 
-          const dotResponse =
+          const DotResponse =
             await Api.get<DotDanhGia[]>(
               '/danh_gia_hoc_tap/dot_danh_gia',
             );
 
           SetDotDanhGia(
-            dotResponse.data,
+            DotResponse.data,
           );
 
-          const tieuChiResponse =
+          const TieuChiResponse =
             await Api.get<TieuChi[]>(
               '/danh_gia_hoc_tap/tieu_chi_danh_gia',
             );
 
           SetTieuChi(
-            tieuChiResponse.data,
+            TieuChiResponse.data,
           );
 
           if (LaAdmin) {
@@ -341,19 +341,19 @@ export default function DanhGiaPage() {
           }
 
           if (LaGiaoVien) {
-            const response =
+            const Response =
               await Api.get<PhanCongCuaToiResponse>(
                 '/phan_cong_giang_day/phan_cong/cua_toi',
               );
 
             SetPhanCong(
-              response.data.phan_cong,
+              Response.data.phan_cong,
             );
           }
-        } catch (error: unknown) {
+        } catch (Error: unknown) {
           SetLoi(
             LayThongBaoLoi(
-              error,
+              Error,
             ),
           );
         }
@@ -376,23 +376,23 @@ export default function DanhGiaPage() {
   const LopDuocPhanCong =
     useMemo(
       () => {
-        const map =
+        const BanDo =
           new Map<
             number,
             PhanCong['lop_hoc']
           >();
 
         PhanCong.forEach(
-          (item) => {
-            map.set(
-              item.lop_hoc.id,
-              item.lop_hoc,
+          (Item) => {
+            BanDo.set(
+              Item.lop_hoc.id,
+              Item.lop_hoc,
             );
           },
         );
 
         return [
-          ...map.values(),
+          ...BanDo.values(),
         ];
       },
       [
@@ -405,28 +405,28 @@ export default function DanhGiaPage() {
       () =>
         PhanCong
           .filter(
-            (item) =>
+            (Item) =>
               String(
-                item.lop_hoc_id,
+                Item.lop_hoc_id,
               ) ===
                 LopHocId &&
-              item.mon_hoc,
+              Item.mon_hoc,
           )
           .map(
-            (item) =>
-              item.mon_hoc!,
+            (Item) =>
+              Item.mon_hoc!,
           )
           .filter(
             (
-              item,
-              index,
-              array,
+              Item,
+              ViTri,
+              DanhSachMon,
             ) =>
-              array.findIndex(
-                (mon) =>
-                  mon.id ===
-                  item.id,
-              ) === index,
+              DanhSachMon.findIndex(
+                (Mon) =>
+                  Mon.id ===
+                  Item.id,
+              ) === ViTri,
           ),
       [
         PhanCong,
@@ -452,44 +452,44 @@ export default function DanhGiaPage() {
     }
 
     try {
-      const response =
+      const Response =
         await Api.get<HocSinhLopResponse>(
-          `/danh_gia_hoc_tap/lop/${id}/hoc_sinh`,
+          `/danh_gia_hoc_tap/Lop/${id}/hoc_sinh`,
         );
 
       SetHocSinh(
-        response.data.hoc_sinh,
+        Response.data.hoc_sinh,
       );
 
       if (
-        response.data.hoc_sinh[0]
+        Response.data.hoc_sinh[0]
       ) {
         SetHocSinhId(
           String(
-            response.data.hoc_sinh[0]
+            Response.data.hoc_sinh[0]
               .hoc_sinh.id,
           ),
         );
       }
-    } catch (error: unknown) {
+    } catch (Error: unknown) {
       SetLoi(
         LayThongBaoLoi(
-          error,
+          Error,
         ),
       );
     }
   }
 
   async function TaiCauHinhDiem() {
-    const lop =
+    const Lop =
       LopDuocPhanCong.find(
-        (item) =>
-          String(item.id) ===
+        (Item) =>
+          String(Item.id) ===
           LopHocId,
       );
 
     if (
-      !lop ||
+      !Lop ||
       !DotId ||
       !MonId
     ) {
@@ -497,7 +497,7 @@ export default function DanhGiaPage() {
     }
 
     try {
-      const response =
+      const Response =
         await Api.get<CauHinhDiem[]>(
           '/danh_gia_hoc_tap/cau_hinh_diem',
           {
@@ -506,7 +506,7 @@ export default function DanhGiaPage() {
                 Number(DotId),
 
               khoi_id:
-                lop.khoi_id,
+                Lop.khoi_id,
 
               mon_hoc_id:
                 Number(MonId),
@@ -515,13 +515,13 @@ export default function DanhGiaPage() {
         );
 
       SetCauHinhDiem(
-        response.data,
+        Response.data,
       );
 
       const NhapTay =
-        response.data.find(
-          (item) =>
-            item.cach_nhap ===
+        Response.data.find(
+          (Item) =>
+            Item.cach_nhap ===
             'NHAP_TAY',
         );
 
@@ -532,19 +532,19 @@ export default function DanhGiaPage() {
             )
           : '',
       );
-    } catch (error: unknown) {
+    } catch (Error: unknown) {
       SetLoi(
         LayThongBaoLoi(
-          error,
+          Error,
         ),
       );
     }
   }
 
   async function LuuKetQuaMon(
-    event: FormEvent,
+    Event: FormEvent,
   ) {
-    event.preventDefault();
+    Event.preventDefault();
 
     try {
       SetLoi('');
@@ -578,19 +578,19 @@ export default function DanhGiaPage() {
       window.alert(
         'Lưu kết quả môn học thành công',
       );
-    } catch (error: unknown) {
+    } catch (Error: unknown) {
       SetLoi(
         LayThongBaoLoi(
-          error,
+          Error,
         ),
       );
     }
   }
 
   async function LuuDiem(
-    event: FormEvent,
+    Event: FormEvent,
   ) {
-    event.preventDefault();
+    Event.preventDefault();
 
     try {
       SetLoi('');
@@ -610,7 +610,7 @@ export default function DanhGiaPage() {
 
           diem:
             Number(
-              diem,
+              DiemNhap,
             ),
 
           ngay_kiem_tra:
@@ -618,24 +618,24 @@ export default function DanhGiaPage() {
         },
       );
 
-      SetDiem('');
+      SetDiemNhap('');
 
       window.alert(
         'Nhập điểm thành công',
       );
-    } catch (error: unknown) {
+    } catch (Error: unknown) {
       SetLoi(
         LayThongBaoLoi(
-          error,
+          Error,
         ),
       );
     }
   }
 
   async function LuuNangLuc(
-    event: FormEvent,
+    Event: FormEvent,
   ) {
-    event.preventDefault();
+    Event.preventDefault();
 
     try {
       SetLoi('');
@@ -666,19 +666,19 @@ export default function DanhGiaPage() {
       window.alert(
         'Lưu năng lực/phẩm chất thành công',
       );
-    } catch (error: unknown) {
+    } catch (Error: unknown) {
       SetLoi(
         LayThongBaoLoi(
-          error,
+          Error,
         ),
       );
     }
   }
 
   async function TaoDot(
-    event: FormEvent,
+    Event: FormEvent,
   ) {
-    event.preventDefault();
+    Event.preventDefault();
 
     try {
       await Api.post(
@@ -707,19 +707,19 @@ export default function DanhGiaPage() {
 
       SetAdminTenDot('');
       await TaiDanhMuc();
-    } catch (error: unknown) {
+    } catch (Error: unknown) {
       SetLoi(
         LayThongBaoLoi(
-          error,
+          Error,
         ),
       );
     }
   }
 
   async function TaoCauHinhMon(
-    event: FormEvent,
+    Event: FormEvent,
   ) {
-    event.preventDefault();
+    Event.preventDefault();
 
     try {
       await Api.post(
@@ -745,19 +745,19 @@ export default function DanhGiaPage() {
       window.alert(
         'Đã cấu hình môn cho đợt đánh giá',
       );
-    } catch (error: unknown) {
+    } catch (Error: unknown) {
       SetLoi(
         LayThongBaoLoi(
-          error,
+          Error,
         ),
       );
     }
   }
 
   async function TaoCauHinhDiem(
-    event: FormEvent,
+    Event: FormEvent,
   ) {
-    event.preventDefault();
+    Event.preventDefault();
 
     try {
       await Api.post(
@@ -801,19 +801,19 @@ export default function DanhGiaPage() {
       window.alert(
         'Đã tạo cấu hình điểm',
       );
-    } catch (error: unknown) {
+    } catch (Error: unknown) {
       SetLoi(
         LayThongBaoLoi(
-          error,
+          Error,
         ),
       );
     }
   }
 
   async function TaoTieuChi(
-    event: FormEvent,
+    Event: FormEvent,
   ) {
-    event.preventDefault();
+    Event.preventDefault();
 
     try {
       await Api.post(
@@ -836,10 +836,10 @@ export default function DanhGiaPage() {
       SetAdminTieuChiMa('');
       SetAdminTieuChiTen('');
       await TaiDanhMuc();
-    } catch (error: unknown) {
+    } catch (Error: unknown) {
       SetLoi(
         LayThongBaoLoi(
-          error,
+          Error,
         ),
       );
     }
@@ -878,9 +878,9 @@ export default function DanhGiaPage() {
                 AdminNamHocId
               }
               onChange={
-                (event) =>
+                (Event) =>
                   SetAdminNamHocId(
-                    event.target.value,
+                    Event.target.value,
                   )
               }
               required
@@ -891,17 +891,17 @@ export default function DanhGiaPage() {
               </option>
 
               {NamHoc.map(
-                (item) => (
+                (Item) => (
                   <option
                     key={
-                      item.id
+                      Item.id
                     }
                     value={
-                      item.id
+                      Item.id
                     }
                   >
                     {
-                      item.ten_nam_hoc
+                      Item.ten_nam_hoc
                     }
                   </option>
                 ),
@@ -917,9 +917,9 @@ export default function DanhGiaPage() {
                 AdminMaDot
               }
               onChange={
-                (event) => {
+                (Event) => {
                   const GiaTri =
-                    event.target.value;
+                    Event.target.value;
 
                   SetAdminMaDot(
                     GiaTri,
@@ -959,9 +959,9 @@ export default function DanhGiaPage() {
                 AdminTenDot
               }
               onChange={
-                (event) =>
+                (Event) =>
                   SetAdminTenDot(
-                    event.target.value,
+                    Event.target.value,
                   )
               }
               placeholder="VD: Giữa học kỳ I năm học 2026-2027"
@@ -981,9 +981,9 @@ export default function DanhGiaPage() {
                 AdminThuTu
               }
               onChange={
-                (event) =>
+                (Event) =>
                   SetAdminThuTu(
-                    event.target.value,
+                    Event.target.value,
                   )
               }
               className="mt-3 w-full rounded-lg border px-3 py-2"
@@ -1016,33 +1016,33 @@ export default function DanhGiaPage() {
                 AdminDotId
               }
               onChange={
-                (event) =>
+                (Event) =>
                   SetAdminDotId(
-                    event.target.value,
+                    Event.target.value,
                   )
               }
               required
-              className="mt-4 w-full rounded-lg border px-3 py-2"
+              className="mt-1 w-full rounded-lg border px-3 py-2"
             >
               <option value="">
                 Chọn đợt
               </option>
 
               {DotDanhGia.map(
-                (item) => (
+                (Item) => (
                   <option
                     key={
-                      item.id
+                      Item.id
                     }
                     value={
-                      item.id
+                      Item.id
                     }
                   >
                     {
-                      item.nam_hoc
+                      Item.nam_hoc
                         .ten_nam_hoc
                     } - {
-                      item.ten_dot
+                      Item.ten_dot
                     }
                   </option>
                 ),
@@ -1058,9 +1058,9 @@ export default function DanhGiaPage() {
                 AdminKhoiId
               }
               onChange={
-                (event) =>
+                (Event) =>
                   SetAdminKhoiId(
-                    event.target.value,
+                    Event.target.value,
                   )
               }
               required
@@ -1071,17 +1071,17 @@ export default function DanhGiaPage() {
               </option>
 
               {Khoi.map(
-                (item) => (
+                (Item) => (
                   <option
                     key={
-                      item.id
+                      Item.id
                     }
                     value={
-                      item.id
+                      Item.id
                     }
                   >
                     {
-                      item.ten_khoi
+                      Item.ten_khoi
                     }
                   </option>
                 ),
@@ -1097,9 +1097,9 @@ export default function DanhGiaPage() {
                 AdminMonId
               }
               onChange={
-                (event) =>
+                (Event) =>
                   SetAdminMonId(
-                    event.target.value,
+                    Event.target.value,
                   )
               }
               required
@@ -1110,17 +1110,17 @@ export default function DanhGiaPage() {
               </option>
 
               {MonHoc.map(
-                (item) => (
+                (Item) => (
                   <option
                     key={
-                      item.id
+                      Item.id
                     }
                     value={
-                      item.id
+                      Item.id
                     }
                   >
                     {
-                      item.ten_mon_hoc
+                      Item.ten_mon_hoc
                     }
                   </option>
                 ),
@@ -1149,44 +1149,56 @@ export default function DanhGiaPage() {
               Dùng đợt, khối và môn đang chọn ở khung trên.
             </p>
 
+            <label className="mt-4 block text-sm font-medium text-slate-700">
+              Mã loại điểm
+            </label>
+
             <input
               value={
                 AdminMaLoaiDiem
               }
               onChange={
-                (event) =>
+                (Event) =>
                   SetAdminMaLoaiDiem(
-                    event.target.value,
+                    Event.target.value,
                   )
               }
-              placeholder="Mã loại điểm, ví dụ DOC"
+              placeholder="VD: DOC, VIET, KT_DINH_KY"
               required
               className="mt-4 w-full rounded-lg border px-3 py-2"
             />
+
+            <label className="mt-3 block text-sm font-medium text-slate-700">
+              Tên hiển thị
+            </label>
 
             <input
               value={
                 AdminTenLoaiDiem
               }
               onChange={
-                (event) =>
+                (Event) =>
                   SetAdminTenLoaiDiem(
-                    event.target.value,
+                    Event.target.value,
                   )
               }
-              placeholder="Tên hiển thị"
+              placeholder="VD: Điểm đọc, Điểm viết"
               required
               className="mt-3 w-full rounded-lg border px-3 py-2"
             />
+
+            <label className="mt-3 block text-sm font-medium text-slate-700">
+              Cách nhập điểm
+            </label>
 
             <select
               value={
                 AdminCachNhap
               }
               onChange={
-                (event) =>
+                (Event) =>
                   SetAdminCachNhap(
-                    event.target.value,
+                    Event.target.value,
                   )
               }
               className="mt-3 w-full rounded-lg border px-3 py-2"
@@ -1217,44 +1229,56 @@ export default function DanhGiaPage() {
               Tiêu chí năng lực / phẩm chất
             </h2>
 
+            <label className="mt-4 block text-sm font-medium text-slate-700">
+              Mã tiêu chí
+            </label>
+
             <input
               value={
                 AdminTieuChiMa
               }
               onChange={
-                (event) =>
+                (Event) =>
                   SetAdminTieuChiMa(
-                    event.target.value,
+                    Event.target.value,
                   )
               }
-              placeholder="Mã tiêu chí"
+              placeholder="VD: TU_PHUC_VU, CHAM_HOC"
               required
               className="mt-4 w-full rounded-lg border px-3 py-2"
             />
+
+            <label className="mt-3 block text-sm font-medium text-slate-700">
+              Tên tiêu chí
+            </label>
 
             <input
               value={
                 AdminTieuChiTen
               }
               onChange={
-                (event) =>
+                (Event) =>
                   SetAdminTieuChiTen(
-                    event.target.value,
+                    Event.target.value,
                   )
               }
-              placeholder="Tên tiêu chí"
+              placeholder="VD: Tự phục vụ, Chăm học"
               required
               className="mt-3 w-full rounded-lg border px-3 py-2"
             />
+
+            <label className="mt-3 block text-sm font-medium text-slate-700">
+              Nhóm đánh giá
+            </label>
 
             <select
               value={
                 AdminTieuChiNhom
               }
               onChange={
-                (event) =>
+                (Event) =>
                   SetAdminTieuChiNhom(
-                    event.target.value,
+                    Event.target.value,
                   )
               }
               className="mt-3 w-full rounded-lg border px-3 py-2"
@@ -1306,9 +1330,9 @@ export default function DanhGiaPage() {
               LopHocId
             }
             onChange={
-              (event) =>
+              (Event) =>
                 void TaiHocSinhLop(
-                  event.target.value,
+                  Event.target.value,
                 )
             }
             className="rounded-lg border px-3 py-2"
@@ -1318,20 +1342,20 @@ export default function DanhGiaPage() {
             </option>
 
             {LopDuocPhanCong.map(
-              (item) => (
+              (Item) => (
                 <option
                   key={
-                    item.id
+                    Item.id
                   }
                   value={
-                    item.id
+                    Item.id
                   }
                 >
                   {
-                    item.nam_hoc
+                    Item.nam_hoc
                       .ten_nam_hoc
                   } - {
-                    item.ten_lop
+                    Item.ten_lop
                   }
                 </option>
               ),
@@ -1348,9 +1372,9 @@ export default function DanhGiaPage() {
               HocSinhId
             }
             onChange={
-              (event) =>
+              (Event) =>
                 SetHocSinhId(
-                  event.target.value,
+                  Event.target.value,
                 )
             }
             className="rounded-lg border px-3 py-2"
@@ -1360,20 +1384,20 @@ export default function DanhGiaPage() {
             </option>
 
             {HocSinh.map(
-              (item) => (
+              (Item) => (
                 <option
                   key={
-                    item.hoc_sinh.id
+                    Item.hoc_sinh.id
                   }
                   value={
-                    item.hoc_sinh.id
+                    Item.hoc_sinh.id
                   }
                 >
                   {
-                    item.hoc_sinh
+                    Item.hoc_sinh
                       .ma_hoc_sinh
                   } - {
-                    item.hoc_sinh
+                    Item.hoc_sinh
                       .ho_ten
                   }
                 </option>
@@ -1391,9 +1415,9 @@ export default function DanhGiaPage() {
               DotId
             }
             onChange={
-              (event) =>
+              (Event) =>
                 SetDotId(
-                  event.target.value,
+                  Event.target.value,
                 )
             }
             className="rounded-lg border px-3 py-2"
@@ -1403,20 +1427,20 @@ export default function DanhGiaPage() {
             </option>
 
             {DotDanhGia.map(
-              (item) => (
+              (Item) => (
                 <option
                   key={
-                    item.id
+                    Item.id
                   }
                   value={
-                    item.id
+                    Item.id
                   }
                 >
                   {
-                    item.nam_hoc
+                    Item.nam_hoc
                       .ten_nam_hoc
                   } - {
-                    item.ten_dot
+                    Item.ten_dot
                   }
                 </option>
               ),
@@ -1433,9 +1457,9 @@ export default function DanhGiaPage() {
               MonId
             }
             onChange={
-              (event) => {
+              (Event) => {
                 SetMonId(
-                  event.target.value,
+                  Event.target.value,
                 );
 
                 SetCauHinhDiem(
@@ -1450,17 +1474,17 @@ export default function DanhGiaPage() {
             </option>
 
             {MonDuocDay.map(
-              (item) => (
+              (Item) => (
                 <option
                   key={
-                    item.id
+                    Item.id
                   }
                   value={
-                    item.id
+                    Item.id
                   }
                 >
                   {
-                    item.ten_mon_hoc
+                    Item.ten_mon_hoc
                   }
                 </option>
               ),
@@ -1492,14 +1516,18 @@ export default function DanhGiaPage() {
             Kết quả môn học
           </h2>
 
+          <label className="mt-4 block text-sm font-medium text-slate-700">
+            Mức đánh giá môn học
+          </label>
+
           <input
             value={
               MucDanhGia
             }
             onChange={
-              (event) =>
+              (Event) =>
                 SetMucDanhGia(
-                  event.target.value,
+                  Event.target.value,
                 )
             }
             placeholder="Nhập mức đánh giá theo quy định của trường"
@@ -1507,14 +1535,18 @@ export default function DanhGiaPage() {
             className="mt-4 w-full rounded-lg border px-3 py-2"
           />
 
+          <label className="mt-3 block text-sm font-medium text-slate-700">
+            Nhận xét
+          </label>
+
           <textarea
             value={
               NhanXet
             }
             onChange={
-              (event) =>
+              (Event) =>
                 SetNhanXet(
-                  event.target.value,
+                  Event.target.value,
                 )
             }
             placeholder="Nhập nhận xét ngắn gọn, rõ ràng về học sinh"
@@ -1539,14 +1571,18 @@ export default function DanhGiaPage() {
             Điểm định kỳ
           </h2>
 
+          <label className="mt-4 block text-sm font-medium text-slate-700">
+            Loại điểm
+          </label>
+
           <select
             value={
               CauHinhDiemId
             }
             onChange={
-              (event) =>
+              (Event) =>
                 SetCauHinhDiemId(
-                  event.target.value,
+                  Event.target.value,
                 )
             }
             required
@@ -1558,27 +1594,31 @@ export default function DanhGiaPage() {
 
             {CauHinhDiem
               .filter(
-                (item) =>
-                  item.cach_nhap ===
+                (Item) =>
+                  Item.cach_nhap ===
                   'NHAP_TAY',
               )
               .map(
-                (item) => (
+                (Item) => (
                   <option
                     key={
-                      item.id
+                      Item.id
                     }
                     value={
-                      item.id
+                      Item.id
                     }
                   >
                     {
-                      item.ten_hien_thi
+                      Item.ten_hien_thi
                     }
                   </option>
                 ),
               )}
           </select>
+
+          <label className="mt-3 block text-sm font-medium text-slate-700">
+            Điểm
+          </label>
 
           <input
             type="number"
@@ -1586,12 +1626,12 @@ export default function DanhGiaPage() {
             max="10"
             step="0.1"
             value={
-              diem
+              DiemNhap
             }
             onChange={
-              (event) =>
-                SetDiem(
-                  event.target.value,
+              (Event) =>
+                SetDiemNhap(
+                  Event.target.value,
                 )
             }
             placeholder="Điểm"
@@ -1599,19 +1639,28 @@ export default function DanhGiaPage() {
             className="mt-3 w-full rounded-lg border px-3 py-2"
           />
 
+          <label className="mt-3 block text-sm font-medium text-slate-700">
+            Ngày kiểm tra
+          </label>
+
           <input
             type="date"
             value={
               NgayKiemTra
             }
             onChange={
-              (event) =>
+              (Event) =>
                 SetNgayKiemTra(
-                  event.target.value,
+                  Event.target.value,
                 )
             }
+            max={
+              new Date()
+                .toISOString()
+                .slice(0, 10)
+            }
             required
-            className="mt-3 w-full rounded-lg border px-3 py-2"
+            className="mt-1 w-full rounded-lg border px-3 py-2"
           />
 
           <button
@@ -1632,14 +1681,18 @@ export default function DanhGiaPage() {
             Năng lực / phẩm chất
           </h2>
 
+          <label className="mt-4 block text-sm font-medium text-slate-700">
+            Tiêu chí
+          </label>
+
           <select
             value={
               TieuChiId
             }
             onChange={
-              (event) =>
+              (Event) =>
                 SetTieuChiId(
-                  event.target.value,
+                  Event.target.value,
                 )
             }
             required
@@ -1650,33 +1703,37 @@ export default function DanhGiaPage() {
             </option>
 
             {TieuChi.map(
-              (item) => (
+              (Item) => (
                 <option
                   key={
-                    item.id
+                    Item.id
                   }
                   value={
-                    item.id
+                    Item.id
                   }
                 >
                   {
-                    item.nhom_danh_gia
+                    Item.nhom_danh_gia
                   } - {
-                    item.ten_tieu_chi
+                    Item.ten_tieu_chi
                   }
                 </option>
               ),
             )}
           </select>
 
+          <label className="mt-3 block text-sm font-medium text-slate-700">
+            Mức đánh giá
+          </label>
+
           <input
             value={
               MucNangLuc
             }
             onChange={
-              (event) =>
+              (Event) =>
                 SetMucNangLuc(
-                  event.target.value,
+                  Event.target.value,
                 )
             }
             placeholder="Nhập mức đánh giá theo quy định của trường"
