@@ -1,5 +1,6 @@
 import {
   DocJwt,
+  LayTenVaiTro,
 } from '../auth/auth';
 
 export default function DashboardPage() {
@@ -28,7 +29,11 @@ export default function DashboardPage() {
         với vai trò{' '}
 
         <strong>
-          {NguoiDung?.vai_tro}
+          {
+            LayTenVaiTro(
+              NguoiDung?.vai_tro,
+            )
+          }
         </strong>
       </p>
 
@@ -106,7 +111,11 @@ export default function DashboardPage() {
               font-bold
             "
           >
-            {NguoiDung?.vai_tro}
+            {
+              LayTenVaiTro(
+                NguoiDung?.vai_tro,
+              )
+            }
           </p>
         </div>
       </div>
