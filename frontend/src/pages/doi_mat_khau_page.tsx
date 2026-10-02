@@ -13,8 +13,8 @@ import {
 import api from '../api/api';
 
 import {
-  dangXuat,
-  luuToken,
+  DangXuat,
+  LuuToken,
 } from '../auth/auth';
 
 interface DoiMatKhauResponse {
@@ -90,7 +90,7 @@ export default function DoiMatKhauPage() {
           },
         );
 
-      luuToken(
+      LuuToken(
         response.data.access_token,
       );
 
@@ -110,7 +110,7 @@ export default function DoiMatKhauPage() {
   }
 
   function xuLyDangXuat() {
-    dangXuat();
+    DangXuat();
 
     navigate(
       '/dang_nhap',
