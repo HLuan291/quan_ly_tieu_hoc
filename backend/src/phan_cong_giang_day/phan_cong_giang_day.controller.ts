@@ -23,7 +23,7 @@ import {
 
 import {
   PhanCongGiangDayService,
-} from './phan_cong_giang_day.Service';
+} from './phan_cong_giang_day.service';
 
 import {
   CapNhatMonHocDto,
