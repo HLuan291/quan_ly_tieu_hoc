@@ -9,7 +9,7 @@ import type {
   FormEvent,
 } from 'react';
 
-import api from '../api/api';
+import Api from '../api/api';
 
 import {
   DocJwt,
@@ -203,7 +203,7 @@ export default function HocSinhPage() {
           SetLoi('');
 
           const Response =
-            await api.get<DanhSachResponse>(
+            await Api.get<DanhSachResponse>(
               '/ho_so_hoc_sinh/hoc_sinh',
               {
                 params: {
@@ -440,7 +440,7 @@ export default function HocSinhPage() {
       );
 
       const Response =
-        await api.post(
+        await Api.post(
           '/ho_so_hoc_sinh/hoc_sinh',
           {
             hoc_sinh: {
@@ -551,7 +551,7 @@ export default function HocSinhPage() {
     try {
       SetLoi('');
 
-      await api.patch(
+      await Api.patch(
         `/ho_so_hoc_sinh/hoc_sinh/${HocSinhItem.id}/suc_khoe`,
         {
           chieu_cao_cm:
