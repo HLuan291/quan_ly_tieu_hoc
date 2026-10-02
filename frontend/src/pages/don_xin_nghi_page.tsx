@@ -7,7 +7,7 @@ import type {
   FormEvent,
 } from 'react';
 
-import api from '../api/api';
+import Api from '../api/api';
 
 import {
   DocJwt,
@@ -140,11 +140,11 @@ export default function DonXinNghiPage() {
               DonResponse,
             ] =
               await Promise.all([
-                api.get<PhuHuynhMeResponse>(
+                Api.get<PhuHuynhMeResponse>(
                   '/ho_so_hoc_sinh/phu_huynh/me',
                 ),
 
-                api.get<DonXinNghi[]>(
+                Api.get<DonXinNghi[]>(
                   '/diem_danh_nghi_hoc/don_xin_nghi/cua_toi',
                 ),
               ]);
@@ -178,7 +178,7 @@ export default function DonXinNghiPage() {
 
           if (LaGiaoVien) {
             const Response =
-              await api.get<LopChuNhiem[]>(
+              await Api.get<LopChuNhiem[]>(
                 '/diem_danh_nghi_hoc/lop_chu_nhiem_cua_toi',
               );
 
@@ -231,7 +231,7 @@ export default function DonXinNghiPage() {
 
     try {
       const Response =
-        await api.get<DonXinNghi[]>(
+        await Api.get<DonXinNghi[]>(
           `/diem_danh_nghi_hoc/don_xin_nghi/Lop/${Id}`,
         );
 
@@ -255,7 +255,7 @@ export default function DonXinNghiPage() {
     try {
       SetLoi('');
 
-      await api.post(
+      await Api.post(
         '/diem_danh_nghi_hoc/don_xin_nghi',
         {
           hoc_sinh_id:
@@ -280,7 +280,7 @@ export default function DonXinNghiPage() {
       SetLyDo('');
 
       const Response =
-        await api.get<DonXinNghi[]>(
+        await Api.get<DonXinNghi[]>(
           '/diem_danh_nghi_hoc/don_xin_nghi/cua_toi',
         );
 
@@ -323,7 +323,7 @@ export default function DonXinNghiPage() {
     try {
       SetLoi('');
 
-      await api.patch(
+      await Api.patch(
         `/diem_danh_nghi_hoc/don_xin_nghi/${Item.Id}/xu_ly`,
         {
           trang_thai:
