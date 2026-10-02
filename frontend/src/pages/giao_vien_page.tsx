@@ -1,5 +1,4 @@
 import {
-  FormEvent,
   useCallback,
   useEffect,
   useState,
@@ -7,6 +6,7 @@ import {
 
 import type {
   ChangeEvent,
+  FormEvent,
 } from 'react';
 
 import axios from 'axios';
