@@ -22,26 +22,29 @@ import DashboardPage
 import GiaoVienPage
   from './pages/giao_vien_page';
 
+import HocSinhPage
+  from './pages/hoc_sinh_page';
+
+import LopHocPage
+  from './pages/lop_hoc_page';
+
+import PhanCongPage
+  from './pages/phan_cong_page';
+
+import DiemDanhPage
+  from './pages/diem_danh_page';
+
+import DonXinNghiPage
+  from './pages/don_xin_nghi_page';
+
+import DanhGiaPage
+  from './pages/danh_gia_page';
+
+import ConCuaToiPage
+  from './pages/con_cua_toi_page';
+
 import KhongCoQuyenPage
   from './pages/khong_co_quyen_page';
-
-function TrangTam({
-  ten,
-}: {
-  ten: string;
-}) {
-  return (
-    <div>
-      <h1 className="text-2xl font-bold text-slate-800">
-        {ten}
-      </h1>
-
-      <p className="mt-2 text-slate-500">
-        Màn hình đang được hoàn thiện.
-      </p>
-    </div>
-  );
-}
 
 export default function App() {
   return (
@@ -94,49 +97,49 @@ export default function App() {
           <Route
             path="/hoc_sinh"
             element={
-              <TrangTam ten="Quản lý học sinh" />
+              <HocSinhPage />
             }
           />
 
           <Route
             path="/lop_hoc"
             element={
-              <TrangTam ten="Tổ chức lớp học" />
+              <LopHocPage />
             }
           />
 
           <Route
             path="/phan_cong"
             element={
-              <TrangTam ten="Phân công giảng dạy" />
+              <PhanCongPage />
             }
           />
 
           <Route
             path="/diem_danh"
             element={
-              <TrangTam ten="Điểm danh" />
+              <DiemDanhPage />
             }
           />
 
           <Route
             path="/don_xin_nghi"
             element={
-              <TrangTam ten="Đơn xin nghỉ" />
+              <DonXinNghiPage />
             }
           />
 
           <Route
             path="/danh_gia"
             element={
-              <TrangTam ten="Đánh giá học tập" />
+              <DanhGiaPage />
             }
           />
 
           <Route
             path="/con_cua_toi"
             element={
-              <TrangTam ten="Con của tôi" />
+              <ConCuaToiPage />
             }
           />
         </Route>
