@@ -3,19 +3,28 @@ import { PrismaService } from './prisma.service';
 
 @Injectable()
 export class AppService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly Prisma:
+      PrismaService,
+  ) {}
 
-  getHello(): string {
+  GetHello(): string {
     return 'Hello World!';
   }
 
-  async kiemTraDatabase() {
-    const soTaiKhoan = await this.prisma.tai_khoan.count();
+  async KiemTraDatabase() {
+    const SoTaiKhoan =
+      await this.Prisma.tai_khoan.count();
 
     return {
-      ket_noi_database: 'THANH_CONG',
-      bang_kiem_tra: 'tai_khoan',
-      so_ban_ghi: soTaiKhoan,
+      ket_noi_database:
+        'THANH_CONG',
+
+      bang_kiem_tra:
+        'tai_khoan',
+
+      so_ban_ghi:
+        SoTaiKhoan,
     };
   }
 }
