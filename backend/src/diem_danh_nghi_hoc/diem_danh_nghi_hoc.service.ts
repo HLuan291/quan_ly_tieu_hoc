@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { PrismaService } from '../Prisma.service';
+import { PrismaService } from '../prisma.service';
 
 import {
   DiemDanhHangLoatDto,
