@@ -104,7 +104,7 @@ export default function MainLayout() {
       (Item) =>
         NguoiDung &&
         Item.VaiTro.includes(
-          NguoiDung.VaiTro,
+          NguoiDung.vai_tro,
         ),
     );
 
@@ -141,7 +141,7 @@ export default function MainLayout() {
               text-slate-400
             "
           >
-            {NguoiDung?.VaiTro}
+            {NguoiDung?.vai_tro}
           </p>
         </div>
 
@@ -155,9 +155,7 @@ export default function MainLayout() {
                 to={
                   Item.DuongDan
                 }
-                className={({
-                  IsActive,
-                }) =>
+                className={({ isActive: IsActive }) =>
                   `
                     mb-1
                     block
