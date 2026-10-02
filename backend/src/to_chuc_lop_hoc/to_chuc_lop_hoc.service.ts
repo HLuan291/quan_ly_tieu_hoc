@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { PrismaService } from '../prisma.service';
+import { PrismaService } from '../Prisma.service';
 
 import {
   CapNhatLopHocDto,
@@ -19,78 +19,125 @@ import {
 @Injectable()
 export class ToChucLopHocService {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly Prisma: PrismaService,
   ) {}
 
   // ==================================================
   // HÀM DÙNG CHUNG
   // ==================================================
 
-  private chuyenNgay(
-    giaTri: string,
-    tenTruong: string,
+  private ChuyenNgay(
+    GiaTri: string,
+    TenTruong: string,
   ): Date {
-    const ngay = new Date(
-      `${giaTri}T00:00:00.000Z`,
+    const Ngay = new Date(
+      `${GiaTri}T00:00:00.000Z`,
     );
 
-    if (Number.isNaN(ngay.getTime())) {
+    if (
+      !/^\d{4}-\d{2}-\d{2}$/.test(
+        GiaTri,
+      ) ||
+      Number.isNaN(
+        Ngay.getTime(),
+      ) ||
+      Ngay.toISOString().slice(0, 10) !==
+        GiaTri
+    ) {
       throw new BadRequestException(
-        `${tenTruong} không hợp lệ`,
+        `${TenTruong} không hợp lệ`,
       );
     }
 
-    return ngay;
+    return Ngay;
   }
 
-  private homNay(): Date {
-    const ngay = new Date();
+  private HomNay(): Date {
+    const Ngay = new Date();
 
-    ngay.setUTCHours(
+    Ngay.setUTCHours(
       0,
       0,
       0,
       0,
     );
 
-    return ngay;
+    return Ngay;
+  }
+
+  private KiemTraTenNamHoc(
+    TenNamHoc: string,
+  ) {
+    const KetQua =
+      /^(\d{4})-(\d{4})$/.exec(
+        TenNamHoc,
+      );
+
+    if (!KetQua) {
+      throw new BadRequestException(
+        'Năm học phải có dạng YYYY-YYYY, ví dụ: 2026-2027',
+      );
+    }
+
+    const NamBatDau =
+      Number(
+        KetQua[1],
+      );
+
+    const NamKetThuc =
+      Number(
+        KetQua[2],
+      );
+
+    if (
+      NamKetThuc !==
+      NamBatDau + 1
+    ) {
+      throw new BadRequestException(
+        'Năm kết thúc phải lớn hơn năm bắt đầu đúng 1 năm',
+      );
+    }
   }
 
   // ==================================================
   // 1. TẠO NĂM HỌC
   // ==================================================
 
-  async taoNamHoc(
-    duLieu: TaoNamHocDto,
+  async TaoNamHoc(
+    DuLieu: TaoNamHocDto,
   ) {
-    const tenNamHoc =
-      duLieu.ten_nam_hoc?.trim();
+    const TenNamHoc =
+      DuLieu.ten_nam_hoc?.trim();
 
-    if (!tenNamHoc) {
+    if (!TenNamHoc) {
       throw new BadRequestException(
         'Tên năm học không được để trống',
       );
     }
 
-    const namHocCu =
-      await this.prisma.nam_hoc.findUnique({
+    this.KiemTraTenNamHoc(
+      TenNamHoc,
+    );
+
+    const NamHocCu =
+      await this.Prisma.nam_hoc.findUnique({
         where: {
           ten_nam_hoc:
-            tenNamHoc,
+            TenNamHoc,
         },
       });
 
-    if (namHocCu) {
+    if (NamHocCu) {
       throw new ConflictException(
         'Năm học đã tồn tại',
       );
     }
 
-    const namHoc =
-      await this.prisma.nam_hoc.create({
+    const NamHoc =
+      await this.Prisma.nam_hoc.create({
         data: {
           ten_nam_hoc:
-            tenNamHoc,
+            TenNamHoc,
         },
       });
 
@@ -99,7 +146,7 @@ export class ToChucLopHocService {
         'Tạo năm học thành công',
 
       nam_hoc:
-        namHoc,
+        NamHoc,
     };
   }
 
@@ -107,8 +154,8 @@ export class ToChucLopHocService {
   // 2. DANH SÁCH NĂM HỌC
   // ==================================================
 
-  async layDanhSachNamHoc() {
-    return this.prisma.nam_hoc.findMany({
+  async LayDanhSachNamHoc() {
+    return this.Prisma.nam_hoc.findMany({
       orderBy: {
         id: 'desc',
       },
@@ -119,93 +166,99 @@ export class ToChucLopHocService {
   // 3. CẬP NHẬT NĂM HỌC
   // ==================================================
 
-  async capNhatNamHoc(
+  async CapNhatNamHoc(
     id: number,
-    duLieu: CapNhatNamHocDto,
+    DuLieu: CapNhatNamHocDto,
   ) {
-    const namHoc =
-      await this.prisma.nam_hoc.findUnique({
+    const NamHoc =
+      await this.Prisma.nam_hoc.findUnique({
         where: {
           id,
         },
       });
 
-    if (!namHoc) {
+    if (!NamHoc) {
       throw new NotFoundException(
         'Không tìm thấy năm học',
       );
     }
 
     if (
-      duLieu.ten_nam_hoc === undefined &&
-      duLieu.trang_thai === undefined
+      DuLieu.ten_nam_hoc === undefined &&
+      DuLieu.trang_thai === undefined
     ) {
       throw new BadRequestException(
         'Không có dữ liệu cần cập nhật',
       );
     }
 
-    const tenNamHoc =
-      duLieu.ten_nam_hoc?.trim();
+    const TenNamHoc =
+      DuLieu.ten_nam_hoc?.trim();
 
     if (
-      duLieu.ten_nam_hoc !== undefined &&
-      !tenNamHoc
+      DuLieu.ten_nam_hoc !== undefined &&
+      !TenNamHoc
     ) {
       throw new BadRequestException(
         'Tên năm học không được để trống',
       );
     }
 
+    if (TenNamHoc) {
+      this.KiemTraTenNamHoc(
+        TenNamHoc,
+      );
+    }
+
     if (
-      tenNamHoc &&
-      tenNamHoc !== namHoc.ten_nam_hoc
+      TenNamHoc &&
+      TenNamHoc !== NamHoc.ten_nam_hoc
     ) {
-      const trung =
-        await this.prisma.nam_hoc.findUnique({
+      const Trung =
+        await this.Prisma.nam_hoc.findUnique({
           where: {
             ten_nam_hoc:
-              tenNamHoc,
+              TenNamHoc,
           },
         });
 
-      if (trung) {
+      if (Trung) {
         throw new ConflictException(
           'Tên năm học đã tồn tại',
         );
       }
     }
 
-    const trangThai =
-      duLieu.trang_thai?.trim();
+    const TrangThai =
+      DuLieu.trang_thai?.trim();
 
     if (
-      duLieu.trang_thai !== undefined &&
-      !trangThai
+      DuLieu.trang_thai !== undefined &&
+      !TrangThai
     ) {
       throw new BadRequestException(
         'Trạng thái không được để trống',
       );
     }
 
-    const ketQua =
-      await this.prisma.nam_hoc.update({
+    const KetQua =
+      await this.Prisma.nam_hoc.update({
         where: {
           id,
         },
 
         data: {
-          ...(tenNamHoc
+          ...(TenNamHoc
             ? {
                 ten_nam_hoc:
-                  tenNamHoc,
+                  TenNamHoc,
               }
             : {}),
 
-          ...(trangThai
+          ...(TrangThai
             ? {
                 trang_thai:
-                  trangThai,
+                  TrangThai,
               }
             : {}),
 
@@ -219,7 +272,7 @@ export class ToChucLopHocService {
         'Cập nhật năm học thành công',
 
       nam_hoc:
-        ketQua,
+        KetQua,
     };
   }
 
@@ -227,8 +280,8 @@ export class ToChucLopHocService {
   // 4. DANH SÁCH KHỐI
   // ==================================================
 
-  async layDanhSachKhoi() {
-    return this.prisma.khoi.findMany({
+  async LayDanhSachKhoi() {
+    return this.Prisma.khoi.findMany({
       orderBy: {
         so_khoi: 'asc',
       },
@@ -239,14 +292,14 @@ export class ToChucLopHocService {
   // 5. TẠO LỚP
   // ==================================================
 
-  async taoLopHoc(
-    duLieu: TaoLopHocDto,
+  async TaoLopHoc(
+    DuLieu: TaoLopHocDto,
   ) {
     if (
       !Number.isInteger(
-        duLieu.nam_hoc_id,
+        DuLieu.nam_hoc_id,
       ) ||
-      duLieu.nam_hoc_id <= 0
+      DuLieu.nam_hoc_id <= 0
     ) {
       throw new BadRequestException(
         'Năm học không hợp lệ',
@@ -255,44 +308,44 @@ export class ToChucLopHocService {
 
     if (
       !Number.isInteger(
-        duLieu.khoi_id,
+        DuLieu.khoi_id,
       ) ||
-      duLieu.khoi_id <= 0
+      DuLieu.khoi_id <= 0
     ) {
       throw new BadRequestException(
         'Khối không hợp lệ',
       );
     }
 
-    const tenLop =
-      duLieu.ten_lop?.trim();
+    const TenLop =
+      DuLieu.ten_lop?.trim();
 
-    if (!tenLop) {
+    if (!TenLop) {
       throw new BadRequestException(
         'Tên lớp không được để trống',
       );
     }
 
     const [
-      namHoc,
+      NamHoc,
       khoi,
     ] = await Promise.all([
-      this.prisma.nam_hoc.findUnique({
+      this.Prisma.nam_hoc.findUnique({
         where: {
           id:
-            duLieu.nam_hoc_id,
+            DuLieu.nam_hoc_id,
         },
       }),
 
-      this.prisma.khoi.findUnique({
+      this.Prisma.khoi.findUnique({
         where: {
           id:
-            duLieu.khoi_id,
+            DuLieu.khoi_id,
         },
       }),
     ]);
 
-    if (!namHoc) {
+    if (!NamHoc) {
       throw new NotFoundException(
         'Không tìm thấy năm học',
       );
@@ -304,37 +357,37 @@ export class ToChucLopHocService {
       );
     }
 
-    const lopTrung =
-      await this.prisma.lop_hoc.findFirst({
+    const LopTrung =
+      await this.Prisma.lop_hoc.findFirst({
         where: {
           nam_hoc_id:
-            duLieu.nam_hoc_id,
+            DuLieu.nam_hoc_id,
 
           ten_lop:
-            tenLop,
+            TenLop,
         },
       });
 
-    if (lopTrung) {
+    if (LopTrung) {
       throw new ConflictException(
         'Tên lớp đã tồn tại trong năm học này',
       );
     }
 
-    const lopHoc =
-      await this.prisma.lop_hoc.create({
+    const LopHoc =
+      await this.Prisma.lop_hoc.create({
         data: {
           nam_hoc_id:
-            duLieu.nam_hoc_id,
+            DuLieu.nam_hoc_id,
 
           khoi_id:
-            duLieu.khoi_id,
+            DuLieu.khoi_id,
 
           ten_lop:
-            tenLop,
+            TenLop,
 
           ghi_chu:
-            duLieu.ghi_chu
+            DuLieu.ghi_chu
               ?.trim() ||
             null,
         },
@@ -345,7 +398,7 @@ export class ToChucLopHocService {
         'Tạo lớp học thành công',
 
       lop_hoc:
-        lopHoc,
+        LopHoc,
     };
   }
 
@@ -353,35 +406,35 @@ export class ToChucLopHocService {
   // 6. DANH SÁCH LỚP
   // ==================================================
 
-  async layDanhSachLopHoc(
-    namHocId?: number,
-    khoiId?: number,
-    tuKhoa?: string,
+  async LayDanhSachLopHoc(
+    NamHocId?: number,
+    KhoiId?: number,
+    TuKhoa?: string,
   ) {
-    const tim =
-      tuKhoa?.trim();
+    const Tim =
+      TuKhoa?.trim();
 
-    return this.prisma.lop_hoc.findMany({
+    return this.Prisma.lop_hoc.findMany({
       where: {
-        ...(namHocId
+        ...(NamHocId
           ? {
               nam_hoc_id:
-                namHocId,
+                NamHocId,
             }
           : {}),
 
-        ...(khoiId
+        ...(KhoiId
           ? {
               khoi_id:
-                khoiId,
+                KhoiId,
             }
           : {}),
 
-        ...(tim
+        ...(Tim
           ? {
               ten_lop: {
                 contains:
-                  tim,
+                  Tim,
               },
             }
           : {}),
@@ -422,11 +475,11 @@ export class ToChucLopHocService {
   // 7. CHI TIẾT LỚP
   // ==================================================
 
-  async layChiTietLopHoc(
+  async LayChiTietLopHoc(
     id: number,
   ) {
-    const lopHoc =
-      await this.prisma.lop_hoc.findUnique({
+    const LopHoc =
+      await this.Prisma.lop_hoc.findUnique({
         where: {
           id,
         },
@@ -457,51 +510,51 @@ export class ToChucLopHocService {
         },
       });
 
-    if (!lopHoc) {
+    if (!LopHoc) {
       throw new NotFoundException(
         'Không tìm thấy lớp học',
       );
     }
 
-    return lopHoc;
+    return LopHoc;
   }
 
   // ==================================================
   // 8. CẬP NHẬT LỚP
   // ==================================================
 
-  async capNhatLopHoc(
+  async CapNhatLopHoc(
     id: number,
-    duLieu: CapNhatLopHocDto,
+    DuLieu: CapNhatLopHocDto,
   ) {
-    const lopHoc =
-      await this.prisma.lop_hoc.findUnique({
+    const LopHoc =
+      await this.Prisma.lop_hoc.findUnique({
         where: {
           id,
         },
       });
 
-    if (!lopHoc) {
+    if (!LopHoc) {
       throw new NotFoundException(
         'Không tìm thấy lớp học',
       );
     }
 
     if (
-      duLieu.ten_lop === undefined &&
-      duLieu.ghi_chu === undefined
+      DuLieu.ten_lop === undefined &&
+      DuLieu.ghi_chu === undefined
     ) {
       throw new BadRequestException(
         'Không có dữ liệu cần cập nhật',
       );
     }
 
-    const tenLop =
-      duLieu.ten_lop?.trim();
+    const TenLop =
+      DuLieu.ten_lop?.trim();
 
     if (
-      duLieu.ten_lop !== undefined &&
-      !tenLop
+      DuLieu.ten_lop !== undefined &&
+      !TenLop
     ) {
       throw new BadRequestException(
         'Tên lớp không được để trống',
@@ -509,17 +562,17 @@ export class ToChucLopHocService {
     }
 
     if (
-      tenLop &&
-      tenLop !== lopHoc.ten_lop
+      TenLop &&
+      TenLop !== LopHoc.ten_lop
     ) {
-      const trung =
-        await this.prisma.lop_hoc.findFirst({
+      const Trung =
+        await this.Prisma.lop_hoc.findFirst({
           where: {
             nam_hoc_id:
-              lopHoc.nam_hoc_id,
+              LopHoc.nam_hoc_id,
 
             ten_lop:
-              tenLop,
+              TenLop,
 
             id: {
               not:
@@ -528,31 +581,31 @@ export class ToChucLopHocService {
           },
         });
 
-      if (trung) {
+      if (Trung) {
         throw new ConflictException(
           'Tên lớp đã tồn tại trong năm học này',
         );
       }
     }
 
-    const ketQua =
-      await this.prisma.lop_hoc.update({
+    const KetQua =
+      await this.Prisma.lop_hoc.update({
         where: {
           id,
         },
 
         data: {
-          ...(tenLop
+          ...(TenLop
             ? {
                 ten_lop:
-                  tenLop,
+                  TenLop,
               }
             : {}),
 
-          ...(duLieu.ghi_chu !== undefined
+          ...(DuLieu.ghi_chu !== undefined
             ? {
                 ghi_chu:
-                  duLieu.ghi_chu
+                  DuLieu.ghi_chu
                     ?.trim() ||
                   null,
               }
@@ -568,7 +621,7 @@ export class ToChucLopHocService {
         'Cập nhật lớp học thành công',
 
       lop_hoc:
-        ketQua,
+        KetQua,
     };
   }
 
@@ -576,11 +629,11 @@ export class ToChucLopHocService {
   // 9. HỌC SINH CHƯA CÓ LỚP HIỆN TẠI
   // ==================================================
 
-  async layHocSinhChuaXepLop() {
-    const homNay =
-      this.homNay();
+  async LayHocSinhChuaXepLop() {
+    const HomNay =
+      this.HomNay();
 
-    return this.prisma.hoc_sinh.findMany({
+    return this.Prisma.hoc_sinh.findMany({
       where: {
         trang_thai:
           'DANG_HOC',
@@ -589,7 +642,7 @@ export class ToChucLopHocService {
           none: {
             ngay_bat_dau: {
               lte:
-                homNay,
+                HomNay,
             },
 
             OR: [
@@ -601,7 +654,7 @@ export class ToChucLopHocService {
               {
                 ngay_ket_thuc: {
                   gte:
-                    homNay,
+                    HomNay,
                 },
               },
             ],
@@ -628,14 +681,14 @@ export class ToChucLopHocService {
   // 10. XẾP HỌC SINH VÀO LỚP
   // ==================================================
 
-  async xepHocSinhVaoLop(
-    duLieu: XepHocSinhVaoLopDto,
+  async XepHocSinhVaoLop(
+    DuLieu: XepHocSinhVaoLopDto,
   ) {
     if (
       !Number.isInteger(
-        duLieu.hoc_sinh_id,
+        DuLieu.hoc_sinh_id,
       ) ||
-      duLieu.hoc_sinh_id <= 0
+      DuLieu.hoc_sinh_id <= 0
     ) {
       throw new BadRequestException(
         'Học sinh không hợp lệ',
@@ -644,32 +697,32 @@ export class ToChucLopHocService {
 
     if (
       !Number.isInteger(
-        duLieu.lop_hoc_id,
+        DuLieu.lop_hoc_id,
       ) ||
-      duLieu.lop_hoc_id <= 0
+      DuLieu.lop_hoc_id <= 0
     ) {
       throw new BadRequestException(
         'Lớp học không hợp lệ',
       );
     }
 
-    const ngayBatDau =
-      this.chuyenNgay(
-        duLieu.ngay_bat_dau,
+    const NgayBatDau =
+      this.ChuyenNgay(
+        DuLieu.ngay_bat_dau,
         'Ngày bắt đầu',
       );
 
-    const ngayKetThuc =
-      duLieu.ngay_ket_thuc
-        ? this.chuyenNgay(
-            duLieu.ngay_ket_thuc,
+    const NgayKetThuc =
+      DuLieu.ngay_ket_thuc
+        ? this.ChuyenNgay(
+            DuLieu.ngay_ket_thuc,
             'Ngày kết thúc',
           )
         : null;
 
     if (
-      ngayKetThuc &&
-      ngayKetThuc < ngayBatDau
+      NgayKetThuc &&
+      NgayKetThuc < NgayBatDau
     ) {
       throw new BadRequestException(
         'Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu',
@@ -677,32 +730,32 @@ export class ToChucLopHocService {
     }
 
     const [
-      hocSinh,
-      lopHoc,
+      HocSinh,
+      LopHoc,
     ] = await Promise.all([
-      this.prisma.hoc_sinh.findUnique({
+      this.Prisma.hoc_sinh.findUnique({
         where: {
           id:
-            duLieu.hoc_sinh_id,
+            DuLieu.hoc_sinh_id,
         },
       }),
 
-      this.prisma.lop_hoc.findUnique({
+      this.Prisma.lop_hoc.findUnique({
         where: {
           id:
-            duLieu.lop_hoc_id,
+            DuLieu.lop_hoc_id,
         },
       }),
     ]);
 
-    if (!hocSinh) {
+    if (!HocSinh) {
       throw new NotFoundException(
         'Không tìm thấy học sinh',
       );
     }
 
     if (
-      hocSinh.trang_thai !==
+      HocSinh.trang_thai !==
       'DANG_HOC'
     ) {
       throw new BadRequestException(
@@ -710,23 +763,23 @@ export class ToChucLopHocService {
       );
     }
 
-    if (!lopHoc) {
+    if (!LopHoc) {
       throw new NotFoundException(
         'Không tìm thấy lớp học',
       );
     }
 
-    const trungKhoangThoiGian =
-      await this.prisma.xep_lop.findFirst({
+    const TrungKhoangThoiGian =
+      await this.Prisma.xep_lop.findFirst({
         where: {
           hoc_sinh_id:
-            duLieu.hoc_sinh_id,
+            DuLieu.hoc_sinh_id,
 
-          ...(ngayKetThuc
+          ...(NgayKetThuc
             ? {
                 ngay_bat_dau: {
                   lte:
-                    ngayKetThuc,
+                    NgayKetThuc,
                 },
               }
             : {}),
@@ -740,36 +793,36 @@ export class ToChucLopHocService {
             {
               ngay_ket_thuc: {
                 gte:
-                  ngayBatDau,
+                  NgayBatDau,
               },
             },
           ],
         },
       });
 
-    if (trungKhoangThoiGian) {
+    if (TrungKhoangThoiGian) {
       throw new ConflictException(
         'Học sinh đã được xếp lớp trong khoảng thời gian này',
       );
     }
 
-    const xepLop =
-      await this.prisma.xep_lop.create({
+    const XepLop =
+      await this.Prisma.xep_lop.create({
         data: {
           hoc_sinh_id:
-            duLieu.hoc_sinh_id,
+            DuLieu.hoc_sinh_id,
 
           lop_hoc_id:
-            duLieu.lop_hoc_id,
+            DuLieu.lop_hoc_id,
 
           ngay_bat_dau:
-            ngayBatDau,
+            NgayBatDau,
 
           ngay_ket_thuc:
-            ngayKetThuc,
+            NgayKetThuc,
 
           ghi_chu:
-            duLieu.ghi_chu
+            DuLieu.ghi_chu
               ?.trim() ||
             null,
         },
@@ -791,7 +844,7 @@ export class ToChucLopHocService {
         'Xếp lớp thành công',
 
       xep_lop:
-        xepLop,
+        XepLop,
     };
   }
 
@@ -799,14 +852,14 @@ export class ToChucLopHocService {
   // 11. LỊCH SỬ XẾP LỚP CỦA HỌC SINH
   // ==================================================
 
-  async layLichSuXepLopHocSinh(
-    hocSinhId: number,
+  async LayLichSuXepLopHocSinh(
+    HocSinhId: number,
   ) {
-    const hocSinh =
-      await this.prisma.hoc_sinh.findUnique({
+    const HocSinh =
+      await this.Prisma.hoc_sinh.findUnique({
         where: {
           id:
-            hocSinhId,
+            HocSinhId,
         },
 
         select: {
@@ -816,17 +869,17 @@ export class ToChucLopHocService {
         },
       });
 
-    if (!hocSinh) {
+    if (!HocSinh) {
       throw new NotFoundException(
         'Không tìm thấy học sinh',
       );
     }
 
-    const lichSu =
-      await this.prisma.xep_lop.findMany({
+    const LichSu =
+      await this.Prisma.xep_lop.findMany({
         where: {
           hoc_sinh_id:
-            hocSinhId,
+            HocSinhId,
         },
 
         orderBy: {
@@ -846,10 +899,10 @@ export class ToChucLopHocService {
 
     return {
       hoc_sinh:
-        hocSinh,
+        HocSinh,
 
       lich_su:
-        lichSu,
+        LichSu,
     };
   }
 
@@ -858,27 +911,27 @@ export class ToChucLopHocService {
   // DÙNG KHI KẾT THÚC / SỬA NGÀY
   // ==================================================
 
-  async capNhatXepLop(
+  async CapNhatXepLop(
     id: number,
-    duLieu: CapNhatXepLopDto,
+    DuLieu: CapNhatXepLopDto,
   ) {
-    const xepLop =
-      await this.prisma.xep_lop.findUnique({
+    const XepLop =
+      await this.Prisma.xep_lop.findUnique({
         where: {
           id,
         },
       });
 
-    if (!xepLop) {
+    if (!XepLop) {
       throw new NotFoundException(
         'Không tìm thấy thông tin xếp lớp',
       );
     }
 
     if (
-      duLieu.ngay_bat_dau === undefined &&
-      duLieu.ngay_ket_thuc === undefined &&
-      duLieu.ghi_chu === undefined
+      DuLieu.ngay_bat_dau === undefined &&
+      DuLieu.ngay_ket_thuc === undefined &&
+      DuLieu.ghi_chu === undefined
     ) {
       throw new BadRequestException(
         'Không có dữ liệu cần cập nhật',
@@ -886,8 +939,8 @@ export class ToChucLopHocService {
     }
 
     if (
-      duLieu.ngay_bat_dau !== undefined &&
-      !duLieu.ngay_bat_dau.trim()
+      DuLieu.ngay_bat_dau !== undefined &&
+      !DuLieu.ngay_bat_dau.trim()
     ) {
       throw new BadRequestException(
         'Ngày bắt đầu không được để trống',
@@ -895,67 +948,67 @@ export class ToChucLopHocService {
     }
 
     if (
-      typeof duLieu.ngay_ket_thuc ===
+      typeof DuLieu.ngay_ket_thuc ===
         'string' &&
-      !duLieu.ngay_ket_thuc.trim()
+      !DuLieu.ngay_ket_thuc.trim()
     ) {
       throw new BadRequestException(
         'Ngày kết thúc không được để trống. Dùng null nếu muốn bỏ ngày kết thúc',
       );
     }
 
-    const ngayBatDau =
-      duLieu.ngay_bat_dau
-        ? this.chuyenNgay(
-            duLieu.ngay_bat_dau,
+    const NgayBatDau =
+      DuLieu.ngay_bat_dau
+        ? this.ChuyenNgay(
+            DuLieu.ngay_bat_dau,
             'Ngày bắt đầu',
           )
-        : xepLop.ngay_bat_dau;
+        : XepLop.ngay_bat_dau;
 
-    let ngayKetThuc:
+    let NgayKetThuc:
       | Date
       | null =
-      xepLop.ngay_ket_thuc;
+      XepLop.ngay_ket_thuc;
 
     if (
-      duLieu.ngay_ket_thuc === null
+      DuLieu.ngay_ket_thuc === null
     ) {
-      ngayKetThuc = null;
+      NgayKetThuc = null;
     } else if (
-      duLieu.ngay_ket_thuc
+      DuLieu.ngay_ket_thuc
     ) {
-      ngayKetThuc =
-        this.chuyenNgay(
-          duLieu.ngay_ket_thuc,
+      NgayKetThuc =
+        this.ChuyenNgay(
+          DuLieu.ngay_ket_thuc,
           'Ngày kết thúc',
         );
     }
 
     if (
-      ngayKetThuc &&
-      ngayKetThuc < ngayBatDau
+      NgayKetThuc &&
+      NgayKetThuc < NgayBatDau
     ) {
       throw new BadRequestException(
         'Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu',
       );
     }
 
-    const trung =
-      await this.prisma.xep_lop.findFirst({
+    const Trung =
+      await this.Prisma.xep_lop.findFirst({
         where: {
           hoc_sinh_id:
-            xepLop.hoc_sinh_id,
+            XepLop.hoc_sinh_id,
 
           id: {
             not:
               id,
           },
 
-          ...(ngayKetThuc
+          ...(NgayKetThuc
             ? {
                 ngay_bat_dau: {
                   lte:
-                    ngayKetThuc,
+                    NgayKetThuc,
                 },
               }
             : {}),
@@ -969,36 +1022,36 @@ export class ToChucLopHocService {
             {
               ngay_ket_thuc: {
                 gte:
-                  ngayBatDau,
+                  NgayBatDau,
               },
             },
           ],
         },
       });
 
-    if (trung) {
+    if (Trung) {
       throw new ConflictException(
         'Khoảng thời gian xếp lớp bị trùng',
       );
     }
 
-    const ketQua =
-      await this.prisma.xep_lop.update({
+    const KetQua =
+      await this.Prisma.xep_lop.update({
         where: {
           id,
         },
 
         data: {
           ngay_bat_dau:
-            ngayBatDau,
+            NgayBatDau,
 
           ngay_ket_thuc:
-            ngayKetThuc,
+            NgayKetThuc,
 
-          ...(duLieu.ghi_chu !== undefined
+          ...(DuLieu.ghi_chu !== undefined
             ? {
                 ghi_chu:
-                  duLieu.ghi_chu
+                  DuLieu.ghi_chu
                     ?.trim() ||
                   null,
               }
@@ -1011,7 +1064,7 @@ export class ToChucLopHocService {
         'Cập nhật xếp lớp thành công',
 
       xep_lop:
-        ketQua,
+        KetQua,
     };
   }
 }
