@@ -88,60 +88,112 @@ export default function App() {
           />
 
           <Route
-            path="/giao_vien"
             element={
-              <GiaoVienPage />
+              <BaoVeRoute
+                vaiTroChoPhep={[
+                  'ADMIN',
+                ]}
+              />
             }
-          />
+          >
+            <Route
+              path="/giao_vien"
+              element={
+                <GiaoVienPage />
+              }
+            />
+
+            <Route
+              path="/lop_hoc"
+              element={
+                <LopHocPage />
+              }
+            />
+          </Route>
 
           <Route
-            path="/hoc_sinh"
             element={
-              <HocSinhPage />
+              <BaoVeRoute
+                vaiTroChoPhep={[
+                  'ADMIN',
+                  'GIAO_VIEN',
+                ]}
+              />
             }
-          />
+          >
+            <Route
+              path="/hoc_sinh"
+              element={
+                <HocSinhPage />
+              }
+            />
+
+            <Route
+              path="/phan_cong"
+              element={
+                <PhanCongPage />
+              }
+            />
+
+            <Route
+              path="/danh_gia"
+              element={
+                <DanhGiaPage />
+              }
+            />
+          </Route>
 
           <Route
-            path="/lop_hoc"
             element={
-              <LopHocPage />
+              <BaoVeRoute
+                vaiTroChoPhep={[
+                  'GIAO_VIEN',
+                ]}
+              />
             }
-          />
+          >
+            <Route
+              path="/diem_danh"
+              element={
+                <DiemDanhPage />
+              }
+            />
+          </Route>
 
           <Route
-            path="/phan_cong"
             element={
-              <PhanCongPage />
+              <BaoVeRoute
+                vaiTroChoPhep={[
+                  'GIAO_VIEN',
+                  'PHU_HUYNH',
+                ]}
+              />
             }
-          />
+          >
+            <Route
+              path="/don_xin_nghi"
+              element={
+                <DonXinNghiPage />
+              }
+            />
+          </Route>
 
           <Route
-            path="/diem_danh"
             element={
-              <DiemDanhPage />
+              <BaoVeRoute
+                vaiTroChoPhep={[
+                  'PHU_HUYNH',
+                ]}
+              />
             }
-          />
-
-          <Route
-            path="/don_xin_nghi"
-            element={
-              <DonXinNghiPage />
-            }
-          />
-
-          <Route
-            path="/danh_gia"
-            element={
-              <DanhGiaPage />
-            }
-          />
-
-          <Route
-            path="/con_cua_toi"
-            element={
-              <ConCuaToiPage />
-            }
-          />
+          >
+            <Route
+              path="/con_cua_toi"
+              element={
+                <ConCuaToiPage />
+              }
+            />
+          </Route>
         </Route>
       </Route>
 
