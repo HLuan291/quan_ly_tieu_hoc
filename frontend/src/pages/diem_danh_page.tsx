@@ -10,7 +10,7 @@ import type {
 import api from '../api/api';
 
 import {
-  layThongBaoLoi,
+  LayThongBaoLoi,
 } from '../utils/loi_api';
 
 interface LopChuNhiem {
@@ -52,18 +52,18 @@ interface DongDiemDanh {
 
 export default function DiemDanhPage() {
   const [
-    lopHoc,
-    setLopHoc,
+    LopHoc,
+    SetLopHoc,
   ] = useState<LopChuNhiem[]>([]);
 
   const [
-    lopHocId,
-    setLopHocId,
+    LopHocId,
+    SetLopHocId,
   ] = useState('');
 
   const [
-    ngayHoc,
-    setNgayHoc,
+    NgayHoc,
+    SetNgayHoc,
   ] = useState(
     new Date()
       .toISOString()
@@ -71,161 +71,161 @@ export default function DiemDanhPage() {
   );
 
   const [
-    buoiHoc,
-    setBuoiHoc,
+    BuoiHoc,
+    SetBuoiHoc,
   ] = useState('SANG');
 
   const [
-    danhSach,
-    setDanhSach,
+    DanhSach,
+    SetDanhSach,
   ] = useState<DongDiemDanh[]>([]);
 
   const [
-    loi,
-    setLoi,
+    Loi,
+    SetLoi,
   ] = useState('');
 
   useEffect(
     () => {
-      async function taiLop() {
+      async function TaiLop() {
         try {
-          const response =
+          const Response =
             await api.get<LopChuNhiem[]>(
               '/diem_danh_nghi_hoc/lop_chu_nhiem_cua_toi',
             );
 
-          setLopHoc(
-            response.data,
+          SetLopHoc(
+            Response.data,
           );
 
           if (
-            response.data[0]
+            Response.data[0]
           ) {
-            setLopHocId(
+            SetLopHocId(
               String(
-                response.data[0]
+                Response.data[0]
                   .lop_hoc_id,
               ),
             );
           }
-        } catch (error: unknown) {
-          setLoi(
-            layThongBaoLoi(
-              error,
+        } catch (Error: unknown) {
+          SetLoi(
+            LayThongBaoLoi(
+              Error,
             ),
           );
         }
       }
 
-      void taiLop();
+      void TaiLop();
     },
     [],
   );
 
-  async function taiSoDiemDanh() {
-    if (!lopHocId) {
+  async function TaiSoDiemDanh() {
+    if (!LopHocId) {
       return;
     }
 
     try {
-      setLoi('');
+      SetLoi('');
 
-      const response =
+      const Response =
         await api.get<SoDiemDanhResponse>(
           '/diem_danh_nghi_hoc/diem_danh',
           {
             params: {
               lop_hoc_id:
-                Number(lopHocId),
+                Number(LopHocId),
 
               ngay_hoc:
-                ngayHoc,
+                NgayHoc,
 
               buoi_hoc:
-                buoiHoc,
+                BuoiHoc,
             },
           },
         );
 
-      setDanhSach(
-        response.data.danh_sach.map(
-          (item) => ({
+      SetDanhSach(
+        Response.data.danh_sach.map(
+          (Item) => ({
             xep_lop_id:
-              item.id,
+              Item.id,
 
             ma_hoc_sinh:
-              item.hoc_sinh
+              Item.hoc_sinh
                 .ma_hoc_sinh,
 
             ho_ten:
-              item.hoc_sinh
+              Item.hoc_sinh
                 .ho_ten,
 
             trang_thai:
-              item.diem_danh[0]
+              Item.diem_danh[0]
                 ?.trang_thai ??
               '',
 
             ghi_chu:
-              item.diem_danh[0]
+              Item.diem_danh[0]
                 ?.ghi_chu ??
               '',
           }),
         ),
       );
-    } catch (error: unknown) {
-      setLoi(
-        layThongBaoLoi(
-          error,
+    } catch (Error: unknown) {
+      SetLoi(
+        LayThongBaoLoi(
+          Error,
         ),
       );
     }
   }
 
-  async function luuDiemDanh(
-    event: FormEvent,
+  async function LuuDiemDanh(
+    Event: FormEvent,
   ) {
-    event.preventDefault();
+    Event.preventDefault();
 
     if (
-      danhSach.some(
-        (item) =>
-          !item.trang_thai
+      DanhSach.some(
+        (Item) =>
+          !Item.trang_thai
             .trim(),
       )
     ) {
-      setLoi(
+      SetLoi(
         'Hãy nhập trạng thái cho tất cả học sinh.',
       );
       return;
     }
 
     try {
-      setLoi('');
+      SetLoi('');
 
       await api.post(
         '/diem_danh_nghi_hoc/diem_danh',
         {
           lop_hoc_id:
-            Number(lopHocId),
+            Number(LopHocId),
 
           ngay_hoc:
-            ngayHoc,
+            NgayHoc,
 
           buoi_hoc:
-            buoiHoc,
+            BuoiHoc,
 
           danh_sach:
-            danhSach.map(
-              (item) => ({
+            DanhSach.map(
+              (Item) => ({
                 xep_lop_id:
-                  item.xep_lop_id,
+                  Item.xep_lop_id,
 
                 trang_thai:
-                  item.trang_thai,
+                  Item.trang_thai,
 
                 ghi_chu:
-                  item.ghi_chu,
+                  Item.ghi_chu,
               }),
             ),
         },
@@ -235,11 +235,11 @@ export default function DiemDanhPage() {
         'Lưu điểm danh thành công',
       );
 
-      await taiSoDiemDanh();
-    } catch (error: unknown) {
-      setLoi(
-        layThongBaoLoi(
-          error,
+      await TaiSoDiemDanh();
+    } catch (Error: unknown) {
+      SetLoi(
+        LayThongBaoLoi(
+          Error,
         ),
       );
     }
@@ -255,22 +255,26 @@ export default function DiemDanhPage() {
         GVCN điểm danh học sinh theo ngày và buổi học.
       </p>
 
-      {loi && (
+      {Loi && (
         <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
-          {loi}
+          {Loi}
         </div>
       )}
 
       <div className="mt-6 rounded-xl bg-white p-5 shadow-sm">
-        <div className="grid gap-3 md:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-4">
+          <div>
+            <label className="mb-1 block text-sm font-medium text-slate-700">
+              Lớp chủ nhiệm
+            </label>
           <select
             value={
-              lopHocId
+              LopHocId
             }
             onChange={
-              (event) =>
-                setLopHocId(
-                  event.target.value,
+              (Event) =>
+                SetLopHocId(
+                  Event.target.value,
                 )
             }
             className="rounded-lg border border-slate-300 px-3 py-2"
@@ -279,54 +283,71 @@ export default function DiemDanhPage() {
               Chọn lớp chủ nhiệm
             </option>
 
-            {lopHoc.map(
-              (item) => (
+            {LopHoc.map(
+              (Item) => (
                 <option
                   key={
-                    item.id
+                    Item.id
                   }
                   value={
-                    item.lop_hoc_id
+                    Item.lop_hoc_id
                   }
                 >
                   {
-                    item.lop_hoc
+                    Item.lop_hoc
                       .nam_hoc
                       .ten_nam_hoc
                   } - {
-                    item.lop_hoc
+                    Item.lop_hoc
                       .ten_lop
                   }
                 </option>
               ),
             )}
           </select>
+          </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-medium text-slate-700">
+              Ngày học
+            </label>
 
           <input
             type="date"
             value={
-              ngayHoc
+              NgayHoc
             }
             onChange={
-              (event) =>
-                setNgayHoc(
-                  event.target.value,
+              (Event) =>
+                SetNgayHoc(
+                  Event.target.value,
                 )
             }
-            className="rounded-lg border border-slate-300 px-3 py-2"
+            max={
+              new Date()
+                .toISOString()
+                .slice(0, 10)
+            }
+            className="w-full rounded-lg border border-slate-300 px-3 py-2"
           />
+          </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-medium text-slate-700">
+              Buổi học
+            </label>
 
           <select
             value={
-              buoiHoc
+              BuoiHoc
             }
             onChange={
-              (event) =>
-                setBuoiHoc(
-                  event.target.value,
+              (Event) =>
+                SetBuoiHoc(
+                  Event.target.value,
                 )
             }
-            className="rounded-lg border border-slate-300 px-3 py-2"
+            className="w-full rounded-lg border border-slate-300 px-3 py-2"
           >
             <option value="SANG">
               Sáng
@@ -335,24 +356,27 @@ export default function DiemDanhPage() {
               Chiều
             </option>
           </select>
+          </div>
 
+          <div className="flex items-end">
           <button
             type="button"
             onClick={
               () =>
-                void taiSoDiemDanh()
+                void TaiSoDiemDanh()
             }
-            className="rounded-lg bg-blue-600 px-4 py-2 text-white"
+            className="w-full rounded-lg bg-blue-600 px-4 py-2 text-white"
           >
             Tải sổ điểm danh
           </button>
+          </div>
         </div>
       </div>
 
-      {danhSach.length > 0 && (
+      {DanhSach.length > 0 && (
         <form
           onSubmit={
-            luuDiemDanh
+            LuuDiemDanh
           }
           className="mt-6 rounded-xl bg-white p-5 shadow-sm"
         >
@@ -376,53 +400,53 @@ export default function DiemDanhPage() {
               </thead>
 
               <tbody>
-                {danhSach.map(
+                {DanhSach.map(
                   (
-                    item,
-                    index,
+                    Item,
+                    Index,
                   ) => (
                     <tr
                       key={
-                        item.xep_lop_id
+                        Item.xep_lop_id
                       }
                       className="border-b"
                     >
                       <td className="px-3 py-3">
                         {
-                          item.ma_hoc_sinh
+                          Item.ma_hoc_sinh
                         }
                       </td>
 
                       <td className="px-3 py-3">
                         {
-                          item.ho_ten
+                          Item.ho_ten
                         }
                       </td>
 
                       <td className="px-3 py-3">
                         <input
                           value={
-                            item.trang_thai
+                            Item.trang_thai
                           }
                           onChange={
-                            (event) =>
-                              setDanhSach(
-                                (cu) =>
-                                  cu.map(
+                            (Event) =>
+                              SetDanhSach(
+                                (Cu) =>
+                                  Cu.map(
                                     (
-                                      dong,
-                                      viTri,
+                                      Dong,
+                                      ViTri,
                                     ) =>
-                                      viTri ===
-                                      index
+                                      ViTri ===
+                                      Index
                                         ? {
-                                            ...dong,
+                                            ...Dong,
                                             trang_thai:
-                                              event
+                                              Event
                                                 .target
                                                 .value,
                                           }
-                                        : dong,
+                                        : Dong,
                                   ),
                               )
                           }
@@ -434,27 +458,27 @@ export default function DiemDanhPage() {
                       <td className="px-3 py-3">
                         <input
                           value={
-                            item.ghi_chu
+                            Item.ghi_chu
                           }
                           onChange={
-                            (event) =>
-                              setDanhSach(
-                                (cu) =>
-                                  cu.map(
+                            (Event) =>
+                              SetDanhSach(
+                                (Cu) =>
+                                  Cu.map(
                                     (
-                                      dong,
-                                      viTri,
+                                      Dong,
+                                      ViTri,
                                     ) =>
-                                      viTri ===
-                                      index
+                                      ViTri ===
+                                      Index
                                         ? {
-                                            ...dong,
+                                            ...Dong,
                                             ghi_chu:
-                                              event
+                                              Event
                                                 .target
                                                 .value,
                                           }
-                                        : dong,
+                                        : Dong,
                                   ),
                               )
                           }
