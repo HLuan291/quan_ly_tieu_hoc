@@ -23,7 +23,7 @@ import {
 
 import {
   DanhGiaHocTapService,
-} from './danh_gia_hoc_tap.Service';
+} from './danh_gia_hoc_tap.service';
 
 import {
   CapNhatKetQuaMonHocDto,
