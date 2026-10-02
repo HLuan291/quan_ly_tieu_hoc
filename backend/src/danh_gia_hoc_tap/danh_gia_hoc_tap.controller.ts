@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   ForbiddenException,
@@ -119,6 +120,32 @@ export class DanhGiaHocTapController {
     return nguoiDung;
   }
 
+  private chuyenQuerySoNguyenDuong(
+    giaTri: string | undefined,
+    tenTruong: string,
+  ): number | undefined {
+    if (
+      giaTri === undefined ||
+      giaTri.trim() === ''
+    ) {
+      return undefined;
+    }
+
+    const so =
+      Number(giaTri);
+
+    if (
+      !Number.isInteger(so) ||
+      so <= 0
+    ) {
+      throw new BadRequestException(
+        `${tenTruong} không hợp lệ`,
+      );
+    }
+
+    return so;
+  }
+
   // ==================================================
   // ADMIN - CẤU HÌNH ĐÁNH GIÁ
   // ==================================================
@@ -149,9 +176,10 @@ export class DanhGiaHocTapController {
 
     return this.service
       .layDanhSachDotDanhGia(
-        namHocId
-          ? Number(namHocId)
-          : undefined,
+        this.chuyenQuerySoNguyenDuong(
+          namHocId,
+          'Năm học',
+        ),
       );
   }
 
@@ -186,13 +214,15 @@ export class DanhGiaHocTapController {
 
     return this.service
       .layCauHinhDanhGiaMon(
-        dotDanhGiaId
-          ? Number(dotDanhGiaId)
-          : undefined,
+        this.chuyenQuerySoNguyenDuong(
+          dotDanhGiaId,
+          'Đợt đánh giá',
+        ),
 
-        khoiId
-          ? Number(khoiId)
-          : undefined,
+        this.chuyenQuerySoNguyenDuong(
+          khoiId,
+          'Khối',
+        ),
       );
   }
 
@@ -228,17 +258,20 @@ export class DanhGiaHocTapController {
 
     return this.service
       .layCauHinhDiem(
-        dotDanhGiaId
-          ? Number(dotDanhGiaId)
-          : undefined,
+        this.chuyenQuerySoNguyenDuong(
+          dotDanhGiaId,
+          'Đợt đánh giá',
+        ),
 
-        khoiId
-          ? Number(khoiId)
-          : undefined,
+        this.chuyenQuerySoNguyenDuong(
+          khoiId,
+          'Khối',
+        ),
 
-        monHocId
-          ? Number(monHocId)
-          : undefined,
+        this.chuyenQuerySoNguyenDuong(
+          monHocId,
+          'Môn học',
+        ),
       );
   }
 
