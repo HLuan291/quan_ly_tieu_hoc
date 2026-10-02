@@ -5,8 +5,8 @@ import {
 } from 'react-router';
 
 import {
-  daDangNhap,
-  docJwt,
+  DaDangNhap,
+  DocJwt,
   type VaiTro,
 } from './auth';
 
@@ -20,7 +20,7 @@ export default function BaoVeRoute({
   const location =
     useLocation();
 
-  if (!daDangNhap()) {
+  if (!DaDangNhap()) {
     return (
       <Navigate
         to="/dang_nhap"
@@ -30,7 +30,7 @@ export default function BaoVeRoute({
   }
 
   const nguoiDung =
-    docJwt();
+    DocJwt();
 
   if (!nguoiDung) {
     return (
