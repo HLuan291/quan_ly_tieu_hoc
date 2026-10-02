@@ -11,7 +11,7 @@ import type {
 import api from '../api/api';
 
 import {
-  layThongBaoLoi as LayThongBaoLoi,
+  LayThongBaoLoi,
 } from '../utils/loi_api';
 
 interface NamHoc {
