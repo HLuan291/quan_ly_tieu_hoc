@@ -20,7 +20,7 @@ import {
 
 import axios from 'axios';
 
-import api from '../api/api';
+import Api from '../api/api';
 
 import {
   LuuToken,
@@ -86,7 +86,7 @@ export default function DangNhapPage() {
       SetLoi('');
 
       const Response =
-        await api.post<LoginResponse>(
+        await Api.post<LoginResponse>(
           '/auth/login',
           DuLieu,
         );
