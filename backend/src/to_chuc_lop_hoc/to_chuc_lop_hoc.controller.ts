@@ -23,7 +23,7 @@ import {
 
 import {
   ToChucLopHocService,
-} from './to_chuc_lop_hoc.service';
+} from './to_chuc_lop_hoc.Service';
 
 import {
   CapNhatLopHocDto,
@@ -47,15 +47,15 @@ interface RequestCoNguoiDung
 @Controller('to_chuc_lop_hoc')
 export class ToChucLopHocController {
   constructor(
-    private readonly service:
+    private readonly Service:
       ToChucLopHocService,
   ) {}
 
-  private kiemTraAdmin(
-    request: RequestCoNguoiDung,
+  private KiemTraAdmin(
+    Request: RequestCoNguoiDung,
   ) {
     if (
-      request.nguoi_dung?.vai_tro !==
+      Request.nguoi_dung?.vai_tro !==
       'ADMIN'
     ) {
       throw new ForbiddenException(
@@ -64,30 +64,30 @@ export class ToChucLopHocController {
     }
   }
 
-  private chuyenQuerySoNguyenDuong(
-    giaTri: string | undefined,
-    tenTruong: string,
+  private ChuyenQuerySoNguyenDuong(
+    GiaTri: string | undefined,
+    TenTruong: string,
   ): number | undefined {
     if (
-      giaTri === undefined ||
-      giaTri.trim() === ''
+      GiaTri === undefined ||
+      GiaTri.trim() === ''
     ) {
       return undefined;
     }
 
-    const so =
-      Number(giaTri);
+    const So =
+      Number(GiaTri);
 
     if (
-      !Number.isInteger(so) ||
-      so <= 0
+      !Number.isInteger(So) ||
+      So <= 0
     ) {
       throw new BadRequestException(
-        `${tenTruong} không hợp lệ`,
+        `${TenTruong} không hợp lệ`,
       );
     }
 
-    return so;
+    return So;
   }
 
   // =========================================
@@ -95,50 +95,50 @@ export class ToChucLopHocController {
   // =========================================
 
   @Post('nam_hoc')
-  taoNamHoc(
+  TaoNamHoc(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Body()
-    body: TaoNamHocDto,
+    Body: TaoNamHocDto,
   ) {
-    this.kiemTraAdmin(request);
+    this.KiemTraAdmin(Request);
 
-    return this.service.taoNamHoc(
-      body,
+    return this.Service.TaoNamHoc(
+      Body,
     );
   }
 
   @Get('nam_hoc')
-  layDanhSachNamHoc(
+  LayDanhSachNamHoc(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
   ) {
-    this.kiemTraAdmin(request);
+    this.KiemTraAdmin(Request);
 
-    return this.service
-      .layDanhSachNamHoc();
+    return this.Service
+      .LayDanhSachNamHoc();
   }
 
-  @Patch('nam_hoc/:id')
-  capNhatNamHoc(
+  @Patch('nam_hoc/:Id')
+  CapNhatNamHoc(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Param(
-      'id',
+      'Id',
       ParseIntPipe,
     )
-    id: number,
+    Id: number,
 
     @Body()
-    body: CapNhatNamHocDto,
+    Body: CapNhatNamHocDto,
   ) {
-    this.kiemTraAdmin(request);
+    this.KiemTraAdmin(Request);
 
-    return this.service.capNhatNamHoc(
-      id,
-      body,
+    return this.Service.CapNhatNamHoc(
+      Id,
+      Body,
     );
   }
 
@@ -147,14 +147,14 @@ export class ToChucLopHocController {
   // =========================================
 
   @Get('khoi')
-  layDanhSachKhoi(
+  LayDanhSachKhoi(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
   ) {
-    this.kiemTraAdmin(request);
+    this.KiemTraAdmin(Request);
 
-    return this.service
-      .layDanhSachKhoi();
+    return this.Service
+      .LayDanhSachKhoi();
   }
 
   // =========================================
@@ -162,89 +162,89 @@ export class ToChucLopHocController {
   // =========================================
 
   @Post('lop_hoc')
-  taoLopHoc(
+  TaoLopHoc(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Body()
-    body: TaoLopHocDto,
+    Body: TaoLopHocDto,
   ) {
-    this.kiemTraAdmin(request);
+    this.KiemTraAdmin(Request);
 
-    return this.service.taoLopHoc(
-      body,
+    return this.Service.TaoLopHoc(
+      Body,
     );
   }
 
   @Get('lop_hoc')
-  layDanhSachLopHoc(
+  LayDanhSachLopHoc(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Query('nam_hoc_id')
-    namHocId?: string,
+    NamHocId?: string,
 
     @Query('khoi_id')
-    khoiId?: string,
+    KhoiId?: string,
 
     @Query('tu_khoa')
-    tuKhoa?: string,
+    TuKhoa?: string,
   ) {
-    this.kiemTraAdmin(request);
+    this.KiemTraAdmin(Request);
 
-    return this.service
-      .layDanhSachLopHoc(
-        this.chuyenQuerySoNguyenDuong(
-          namHocId,
+    return this.Service
+      .LayDanhSachLopHoc(
+        this.ChuyenQuerySoNguyenDuong(
+          NamHocId,
           'Năm học',
         ),
 
-        this.chuyenQuerySoNguyenDuong(
-          khoiId,
+        this.ChuyenQuerySoNguyenDuong(
+          KhoiId,
           'Khối',
         ),
 
-        tuKhoa,
+        TuKhoa,
       );
   }
 
-  @Get('lop_hoc/:id')
-  layChiTietLopHoc(
+  @Get('lop_hoc/:Id')
+  LayChiTietLopHoc(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Param(
-      'id',
+      'Id',
       ParseIntPipe,
     )
-    id: number,
+    Id: number,
   ) {
-    this.kiemTraAdmin(request);
+    this.KiemTraAdmin(Request);
 
-    return this.service
-      .layChiTietLopHoc(id);
+    return this.Service
+      .LayChiTietLopHoc(Id);
   }
 
-  @Patch('lop_hoc/:id')
-  capNhatLopHoc(
+  @Patch('lop_hoc/:Id')
+  CapNhatLopHoc(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Param(
-      'id',
+      'Id',
       ParseIntPipe,
     )
-    id: number,
+    Id: number,
 
     @Body()
-    body: CapNhatLopHocDto,
+    Body: CapNhatLopHocDto,
   ) {
-    this.kiemTraAdmin(request);
+    this.KiemTraAdmin(Request);
 
-    return this.service
-      .capNhatLopHoc(
-        id,
-        body,
+    return this.Service
+      .CapNhatLopHoc(
+        Id,
+        Body,
       );
   }
 
@@ -253,71 +253,71 @@ export class ToChucLopHocController {
   // =========================================
 
   @Get('hoc_sinh_chua_xep_lop')
-  layHocSinhChuaXepLop(
+  LayHocSinhChuaXepLop(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
   ) {
-    this.kiemTraAdmin(request);
+    this.KiemTraAdmin(Request);
 
-    return this.service
-      .layHocSinhChuaXepLop();
+    return this.Service
+      .LayHocSinhChuaXepLop();
   }
 
   @Post('xep_lop')
-  xepHocSinhVaoLop(
+  XepHocSinhVaoLop(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Body()
-    body: XepHocSinhVaoLopDto,
+    Body: XepHocSinhVaoLopDto,
   ) {
-    this.kiemTraAdmin(request);
+    this.KiemTraAdmin(Request);
 
-    return this.service
-      .xepHocSinhVaoLop(body);
+    return this.Service
+      .XepHocSinhVaoLop(Body);
   }
 
   @Get(
     'xep_lop/hoc_sinh/:hoc_sinh_id',
   )
-  layLichSuXepLop(
+  LayLichSuXepLop(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Param(
       'hoc_sinh_id',
       ParseIntPipe,
     )
-    hocSinhId: number,
+    HocSinhId: number,
   ) {
-    this.kiemTraAdmin(request);
+    this.KiemTraAdmin(Request);
 
-    return this.service
+    return this.Service
       .layLichSuXepLopHocSinh(
-        hocSinhId,
+        HocSinhId,
       );
   }
 
-  @Patch('xep_lop/:id')
-  capNhatXepLop(
+  @Patch('xep_lop/:Id')
+  CapNhatXepLop(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Param(
-      'id',
+      'Id',
       ParseIntPipe,
     )
-    id: number,
+    Id: number,
 
     @Body()
-    body: CapNhatXepLopDto,
+    Body: CapNhatXepLopDto,
   ) {
-    this.kiemTraAdmin(request);
+    this.KiemTraAdmin(Request);
 
-    return this.service
-      .capNhatXepLop(
-        id,
-        body,
+    return this.Service
+      .CapNhatXepLop(
+        Id,
+        Body,
       );
   }
 }
