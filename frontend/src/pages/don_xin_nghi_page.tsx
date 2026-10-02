@@ -18,7 +18,7 @@ import {
 } from '../utils/loi_api';
 
 interface Con {
-  Id: number;
+  id: number;
   ma_hoc_sinh: string;
   ho_ten: string;
 }
@@ -31,7 +31,7 @@ interface PhuHuynhMeResponse {
 }
 
 interface DonXinNghi {
-  Id: number;
+  id: number;
   hoc_sinh_id: number;
   ngay_bat_dau: string;
   ngay_ket_thuc: string;
@@ -47,15 +47,21 @@ interface DonXinNghi {
 }
 
 interface LopChuNhiem {
-  Id: number;
+  id: number;
   lop_hoc_id: number;
   lop_hoc: {
-    Id: number;
+    id: number;
     ten_lop: string;
     nam_hoc: {
       ten_nam_hoc: string;
     };
   };
+}
+
+function LayNgayHomNay() {
+  return new Date()
+    .toISOString()
+    .slice(0, 10);
 }
 
 export default function DonXinNghiPage() {
@@ -84,18 +90,14 @@ export default function DonXinNghiPage() {
     NgayBatDau,
     SetNgayBatDau,
   ] = useState(
-    new Date()
-      .toISOString()
-      .slice(0, 10),
+    LayNgayHomNay(),
   );
 
   const [
     NgayKetThuc,
     SetNgayKetThuc,
   ] = useState(
-    new Date()
-      .toISOString()
-      .slice(0, 10),
+    LayNgayHomNay(),
   );
 
   const [
@@ -166,7 +168,7 @@ export default function DonXinNghiPage() {
             ) {
               SetHocSinhId(
                 String(
-                  DanhSachCon[0].Id,
+                  DanhSachCon[0].id,
                 ),
               );
             }
@@ -232,7 +234,7 @@ export default function DonXinNghiPage() {
     try {
       const Response =
         await Api.get<DonXinNghi[]>(
-          `/diem_danh_nghi_hoc/don_xin_nghi/Lop/${Id}`,
+          `/diem_danh_nghi_hoc/don_xin_nghi/lop/${Id}`,
         );
 
       SetDon(
@@ -298,7 +300,9 @@ export default function DonXinNghiPage() {
 
   async function XuLyDon(
     Item: DonXinNghi,
-    TrangThai: 'DA_DUYET' | 'TU_CHOI',
+    TrangThai:
+      | 'DA_DUYET'
+      | 'TU_CHOI',
   ) {
     let LyDoTuChoi:
       string | undefined;
@@ -324,7 +328,7 @@ export default function DonXinNghiPage() {
       SetLoi('');
 
       await Api.patch(
-        `/diem_danh_nghi_hoc/don_xin_nghi/${Item.Id}/xu_ly`,
+        `/diem_danh_nghi_hoc/don_xin_nghi/${Item.id}/xu_ly`,
         {
           trang_thai:
             TrangThai,
@@ -354,7 +358,7 @@ export default function DonXinNghiPage() {
 
       <p className="mt-1 text-sm text-slate-500">
         {LaPhuHuynh
-          ? 'Phụ huynh gửi và theo dõi đơn xin nghỉ của Con.'
+          ? 'Phụ huynh gửi và theo dõi đơn xin nghỉ của con.'
           : 'GVCN xem và xử lý đơn xin nghỉ của học sinh.'}
       </p>
 
@@ -380,138 +384,154 @@ export default function DonXinNghiPage() {
               <label className="mb-1 block text-sm font-medium text-slate-700">
                 Học sinh
               </label>
-            <select
-              value={
-                HocSinhId
-              }
-              onChange={
-                (Event) =>
-                  SetHocSinhId(
-                    Event.target.value,
-                  )
-              }
-              required
-              className="rounded-lg border border-slate-300 px-3 py-2"
-            >
-              <option value="">
-                Chọn học sinh
-              </option>
 
-              {Con.map(
-                (Item) => (
-                  <option
-                    key={
-                      Item.Id
-                    }
-                    value={
-                      Item.Id
-                    }
-                  >
-                    {
-                      Item.ma_hoc_sinh
-                    } - {
-                      Item.ho_ten
-                    }
-                  </option>
-                ),
-              )}
-            </select>
+              <select
+                value={
+                  HocSinhId
+                }
+                onChange={
+                  (Event) =>
+                    SetHocSinhId(
+                      Event.target.value,
+                    )
+                }
+                required
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              >
+                <option value="">
+                  Chọn học sinh
+                </option>
+
+                {Con.map(
+                  (Item) => (
+                    <option
+                      key={
+                        Item.id
+                      }
+                      value={
+                        Item.id
+                      }
+                    >
+                      {
+                        Item.ma_hoc_sinh
+                      } - {
+                        Item.ho_ten
+                      }
+                    </option>
+                  ),
+                )}
+              </select>
             </div>
 
             <div>
               <label className="mb-1 block text-sm font-medium text-slate-700">
                 Buổi nghỉ
               </label>
-            <select
-              value={
-                BuoiNghi
-              }
-              onChange={
-                (Event) =>
-                  SetBuoiNghi(
-                    Event.target.value,
-                  )
-              }
-              className="rounded-lg border border-slate-300 px-3 py-2"
-            >
-              <option value="SANG">
-                Sáng
-              </option>
-              <option value="CHIEU">
-                Chiều
-              </option>
-              <option value="CA_NGAY">
-                Cả ngày
-              </option>
-            </select>
+
+              <select
+                value={
+                  BuoiNghi
+                }
+                onChange={
+                  (Event) =>
+                    SetBuoiNghi(
+                      Event.target.value,
+                    )
+                }
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              >
+                <option value="SANG">
+                  Sáng
+                </option>
+                <option value="CHIEU">
+                  Chiều
+                </option>
+                <option value="CA_NGAY">
+                  Cả ngày
+                </option>
+              </select>
             </div>
 
             <div>
               <label className="mb-1 block text-sm font-medium text-slate-700">
                 Từ ngày
               </label>
-            <input
-              type="date"
-              value={
-                NgayBatDau
-              }
-              onChange={
-                (Event) =>
-                  SetNgayBatDau(
-                    Event.target.value,
-                  )
-              }
-              required
-              min={
-                new Date()
-                  .toISOString()
-                  .slice(0, 10)
-              }
-              className="w-full rounded-lg border border-slate-300 px-3 py-2"
-            />
+
+              <input
+                type="date"
+                value={
+                  NgayBatDau
+                }
+                onChange={
+                  (Event) => {
+                    const GiaTri =
+                      Event.target.value;
+
+                    SetNgayBatDau(
+                      GiaTri,
+                    );
+
+                    if (
+                      NgayKetThuc <
+                      GiaTri
+                    ) {
+                      SetNgayKetThuc(
+                        GiaTri,
+                      );
+                    }
+                  }
+                }
+                min={
+                  LayNgayHomNay()
+                }
+                required
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              />
             </div>
 
             <div>
               <label className="mb-1 block text-sm font-medium text-slate-700">
                 Đến ngày
               </label>
-            <input
-              type="date"
-              value={
-                NgayKetThuc
-              }
-              onChange={
-                (Event) =>
-                  SetNgayKetThuc(
-                    Event.target.value,
-                  )
-              }
-              min={
-                NgayBatDau
-              }
-              required
-              className="w-full rounded-lg border border-slate-300 px-3 py-2"
-            />
+
+              <input
+                type="date"
+                value={
+                  NgayKetThuc
+                }
+                onChange={
+                  (Event) =>
+                    SetNgayKetThuc(
+                      Event.target.value,
+                    )
+                }
+                min={
+                  NgayBatDau
+                }
+                required
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              />
             </div>
 
             <div className="md:col-span-2">
               <label className="mb-1 block text-sm font-medium text-slate-700">
                 Lý do xin nghỉ
               </label>
-            <textarea
-              value={
-                LyDo
-              }
-              onChange={
-                (Event) =>
-                  SetLyDo(
-                    Event.target.value,
-                  )
-              }
-              placeholder="VD: Học sinh bị sốt, cần nghỉ để theo dõi sức khỏe"
-              required
-              className="w-full rounded-lg border border-slate-300 px-3 py-2"
-            />
+
+              <textarea
+                value={
+                  LyDo
+                }
+                onChange={
+                  (Event) =>
+                    SetLyDo(
+                      Event.target.value,
+                    )
+                }
+                placeholder="VD: Học sinh bị sốt, cần nghỉ để theo dõi sức khỏe"
+                required
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              />
             </div>
           </div>
 
@@ -555,7 +575,7 @@ export default function DonXinNghiPage() {
               (Item) => (
                 <option
                   key={
-                    Item.Id
+                    Item.id
                   }
                   value={
                     Item.lop_hoc_id
@@ -600,6 +620,7 @@ export default function DonXinNghiPage() {
                 <th className="px-3 py-3">
                   Trạng thái
                 </th>
+
                 {LaGiaoVien && (
                   <th className="px-3 py-3">
                     Xử lý
@@ -613,7 +634,7 @@ export default function DonXinNghiPage() {
                 (Item) => (
                   <tr
                     key={
-                      Item.Id
+                      Item.id
                     }
                     className="border-b"
                   >
@@ -623,7 +644,7 @@ export default function DonXinNghiPage() {
                           ?.ho_ten ??
                         Con.find(
                           (HocSinh) =>
-                            HocSinh.Id ===
+                            HocSinh.id ===
                             Item.hoc_sinh_id,
                         )
                           ?.ho_ten ??
