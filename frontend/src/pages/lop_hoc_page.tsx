@@ -8,7 +8,7 @@ import type {
   FormEvent,
 } from 'react';
 
-import api from '../api/api';
+import Api from '../api/api';
 
 import {
   LayThongBaoLoi,
@@ -128,19 +128,19 @@ export default function LopHocPage() {
             HocSinhResponse,
           ] =
             await Promise.all([
-              api.get<NamHoc[]>(
+              Api.get<NamHoc[]>(
                 '/to_chuc_lop_hoc/nam_hoc',
               ),
 
-              api.get<Khoi[]>(
+              Api.get<Khoi[]>(
                 '/to_chuc_lop_hoc/khoi',
               ),
 
-              api.get<LopHoc[]>(
+              Api.get<LopHoc[]>(
                 '/to_chuc_lop_hoc/lop_hoc',
               ),
 
-              api.get<HocSinhChuaXep[]>(
+              Api.get<HocSinhChuaXep[]>(
                 '/to_chuc_lop_hoc/hoc_sinh_chua_xep_lop',
               ),
             ]);
@@ -188,7 +188,7 @@ export default function LopHocPage() {
     try {
       SetLoi('');
 
-      await api.post(
+      await Api.post(
         '/to_chuc_lop_hoc/nam_hoc',
         {
           ten_nam_hoc:
@@ -215,7 +215,7 @@ export default function LopHocPage() {
     try {
       SetLoi('');
 
-      await api.post(
+      await Api.post(
         '/to_chuc_lop_hoc/lop_hoc',
         {
           nam_hoc_id:
@@ -252,7 +252,7 @@ export default function LopHocPage() {
     try {
       SetLoi('');
 
-      await api.post(
+      await Api.post(
         '/to_chuc_lop_hoc/xep_lop',
         {
           hoc_sinh_id:
