@@ -22,71 +22,71 @@ interface DoiMatKhauResponse {
 }
 
 export default function DoiMatKhauPage() {
-  const navigate =
+  const Navigate =
     useNavigate();
 
   const [
-    matKhauCu,
-    setMatKhauCu,
+    MatKhauCu,
+    SetMatKhauCu,
   ] = useState('');
 
   const [
-    matKhauMoi,
-    setMatKhauMoi,
+    MatKhauMoi,
+    SetMatKhauMoi,
   ] = useState('');
 
   const [
-    xacNhan,
-    setXacNhan,
+    XacNhan,
+    SetXacNhan,
   ] = useState('');
 
   const [
-    loi,
-    setLoi,
+    Loi,
+    SetLoi,
   ] = useState('');
 
   const [
-    dangGui,
-    setDangGui,
+    DangGui,
+    SetDangGui,
   ] = useState(false);
 
-  async function xuLyDoiMatKhau(
+  async function XuLyDoiMatKhau(
     event: FormEvent,
   ) {
     event.preventDefault();
-    setLoi('');
+    SetLoi('');
 
     if (
-      matKhauMoi.length < 8
+      MatKhauMoi.length < 8
     ) {
-      setLoi(
+      SetLoi(
         'Mật khẩu mới phải có ít nhất 8 ký tự',
       );
       return;
     }
 
     if (
-      matKhauMoi !==
-      xacNhan
+      MatKhauMoi !==
+      XacNhan
     ) {
-      setLoi(
+      SetLoi(
         'Mật khẩu xác nhận không khớp',
       );
       return;
     }
 
     try {
-      setDangGui(true);
+      SetDangGui(true);
 
       const response =
         await api.post<DoiMatKhauResponse>(
           '/auth/doi-mat-khau',
           {
             mat_khau_cu:
-              matKhauCu,
+              MatKhauCu,
 
             mat_khau_moi:
-              matKhauMoi,
+              MatKhauMoi,
           },
         );
 
@@ -94,25 +94,25 @@ export default function DoiMatKhauPage() {
         response.data.access_token,
       );
 
-      navigate(
+      Navigate(
         '/dashboard',
         {
           replace: true,
         },
       );
     } catch {
-      setLoi(
+      SetLoi(
         'Đổi mật khẩu thất bại',
       );
     } finally {
-      setDangGui(false);
+      SetDangGui(false);
     }
   }
 
-  function xuLyDangXuat() {
+  function XuLyDangXuat() {
     DangXuat();
 
-    navigate(
+    Navigate(
       '/dang_nhap',
       {
         replace: true,
@@ -133,72 +133,89 @@ export default function DoiMatKhauPage() {
 
         <form
           onSubmit={
-            xuLyDoiMatKhau
+            XuLyDoiMatKhau
           }
           className="mt-6 space-y-5"
         >
+          <div>
+            <label className="mb-1 block text-sm font-medium text-slate-700">
+              Mật khẩu hiện tại
+            </label>
           <input
             type="password"
             value={
-              matKhauCu
+              MatKhauCu
             }
             onChange={
               (event) =>
-                setMatKhauCu(
+                SetMatKhauCu(
                   event.target.value,
                 )
             }
-            placeholder="Mật khẩu hiện tại"
+            placeholder="Nhập mật khẩu hiện tại"
             className="w-full rounded-lg border border-slate-300 px-4 py-3"
             required
           />
+          </div>
 
+          <div>
+            <label className="mb-1 block text-sm font-medium text-slate-700">
+              Mật khẩu mới
+            </label>
           <input
             type="password"
             value={
-              matKhauMoi
+              MatKhauMoi
             }
             onChange={
               (event) =>
-                setMatKhauMoi(
+                SetMatKhauMoi(
                   event.target.value,
                 )
             }
-            placeholder="Mật khẩu mới"
+            minLength={8}
+            placeholder="Ít nhất 8 ký tự"
             className="w-full rounded-lg border border-slate-300 px-4 py-3"
             required
           />
+          </div>
 
+          <div>
+            <label className="mb-1 block text-sm font-medium text-slate-700">
+              Xác nhận mật khẩu mới
+            </label>
           <input
             type="password"
             value={
-              xacNhan
+              XacNhan
             }
             onChange={
               (event) =>
-                setXacNhan(
+                SetXacNhan(
                   event.target.value,
                 )
             }
-            placeholder="Xác nhận mật khẩu mới"
+            minLength={8}
+            placeholder="Nhập lại đúng mật khẩu mới"
             className="w-full rounded-lg border border-slate-300 px-4 py-3"
             required
           />
+          </div>
 
-          {loi && (
+          {Loi && (
             <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
-              {loi}
+              {Loi}
             </div>
           )}
 
           <button
             type="submit"
             disabled={
-              dangGui
+              DangGui
             }
             className="w-full rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white disabled:opacity-50"
           >
-            {dangGui
+            {DangGui
               ? 'Đang đổi mật khẩu...'
               : 'Đổi mật khẩu'}
           </button>
@@ -206,7 +223,7 @@ export default function DoiMatKhauPage() {
           <button
             type="button"
             onClick={
-              xuLyDangXuat
+              XuLyDangXuat
             }
             className="w-full rounded-lg border border-slate-300 px-4 py-3"
           >
