@@ -10,16 +10,16 @@ import {
 } from '../auth/auth';
 
 export default function MainLayout() {
-  const navigate =
+  const Navigate =
     useNavigate();
 
-  const nguoiDung =
+  const NguoiDung =
     DocJwt();
 
-  function xuLyDangXuat() {
+  function XuLyDangXuat() {
     DangXuat();
 
-    navigate(
+    Navigate(
       '/dang_nhap',
       {
         replace: true,
@@ -27,11 +27,11 @@ export default function MainLayout() {
     );
   }
 
-  const menu = [
+  const Menu = [
     {
-      ten: 'Tổng quan',
-      duong_dan: '/dashboard',
-      vai_tro: [
+      Ten: 'Tổng quan',
+      DuongDan: '/dashboard',
+      VaiTro: [
         'ADMIN',
         'GIAO_VIEN',
         'PHU_HUYNH',
@@ -39,72 +39,72 @@ export default function MainLayout() {
     },
 
     {
-      ten: 'Giáo viên',
-      duong_dan: '/giao_vien',
-      vai_tro: ['ADMIN'],
+      Ten: 'Giáo viên',
+      DuongDan: '/giao_vien',
+      VaiTro: ['ADMIN'],
     },
 
     {
-      ten: 'Học sinh',
-      duong_dan: '/hoc_sinh',
-      vai_tro: [
+      Ten: 'Học sinh',
+      DuongDan: '/hoc_sinh',
+      VaiTro: [
         'ADMIN',
         'GIAO_VIEN',
       ],
     },
 
     {
-      ten: 'Tổ chức lớp học',
-      duong_dan: '/lop_hoc',
-      vai_tro: ['ADMIN'],
+      Ten: 'Tổ chức lớp học',
+      DuongDan: '/lop_hoc',
+      VaiTro: ['ADMIN'],
     },
 
     {
-      ten: 'Phân công giảng dạy',
-      duong_dan: '/phan_cong',
-      vai_tro: [
+      Ten: 'Phân công giảng dạy',
+      DuongDan: '/phan_cong',
+      VaiTro: [
         'ADMIN',
         'GIAO_VIEN',
       ],
     },
 
     {
-      ten: 'Điểm danh',
-      duong_dan: '/diem_danh',
-      vai_tro: ['GIAO_VIEN'],
+      Ten: 'Điểm danh',
+      DuongDan: '/diem_danh',
+      VaiTro: ['GIAO_VIEN'],
     },
 
     {
-      ten: 'Đơn xin nghỉ',
-      duong_dan: '/don_xin_nghi',
-      vai_tro: [
+      Ten: 'Đơn xin nghỉ',
+      DuongDan: '/don_xin_nghi',
+      VaiTro: [
         'GIAO_VIEN',
         'PHU_HUYNH',
       ],
     },
 
     {
-      ten: 'Đánh giá học tập',
-      duong_dan: '/danh_gia',
-      vai_tro: [
+      Ten: 'Đánh giá học tập',
+      DuongDan: '/danh_gia',
+      VaiTro: [
         'ADMIN',
         'GIAO_VIEN',
       ],
     },
 
     {
-      ten: 'Con của tôi',
-      duong_dan: '/con_cua_toi',
-      vai_tro: ['PHU_HUYNH'],
+      Ten: 'Con của tôi',
+      DuongDan: '/con_cua_toi',
+      VaiTro: ['PHU_HUYNH'],
     },
   ];
 
-  const menuHienThi =
-    menu.filter(
-      (item) =>
-        nguoiDung &&
-        item.vai_tro.includes(
-          nguoiDung.vai_tro,
+  const MenuHienThi =
+    Menu.filter(
+      (Item) =>
+        NguoiDung &&
+        Item.VaiTro.includes(
+          NguoiDung.VaiTro,
         ),
     );
 
@@ -141,22 +141,22 @@ export default function MainLayout() {
               text-slate-400
             "
           >
-            {nguoiDung?.vai_tro}
+            {NguoiDung?.VaiTro}
           </p>
         </div>
 
         <nav className="p-3">
-          {menuHienThi.map(
-            (item) => (
+          {MenuHienThi.map(
+            (Item) => (
               <NavLink
                 key={
-                  item.duong_dan
+                  Item.DuongDan
                 }
                 to={
-                  item.duong_dan
+                  Item.DuongDan
                 }
                 className={({
-                  isActive,
+                  IsActive,
                 }) =>
                   `
                     mb-1
@@ -166,14 +166,14 @@ export default function MainLayout() {
                     py-3
                     text-sm
                     ${
-                      isActive
+                      IsActive
                         ? 'bg-blue-600 text-white'
                         : 'text-slate-300 hover:bg-slate-800'
                     }
                   `
                 }
               >
-                {item.ten}
+                {Item.Ten}
               </NavLink>
             ),
           )}
@@ -210,7 +210,7 @@ export default function MainLayout() {
 
           <button
             onClick={
-              xuLyDangXuat
+              XuLyDangXuat
             }
             className="
               rounded-lg
