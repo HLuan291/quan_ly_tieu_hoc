@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   ForbiddenException,
@@ -139,8 +140,22 @@ export class DiemDanhNghiHocController {
       !ngayHoc ||
       !buoiHoc
     ) {
-      throw new ForbiddenException(
+      throw new BadRequestException(
         'Thiếu thông tin lớp, ngày học hoặc buổi học',
+      );
+    }
+
+    const lopHocIdSo =
+      Number(lopHocId);
+
+    if (
+      !Number.isInteger(
+        lopHocIdSo,
+      ) ||
+      lopHocIdSo <= 0
+    ) {
+      throw new BadRequestException(
+        'Lớp học không hợp lệ',
       );
     }
 
@@ -148,7 +163,7 @@ export class DiemDanhNghiHocController {
       .laySoDiemDanh(
         nguoiDung.sub,
         nguoiDung.vai_tro,
-        Number(lopHocId),
+        lopHocIdSo,
         ngayHoc,
         buoiHoc,
       );
