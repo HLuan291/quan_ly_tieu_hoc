@@ -292,14 +292,14 @@ export class PhanCongGiangDayService {
     ] = await Promise.all([
       this.Prisma.mon_hoc.findUnique({
         where: {
-          Id:
+          id:
             DuLieu.mon_hoc_id,
         },
       }),
 
       this.Prisma.khoi.findUnique({
         where: {
-          Id:
+          id:
             DuLieu.khoi_id,
         },
       }),
@@ -522,14 +522,14 @@ export class PhanCongGiangDayService {
     ] = await Promise.all([
       this.Prisma.giao_vien.findUnique({
         where: {
-          Id:
+          id:
             DuLieu.giao_vien_id,
         },
       }),
 
       this.Prisma.lop_hoc.findUnique({
         where: {
-          Id:
+          id:
             DuLieu.lop_hoc_id,
         },
 
@@ -841,21 +841,21 @@ export class PhanCongGiangDayService {
     ] = await Promise.all([
       this.Prisma.giao_vien.findUnique({
         where: {
-          Id:
+          id:
             DuLieu.giao_vien_id,
         },
       }),
 
       this.Prisma.lop_hoc.findUnique({
         where: {
-          Id:
+          id:
             DuLieu.lop_hoc_id,
         },
       }),
 
       this.Prisma.mon_hoc.findUnique({
         where: {
-          Id:
+          id:
             DuLieu.mon_hoc_id,
         },
       }),
@@ -1141,7 +1141,7 @@ export class PhanCongGiangDayService {
         include: {
           giao_vien: {
             select: {
-              Id: true,
+              id: true,
               ma_giao_vien: true,
               ho_ten: true,
               trang_thai: true,
@@ -1175,7 +1175,7 @@ export class PhanCongGiangDayService {
         },
 
         select: {
-          Id: true,
+          id: true,
           ma_giao_vien: true,
           ho_ten: true,
         },
@@ -1193,7 +1193,7 @@ export class PhanCongGiangDayService {
         .findMany({
           where: {
             giao_vien_id:
-              GiaoVien.Id,
+              GiaoVien.id,
           },
 
           orderBy: {
