@@ -128,3 +128,24 @@ export function DaDangNhap() {
 
   return true;
 }
+
+
+export function LayTenVaiTro(
+  VaiTroNguoiDung: VaiTro | undefined,
+) {
+  switch (
+    VaiTroNguoiDung
+  ) {
+    case 'ADMIN':
+      return 'Quản trị viên';
+
+    case 'GIAO_VIEN':
+      return 'Giáo viên';
+
+    case 'PHU_HUYNH':
+      return 'Phụ huynh';
+
+    default:
+      return 'Không xác định';
+  }
+}
