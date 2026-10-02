@@ -23,7 +23,7 @@ import {
 
 import {
   DanhGiaHocTapService,
-} from './danh_gia_hoc_tap.service';
+} from './danh_gia_hoc_tap.Service';
 
 import {
   CapNhatKetQuaMonHocDto,
@@ -50,30 +50,30 @@ interface RequestCoNguoiDung
 @Controller('danh_gia_hoc_tap')
 export class DanhGiaHocTapController {
   constructor(
-    private readonly service:
+    private readonly Service:
       DanhGiaHocTapService,
   ) {}
 
-  private layNguoiDung(
-    request: RequestCoNguoiDung,
+  private LayNguoiDung(
+    Request: RequestCoNguoiDung,
   ) {
-    if (!request.nguoi_dung) {
+    if (!Request.nguoi_dung) {
       throw new ForbiddenException(
         'Không xác định được người dùng',
       );
     }
 
-    return request.nguoi_dung;
+    return Request.nguoi_dung;
   }
 
-  private kiemTraAdmin(
-    request: RequestCoNguoiDung,
+  private KiemTraAdmin(
+    Request: RequestCoNguoiDung,
   ) {
-    const nguoiDung =
-      this.layNguoiDung(request);
+    const NguoiDung =
+      this.LayNguoiDung(Request);
 
     if (
-      nguoiDung.vai_tro !==
+      NguoiDung.vai_tro !==
       'ADMIN'
     ) {
       throw new ForbiddenException(
@@ -81,17 +81,17 @@ export class DanhGiaHocTapController {
       );
     }
 
-    return nguoiDung;
+    return NguoiDung;
   }
 
-  private kiemTraGiaoVien(
-    request: RequestCoNguoiDung,
+  private KiemTraGiaoVien(
+    Request: RequestCoNguoiDung,
   ) {
-    const nguoiDung =
-      this.layNguoiDung(request);
+    const NguoiDung =
+      this.LayNguoiDung(Request);
 
     if (
-      nguoiDung.vai_tro !==
+      NguoiDung.vai_tro !==
       'GIAO_VIEN'
     ) {
       throw new ForbiddenException(
@@ -99,17 +99,17 @@ export class DanhGiaHocTapController {
       );
     }
 
-    return nguoiDung;
+    return NguoiDung;
   }
 
-  private kiemTraPhuHuynh(
-    request: RequestCoNguoiDung,
+  private KiemTraPhuHuynh(
+    Request: RequestCoNguoiDung,
   ) {
-    const nguoiDung =
-      this.layNguoiDung(request);
+    const NguoiDung =
+      this.LayNguoiDung(Request);
 
     if (
-      nguoiDung.vai_tro !==
+      NguoiDung.vai_tro !==
       'PHU_HUYNH'
     ) {
       throw new ForbiddenException(
@@ -117,33 +117,33 @@ export class DanhGiaHocTapController {
       );
     }
 
-    return nguoiDung;
+    return NguoiDung;
   }
 
-  private chuyenQuerySoNguyenDuong(
-    giaTri: string | undefined,
-    tenTruong: string,
+  private ChuyenQuerySoNguyenDuong(
+    GiaTri: string | undefined,
+    TenTruong: string,
   ): number | undefined {
     if (
-      giaTri === undefined ||
-      giaTri.trim() === ''
+      GiaTri === undefined ||
+      GiaTri.trim() === ''
     ) {
       return undefined;
     }
 
-    const so =
-      Number(giaTri);
+    const So =
+      Number(GiaTri);
 
     if (
-      !Number.isInteger(so) ||
-      so <= 0
+      !Number.isInteger(So) ||
+      So <= 0
     ) {
       throw new BadRequestException(
-        `${tenTruong} không hợp lệ`,
+        `${TenTruong} không hợp lệ`,
       );
     }
 
-    return so;
+    return So;
   }
 
   // ==================================================
@@ -151,156 +151,156 @@ export class DanhGiaHocTapController {
   // ==================================================
 
   @Post('dot_danh_gia')
-  taoDotDanhGia(
+  TaoDotDanhGia(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Body()
-    body: TaoDotDanhGiaDto,
+    Body: TaoDotDanhGiaDto,
   ) {
-    this.kiemTraAdmin(request);
+    this.KiemTraAdmin(Request);
 
-    return this.service
-      .taoDotDanhGia(body);
+    return this.Service
+      .TaoDotDanhGia(Body);
   }
 
   @Get('dot_danh_gia')
-  layDanhSachDotDanhGia(
+  LayDanhSachDotDanhGia(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Query('nam_hoc_id')
-    namHocId?: string,
+    NamHocId?: string,
   ) {
-    this.layNguoiDung(request);
+    this.LayNguoiDung(Request);
 
-    return this.service
-      .layDanhSachDotDanhGia(
-        this.chuyenQuerySoNguyenDuong(
-          namHocId,
+    return this.Service
+      .LayDanhSachDotDanhGia(
+        this.ChuyenQuerySoNguyenDuong(
+          NamHocId,
           'Năm học',
         ),
       );
   }
 
   @Post('cau_hinh_danh_gia_mon')
-  taoCauHinhDanhGiaMon(
+  TaoCauHinhDanhGiaMon(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Body()
-    body: TaoCauHinhDanhGiaMonDto,
+    Body: TaoCauHinhDanhGiaMonDto,
   ) {
-    this.kiemTraAdmin(request);
+    this.KiemTraAdmin(Request);
 
-    return this.service
-      .taoCauHinhDanhGiaMon(
-        body,
+    return this.Service
+      .TaoCauHinhDanhGiaMon(
+        Body,
       );
   }
 
   @Get('cau_hinh_danh_gia_mon')
-  layCauHinhDanhGiaMon(
+  LayCauHinhDanhGiaMon(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Query('dot_danh_gia_id')
-    dotDanhGiaId?: string,
+    DotDanhGiaId?: string,
 
     @Query('khoi_id')
-    khoiId?: string,
+    KhoiId?: string,
   ) {
-    this.layNguoiDung(request);
+    this.LayNguoiDung(Request);
 
-    return this.service
-      .layCauHinhDanhGiaMon(
-        this.chuyenQuerySoNguyenDuong(
-          dotDanhGiaId,
+    return this.Service
+      .LayCauHinhDanhGiaMon(
+        this.ChuyenQuerySoNguyenDuong(
+          DotDanhGiaId,
           'Đợt đánh giá',
         ),
 
-        this.chuyenQuerySoNguyenDuong(
-          khoiId,
+        this.ChuyenQuerySoNguyenDuong(
+          KhoiId,
           'Khối',
         ),
       );
   }
 
   @Post('cau_hinh_diem')
-  taoCauHinhDiem(
+  TaoCauHinhDiem(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Body()
-    body: TaoCauHinhDiemDto,
+    Body: TaoCauHinhDiemDto,
   ) {
-    this.kiemTraAdmin(request);
+    this.KiemTraAdmin(Request);
 
-    return this.service
-      .taoCauHinhDiem(body);
+    return this.Service
+      .TaoCauHinhDiem(Body);
   }
 
   @Get('cau_hinh_diem')
-  layCauHinhDiem(
+  LayCauHinhDiem(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Query('dot_danh_gia_id')
-    dotDanhGiaId?: string,
+    DotDanhGiaId?: string,
 
     @Query('khoi_id')
-    khoiId?: string,
+    KhoiId?: string,
 
     @Query('mon_hoc_id')
-    monHocId?: string,
+    MonHocId?: string,
   ) {
-    this.layNguoiDung(request);
+    this.LayNguoiDung(Request);
 
-    return this.service
-      .layCauHinhDiem(
-        this.chuyenQuerySoNguyenDuong(
-          dotDanhGiaId,
+    return this.Service
+      .LayCauHinhDiem(
+        this.ChuyenQuerySoNguyenDuong(
+          DotDanhGiaId,
           'Đợt đánh giá',
         ),
 
-        this.chuyenQuerySoNguyenDuong(
-          khoiId,
+        this.ChuyenQuerySoNguyenDuong(
+          KhoiId,
           'Khối',
         ),
 
-        this.chuyenQuerySoNguyenDuong(
-          monHocId,
+        this.ChuyenQuerySoNguyenDuong(
+          MonHocId,
           'Môn học',
         ),
       );
   }
 
   @Post('tieu_chi_danh_gia')
-  taoTieuChiDanhGia(
+  TaoTieuChiDanhGia(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Body()
-    body: TaoTieuChiDanhGiaDto,
+    Body: TaoTieuChiDanhGiaDto,
   ) {
-    this.kiemTraAdmin(request);
+    this.KiemTraAdmin(Request);
 
-    return this.service
-      .taoTieuChiDanhGia(body);
+    return this.Service
+      .TaoTieuChiDanhGia(Body);
   }
 
   @Get('tieu_chi_danh_gia')
-  layDanhSachTieuChi(
+  LayDanhSachTieuChi(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Query('nhom_danh_gia')
     nhomDanhGia?: string,
   ) {
-    this.layNguoiDung(request);
+    this.LayNguoiDung(Request);
 
-    return this.service
-      .layDanhSachTieuChi(
+    return this.Service
+      .LayDanhSachTieuChi(
         nhomDanhGia,
       );
   }
@@ -312,9 +312,9 @@ export class DanhGiaHocTapController {
   @Get(
     'lop/:lop_hoc_id/hoc_sinh',
   )
-  layHocSinhDeDanhGia(
+  LayHocSinhDeDanhGia(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Param(
       'lop_hoc_id',
@@ -322,124 +322,124 @@ export class DanhGiaHocTapController {
     )
     lopHocId: number,
   ) {
-    const nguoiDung =
-      this.kiemTraGiaoVien(
-        request,
+    const NguoiDung =
+      this.KiemTraGiaoVien(
+        Request,
       );
 
-    return this.service
-      .layHocSinhDeDanhGia(
-        nguoiDung.sub,
+    return this.Service
+      .LayHocSinhDeDanhGia(
+        NguoiDung.sub,
         lopHocId,
       );
   }
 
   @Put('ket_qua_mon_hoc')
-  capNhatKetQuaMonHoc(
+  CapNhatKetQuaMonHoc(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Body()
-    body: CapNhatKetQuaMonHocDto,
+    Body: CapNhatKetQuaMonHocDto,
   ) {
-    const nguoiDung =
-      this.kiemTraGiaoVien(
-        request,
+    const NguoiDung =
+      this.KiemTraGiaoVien(
+        Request,
       );
 
-    return this.service
-      .capNhatKetQuaMonHoc(
-        nguoiDung.sub,
-        body,
+    return this.Service
+      .CapNhatKetQuaMonHoc(
+        NguoiDung.sub,
+        Body,
       );
   }
 
   @Post('diem_dinh_ky')
-  nhapDiemDinhKy(
+  NhapDiemDinhKy(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Body()
-    body: NhapDiemDinhKyDto,
+    Body: NhapDiemDinhKyDto,
   ) {
-    const nguoiDung =
-      this.kiemTraGiaoVien(
-        request,
+    const NguoiDung =
+      this.KiemTraGiaoVien(
+        Request,
       );
 
-    return this.service
-      .nhapDiemDinhKy(
-        nguoiDung.sub,
-        body,
+    return this.Service
+      .NhapDiemDinhKy(
+        NguoiDung.sub,
+        Body,
       );
   }
 
   @Post(
-    'diem_dinh_ky/:id/kiem_tra_lai',
+    'diem_dinh_ky/:Id/kiem_tra_lai',
   )
-  nhapDiemKiemTraLai(
+  NhapDiemKiemTraLai(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Param(
-      'id',
+      'Id',
       ParseIntPipe,
     )
-    id: number,
+    Id: number,
 
     @Body()
-    body: NhapDiemKiemTraLaiDto,
+    Body: NhapDiemKiemTraLaiDto,
   ) {
-    const nguoiDung =
-      this.kiemTraGiaoVien(
-        request,
+    const NguoiDung =
+      this.KiemTraGiaoVien(
+        Request,
       );
 
-    return this.service
-      .nhapDiemKiemTraLai(
-        nguoiDung.sub,
-        id,
-        body,
+    return this.Service
+      .NhapDiemKiemTraLai(
+        NguoiDung.sub,
+        Id,
+        Body,
       );
   }
 
   @Put('nang_luc_pham_chat')
-  capNhatNangLucPhamChat(
+  CapNhatNangLucPhamChat(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Body()
-    body: CapNhatNangLucPhamChatDto,
+    Body: CapNhatNangLucPhamChatDto,
   ) {
-    const nguoiDung =
-      this.kiemTraGiaoVien(
-        request,
+    const NguoiDung =
+      this.KiemTraGiaoVien(
+        Request,
       );
 
-    return this.service
-      .capNhatNangLucPhamChat(
-        nguoiDung.sub,
-        body,
+    return this.Service
+      .CapNhatNangLucPhamChat(
+        NguoiDung.sub,
+        Body,
       );
   }
 
   @Put('tong_ket_giao_duc')
-  capNhatTongKetGiaoDuc(
+  CapNhatTongKetGiaoDuc(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Body()
-    body: CapNhatTongKetGiaoDucDto,
+    Body: CapNhatTongKetGiaoDucDto,
   ) {
-    const nguoiDung =
-      this.kiemTraGiaoVien(
-        request,
+    const NguoiDung =
+      this.KiemTraGiaoVien(
+        Request,
       );
 
-    return this.service
-      .capNhatTongKetGiaoDuc(
-        nguoiDung.sub,
-        body,
+    return this.Service
+      .CapNhatTongKetGiaoDuc(
+        NguoiDung.sub,
+        Body,
       );
   }
 
@@ -451,25 +451,25 @@ export class DanhGiaHocTapController {
   @Get(
     'hoc_sinh/:hoc_sinh_id/dot/:dot_danh_gia_id',
   )
-  layKetQuaHocSinhTheoDot(
+  LayKetQuaHocSinhTheoDot(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Param(
       'hoc_sinh_id',
       ParseIntPipe,
     )
-    hocSinhId: number,
+    HocSinhId: number,
 
     @Param(
       'dot_danh_gia_id',
       ParseIntPipe,
     )
-    dotDanhGiaId: number,
+    DotDanhGiaId: number,
   ) {
-    const nguoiDung =
-      this.layNguoiDung(
-        request,
+    const NguoiDung =
+      this.LayNguoiDung(
+        Request,
       );
 
     if (
@@ -477,7 +477,7 @@ export class DanhGiaHocTapController {
         'ADMIN',
         'GIAO_VIEN',
       ].includes(
-        nguoiDung.vai_tro,
+        NguoiDung.vai_tro,
       )
     ) {
       throw new ForbiddenException(
@@ -485,12 +485,12 @@ export class DanhGiaHocTapController {
       );
     }
 
-    return this.service
+    return this.Service
       .layKetQuaHocSinhTheoDotChoNhanVien(
-        nguoiDung.sub,
-        nguoiDung.vai_tro,
-        hocSinhId,
-        dotDanhGiaId,
+        NguoiDung.sub,
+        NguoiDung.vai_tro,
+        HocSinhId,
+        DotDanhGiaId,
       );
   }
 
@@ -501,32 +501,32 @@ export class DanhGiaHocTapController {
   @Get(
     'con/:hoc_sinh_id/dot/:dot_danh_gia_id',
   )
-  layKetQuaCuaCon(
+  LayKetQuaCuaCon(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Param(
       'hoc_sinh_id',
       ParseIntPipe,
     )
-    hocSinhId: number,
+    HocSinhId: number,
 
     @Param(
       'dot_danh_gia_id',
       ParseIntPipe,
     )
-    dotDanhGiaId: number,
+    DotDanhGiaId: number,
   ) {
-    const nguoiDung =
-      this.kiemTraPhuHuynh(
-        request,
+    const NguoiDung =
+      this.KiemTraPhuHuynh(
+        Request,
       );
 
-    return this.service
-      .layKetQuaCuaCon(
-        nguoiDung.sub,
-        hocSinhId,
-        dotDanhGiaId,
+    return this.Service
+      .LayKetQuaCuaCon(
+        NguoiDung.sub,
+        HocSinhId,
+        DotDanhGiaId,
       );
   }
 }
