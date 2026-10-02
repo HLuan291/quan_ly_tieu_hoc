@@ -5,8 +5,8 @@ import {
 } from 'react-router';
 
 import {
-  dangXuat,
-  docJwt,
+  DangXuat,
+  DocJwt,
 } from '../auth/auth';
 
 export default function MainLayout() {
@@ -14,10 +14,10 @@ export default function MainLayout() {
     useNavigate();
 
   const nguoiDung =
-    docJwt();
+    DocJwt();
 
   function xuLyDangXuat() {
-    dangXuat();
+    DangXuat();
 
     navigate(
       '/dang_nhap',
