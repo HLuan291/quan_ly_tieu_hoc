@@ -23,7 +23,7 @@ import {
 
 import {
   DiemDanhNghiHocService,
-} from './diem_danh_nghi_hoc.Service';
+} from './diem_danh_nghi_hoc.service';
 
 import {
   DiemDanhHangLoatDto,
