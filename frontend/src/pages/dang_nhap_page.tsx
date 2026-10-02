@@ -68,10 +68,10 @@ export default function DangNhapPage() {
   ] = useState(false);
 
   const {
-    Register,
-    HandleSubmit,
+    register: Register,
+    handleSubmit: HandleSubmit,
     formState: {
-      Errors,
+      errors: Errors,
     },
   } = useForm<FormData>({
     resolver:
@@ -109,8 +109,8 @@ export default function DangNhapPage() {
         axios.isAxiosError(Error)
       ) {
         const Message =
-          Error.Response?.data
-            ?.Message;
+          Error.response?.data
+            ?.message;
 
         if (
           Array.isArray(Message)
@@ -234,7 +234,7 @@ export default function DangNhapPage() {
                 {
                   Errors
                     .ten_dang_nhap_hoac_so_dien_thoai
-                    .Message
+                    .message
                 }
               </p>
             )}
@@ -282,7 +282,7 @@ export default function DangNhapPage() {
                 {
                   Errors
                     .mat_khau
-                    .Message
+                    .message
                 }
               </p>
             )}
