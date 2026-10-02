@@ -29,7 +29,6 @@ import type {
   DuLieuTaoGiaoVien,
 } from './giao_vien.service';
 
-
 interface RequestCoNguoiDung
   extends Request {
   nguoi_dung?: {
@@ -39,22 +38,19 @@ interface RequestCoNguoiDung
   };
 }
 
-
 @UseGuards(JwtAuthGuard)
 @Controller('giao_vien')
 export class GiaoVienController {
-
   constructor(
-    private readonly giaoVienService:
+    private readonly GiaoVienService:
       GiaoVienService,
   ) {}
 
-
-  private kiemTraAdmin(
-    request: RequestCoNguoiDung,
+  private KiemTraAdmin(
+    Request: RequestCoNguoiDung,
   ) {
     if (
-      request.nguoi_dung?.vai_tro !==
+      Request.nguoi_dung?.vai_tro !==
       'ADMIN'
     ) {
       throw new ForbiddenException(
@@ -63,113 +59,89 @@ export class GiaoVienController {
     }
   }
 
-
-  // =========================================
-  // 1. THÊM GIÁO VIÊN
-  // POST /giao_vien
-  // =========================================
-
   @Post()
-  taoGiaoVien(
+  TaoGiaoVien(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Body()
-    body: DuLieuTaoGiaoVien,
+    Body: DuLieuTaoGiaoVien,
   ) {
-    this.kiemTraAdmin(
-      request,
+    this.KiemTraAdmin(
+      Request,
     );
 
-    return this.giaoVienService
-      .taoGiaoVien(
-        body,
+    return this.GiaoVienService
+      .TaoGiaoVien(
+        Body,
       );
   }
-
-
-  // =========================================
-  // 2. XEM / TÌM DANH SÁCH GIÁO VIÊN
-  // GET /giao_vien
-  // =========================================
 
   @Get()
-  layDanhSachGiaoVien(
+  LayDanhSachGiaoVien(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Query('tu_khoa')
-    tuKhoa?: string,
+    TuKhoa?: string,
 
     @Query('trang_thai')
-    trangThai?: string,
+    TrangThai?: string,
   ) {
-    this.kiemTraAdmin(
-      request,
+    this.KiemTraAdmin(
+      Request,
     );
 
-    return this.giaoVienService
-      .layDanhSachGiaoVien(
-        tuKhoa,
-        trangThai,
+    return this.GiaoVienService
+      .LayDanhSachGiaoVien(
+        TuKhoa,
+        TrangThai,
       );
   }
-
-
-  // =========================================
-  // 3. CẬP NHẬT GIÁO VIÊN
-  // PATCH /giao_vien/:id
-  // =========================================
 
   @Patch(':id')
-  capNhatGiaoVien(
+  CapNhatGiaoVien(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Param(
       'id',
       ParseIntPipe,
     )
-    id: number,
+    Id: number,
 
     @Body()
-    body: DuLieuCapNhatGiaoVien,
+    Body: DuLieuCapNhatGiaoVien,
   ) {
-    this.kiemTraAdmin(
-      request,
+    this.KiemTraAdmin(
+      Request,
     );
 
-    return this.giaoVienService
-      .capNhatGiaoVien(
-        id,
-        body,
+    return this.GiaoVienService
+      .CapNhatGiaoVien(
+        Id,
+        Body,
       );
   }
 
-
-  // =========================================
-  // 4. CẤP LẠI MẬT KHẨU GIÁO VIÊN
-  // POST /giao_vien/:id/cap_lai_mat_khau
-  // =========================================
-
   @Post(':id/cap_lai_mat_khau')
-  capLaiMatKhauGiaoVien(
+  CapLaiMatKhauGiaoVien(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Param(
       'id',
       ParseIntPipe,
     )
-    id: number,
+    Id: number,
   ) {
-    this.kiemTraAdmin(
-      request,
+    this.KiemTraAdmin(
+      Request,
     );
 
-    return this.giaoVienService
-      .capLaiMatKhauGiaoVien(
-        id,
+    return this.GiaoVienService
+      .CapLaiMatKhauGiaoVien(
+        Id,
       );
   }
 }
