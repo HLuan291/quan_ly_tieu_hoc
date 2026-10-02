@@ -23,7 +23,7 @@ import axios from 'axios';
 import api from '../api/api';
 
 import {
-  luuToken,
+  LuuToken,
 } from '../auth/auth';
 
 const schema = z.object({
@@ -91,7 +91,7 @@ export default function DangNhapPage() {
           duLieu,
         );
 
-      luuToken(
+      LuuToken(
         response.data.access_token,
       );
 
