@@ -12,11 +12,11 @@ import type {
 import api from '../api/api';
 
 import {
-  docJwt,
+  DocJwt,
 } from '../auth/auth';
 
 import {
-  layThongBaoLoi,
+  LayThongBaoLoi,
 } from '../utils/loi_api';
 
 interface NamHoc {
@@ -99,7 +99,7 @@ interface TieuChi {
 
 export default function DanhGiaPage() {
   const nguoiDung =
-    docJwt();
+    DocJwt();
 
   const laAdmin =
     nguoiDung?.vai_tro ===
@@ -352,7 +352,7 @@ export default function DanhGiaPage() {
           }
         } catch (error: unknown) {
           setLoi(
-            layThongBaoLoi(
+            LayThongBaoLoi(
               error,
             ),
           );
@@ -473,7 +473,7 @@ export default function DanhGiaPage() {
       }
     } catch (error: unknown) {
       setLoi(
-        layThongBaoLoi(
+        LayThongBaoLoi(
           error,
         ),
       );
@@ -534,7 +534,7 @@ export default function DanhGiaPage() {
       );
     } catch (error: unknown) {
       setLoi(
-        layThongBaoLoi(
+        LayThongBaoLoi(
           error,
         ),
       );
@@ -580,7 +580,7 @@ export default function DanhGiaPage() {
       );
     } catch (error: unknown) {
       setLoi(
-        layThongBaoLoi(
+        LayThongBaoLoi(
           error,
         ),
       );
@@ -625,7 +625,7 @@ export default function DanhGiaPage() {
       );
     } catch (error: unknown) {
       setLoi(
-        layThongBaoLoi(
+        LayThongBaoLoi(
           error,
         ),
       );
@@ -668,7 +668,7 @@ export default function DanhGiaPage() {
       );
     } catch (error: unknown) {
       setLoi(
-        layThongBaoLoi(
+        LayThongBaoLoi(
           error,
         ),
       );
@@ -709,7 +709,7 @@ export default function DanhGiaPage() {
       await taiDanhMuc();
     } catch (error: unknown) {
       setLoi(
-        layThongBaoLoi(
+        LayThongBaoLoi(
           error,
         ),
       );
@@ -747,7 +747,7 @@ export default function DanhGiaPage() {
       );
     } catch (error: unknown) {
       setLoi(
-        layThongBaoLoi(
+        LayThongBaoLoi(
           error,
         ),
       );
@@ -803,7 +803,7 @@ export default function DanhGiaPage() {
       );
     } catch (error: unknown) {
       setLoi(
-        layThongBaoLoi(
+        LayThongBaoLoi(
           error,
         ),
       );
@@ -838,7 +838,7 @@ export default function DanhGiaPage() {
       await taiDanhMuc();
     } catch (error: unknown) {
       setLoi(
-        layThongBaoLoi(
+        LayThongBaoLoi(
           error,
         ),
       );
