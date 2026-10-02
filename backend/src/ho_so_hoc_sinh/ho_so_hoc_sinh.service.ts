@@ -9,7 +9,7 @@ import {
 import { randomBytes } from 'crypto';
 import * as argon2 from 'argon2';
 
-import { PrismaService } from '../Prisma.service';
+import { PrismaService } from '../prisma.service';
 
 import {
   CapNhatHocSinhDto,
