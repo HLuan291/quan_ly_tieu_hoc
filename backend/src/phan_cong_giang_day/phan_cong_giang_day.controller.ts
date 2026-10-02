@@ -23,7 +23,7 @@ import {
 
 import {
   PhanCongGiangDayService,
-} from './phan_cong_giang_day.service';
+} from './phan_cong_giang_day.Service';
 
 import {
   CapNhatMonHocDto,
@@ -48,30 +48,30 @@ interface RequestCoNguoiDung
 @Controller('phan_cong_giang_day')
 export class PhanCongGiangDayController {
   constructor(
-    private readonly service:
+    private readonly Service:
       PhanCongGiangDayService,
   ) {}
 
-  private layNguoiDung(
-    request: RequestCoNguoiDung,
+  private LayNguoiDung(
+    Request: RequestCoNguoiDung,
   ) {
-    if (!request.nguoi_dung) {
+    if (!Request.nguoi_dung) {
       throw new ForbiddenException(
         'Không xác định được người dùng',
       );
     }
 
-    return request.nguoi_dung;
+    return Request.nguoi_dung;
   }
 
-  private kiemTraAdmin(
-    request: RequestCoNguoiDung,
+  private KiemTraAdmin(
+    Request: RequestCoNguoiDung,
   ) {
-    const nguoiDung =
-      this.layNguoiDung(request);
+    const NguoiDung =
+      this.LayNguoiDung(Request);
 
     if (
-      nguoiDung.vai_tro !==
+      NguoiDung.vai_tro !==
       'ADMIN'
     ) {
       throw new ForbiddenException(
@@ -80,30 +80,30 @@ export class PhanCongGiangDayController {
     }
   }
 
-  private chuyenQuerySoNguyenDuong(
-    giaTri: string | undefined,
-    tenTruong: string,
+  private ChuyenQuerySoNguyenDuong(
+    GiaTri: string | undefined,
+    TenTruong: string,
   ): number | undefined {
     if (
-      giaTri === undefined ||
-      giaTri.trim() === ''
+      GiaTri === undefined ||
+      GiaTri.trim() === ''
     ) {
       return undefined;
     }
 
-    const so =
-      Number(giaTri);
+    const So =
+      Number(GiaTri);
 
     if (
-      !Number.isInteger(so) ||
-      so <= 0
+      !Number.isInteger(So) ||
+      So <= 0
     ) {
       throw new BadRequestException(
-        `${tenTruong} không hợp lệ`,
+        `${TenTruong} không hợp lệ`,
       );
     }
 
-    return so;
+    return So;
   }
 
   // ==================================================
@@ -111,59 +111,59 @@ export class PhanCongGiangDayController {
   // ==================================================
 
   @Post('mon_hoc')
-  taoMonHoc(
+  TaoMonHoc(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Body()
-    body: TaoMonHocDto,
+    Body: TaoMonHocDto,
   ) {
-    this.kiemTraAdmin(request);
+    this.KiemTraAdmin(Request);
 
-    return this.service.taoMonHoc(
-      body,
+    return this.Service.TaoMonHoc(
+      Body,
     );
   }
 
   @Get('mon_hoc')
-  layDanhSachMonHoc(
+  LayDanhSachMonHoc(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Query('tu_khoa')
-    tuKhoa?: string,
+    TuKhoa?: string,
 
     @Query('trang_thai')
-    trangThai?: string,
+    TrangThai?: string,
   ) {
-    this.layNguoiDung(request);
+    this.LayNguoiDung(Request);
 
-    return this.service
-      .layDanhSachMonHoc(
-        tuKhoa,
-        trangThai,
+    return this.Service
+      .LayDanhSachMonHoc(
+        TuKhoa,
+        TrangThai,
       );
   }
 
-  @Patch('mon_hoc/:id')
-  capNhatMonHoc(
+  @Patch('mon_hoc/:Id')
+  CapNhatMonHoc(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Param(
-      'id',
+      'Id',
       ParseIntPipe,
     )
-    id: number,
+    Id: number,
 
     @Body()
-    body: CapNhatMonHocDto,
+    Body: CapNhatMonHocDto,
   ) {
-    this.kiemTraAdmin(request);
+    this.KiemTraAdmin(Request);
 
-    return this.service.capNhatMonHoc(
-      id,
-      body,
+    return this.Service.CapNhatMonHoc(
+      Id,
+      Body,
     );
   }
 
@@ -172,58 +172,58 @@ export class PhanCongGiangDayController {
   // ==================================================
 
   @Post('mon_hoc_khoi')
-  ganMonHocChoKhoi(
+  GanMonHocChoKhoi(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Body()
-    body: GanMonHocChoKhoiDto,
+    Body: GanMonHocChoKhoiDto,
   ) {
-    this.kiemTraAdmin(request);
+    this.KiemTraAdmin(Request);
 
-    return this.service
-      .ganMonHocChoKhoi(body);
+    return this.Service
+      .GanMonHocChoKhoi(Body);
   }
 
   @Get('mon_hoc_khoi')
-  layDanhSachMonHocKhoi(
+  LayDanhSachMonHocKhoi(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Query('khoi_id')
-    khoiId?: string,
+    KhoiId?: string,
   ) {
-    this.kiemTraAdmin(request);
+    this.KiemTraAdmin(Request);
 
-    return this.service
-      .layDanhSachMonHocKhoi(
-        this.chuyenQuerySoNguyenDuong(
-          khoiId,
+    return this.Service
+      .LayDanhSachMonHocKhoi(
+        this.ChuyenQuerySoNguyenDuong(
+          KhoiId,
           'Khối',
         ),
       );
   }
 
-  @Patch('mon_hoc_khoi/:id')
-  capNhatMonHocKhoi(
+  @Patch('mon_hoc_khoi/:Id')
+  CapNhatMonHocKhoi(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Param(
-      'id',
+      'Id',
       ParseIntPipe,
     )
-    id: number,
+    Id: number,
 
     @Body()
-    body: CapNhatMonHocKhoiDto,
+    Body: CapNhatMonHocKhoiDto,
   ) {
-    this.kiemTraAdmin(request);
+    this.KiemTraAdmin(Request);
 
-    return this.service
-      .capNhatMonHocKhoi(
-        id,
-        body,
+    return this.Service
+      .CapNhatMonHocKhoi(
+        Id,
+        Body,
       );
   }
 
@@ -232,75 +232,75 @@ export class PhanCongGiangDayController {
   // ==================================================
 
   @Post('phan_cong/gvcn')
-  phanCongGvcn(
+  PhanCongGvcn(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Body()
-    body: PhanCongGvcnDto,
+    Body: PhanCongGvcnDto,
   ) {
-    this.kiemTraAdmin(request);
+    this.KiemTraAdmin(Request);
 
-    return this.service
-      .phanCongGvcn(body);
+    return this.Service
+      .PhanCongGvcn(Body);
   }
 
   @Post('phan_cong/mon_hoc')
-  phanCongMonHoc(
+  PhanCongMonHoc(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Body()
-    body: PhanCongMonHocDto,
+    Body: PhanCongMonHocDto,
   ) {
-    this.kiemTraAdmin(request);
+    this.KiemTraAdmin(Request);
 
-    return this.service
-      .phanCongMonHoc(body);
+    return this.Service
+      .PhanCongMonHoc(Body);
   }
 
   @Get('phan_cong')
-  layDanhSachPhanCong(
+  LayDanhSachPhanCong(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Query('lop_hoc_id')
-    lopHocId?: string,
+    LopHocId?: string,
 
     @Query('giao_vien_id')
-    giaoVienId?: string,
+    GiaoVienId?: string,
 
     @Query('loai_phan_cong')
-    loaiPhanCong?: string,
+    LoaiPhanCong?: string,
   ) {
-    this.kiemTraAdmin(request);
+    this.KiemTraAdmin(Request);
 
-    return this.service
-      .layDanhSachPhanCong(
-        this.chuyenQuerySoNguyenDuong(
-          lopHocId,
+    return this.Service
+      .LayDanhSachPhanCong(
+        this.ChuyenQuerySoNguyenDuong(
+          LopHocId,
           'Lớp học',
         ),
 
-        this.chuyenQuerySoNguyenDuong(
-          giaoVienId,
+        this.ChuyenQuerySoNguyenDuong(
+          GiaoVienId,
           'Giáo viên',
         ),
 
-        loaiPhanCong,
+        LoaiPhanCong,
       );
   }
 
   @Get('phan_cong/cua_toi')
-  layPhanCongCuaToi(
+  LayPhanCongCuaToi(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
   ) {
-    const nguoiDung =
-      this.layNguoiDung(request);
+    const NguoiDung =
+      this.LayNguoiDung(Request);
 
     if (
-      nguoiDung.vai_tro !==
+      NguoiDung.vai_tro !==
       'GIAO_VIEN'
     ) {
       throw new ForbiddenException(
@@ -308,34 +308,34 @@ export class PhanCongGiangDayController {
       );
     }
 
-    return this.service
-      .layPhanCongCuaToi(
-        nguoiDung.sub,
+    return this.Service
+      .LayPhanCongCuaToi(
+        NguoiDung.sub,
       );
   }
 
   @Patch(
-    'phan_cong/:id/ket_thuc',
+    'phan_cong/:Id/ket_thuc',
   )
-  ketThucPhanCong(
+  KetThucPhanCong(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Param(
-      'id',
+      'Id',
       ParseIntPipe,
     )
-    id: number,
+    Id: number,
 
     @Body()
-    body: KetThucPhanCongDto,
+    Body: KetThucPhanCongDto,
   ) {
-    this.kiemTraAdmin(request);
+    this.KiemTraAdmin(Request);
 
-    return this.service
-      .ketThucPhanCong(
-        id,
-        body,
+    return this.Service
+      .KetThucPhanCong(
+        Id,
+        Body,
       );
   }
 }
