@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { PrismaService } from '../prisma.service';
+import { PrismaService } from '../Prisma.service';
 
 import {
   CapNhatMonHocDto,
@@ -21,37 +21,37 @@ import {
 @Injectable()
 export class PhanCongGiangDayService {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly Prisma: PrismaService,
   ) {}
 
   // ==================================================
   // HÀM DÙNG CHUNG
   // ==================================================
 
-  private chuyenNgay(
-    giaTri: string,
-    tenTruong: string,
+  private ChuyenNgay(
+    GiaTri: string,
+    TenTruong: string,
   ): Date {
-    const ngay = new Date(
-      `${giaTri}T00:00:00.000Z`,
+    const Ngay = new Date(
+      `${GiaTri}T00:00:00.000Z`,
     );
 
-    if (Number.isNaN(ngay.getTime())) {
+    if (Number.isNaN(Ngay.getTime())) {
       throw new BadRequestException(
-        `${tenTruong} không hợp lệ`,
+        `${TenTruong} không hợp lệ`,
       );
     }
 
-    return ngay;
+    return Ngay;
   }
 
-  private kiemTraKhoangNgay(
-    ngayBatDau: Date,
-    ngayKetThuc: Date | null,
+  private KiemTraKhoangNgay(
+    NgayBatDau: Date,
+    NgayKetThuc: Date | null,
   ) {
     if (
-      ngayKetThuc &&
-      ngayKetThuc < ngayBatDau
+      NgayKetThuc &&
+      NgayKetThuc < NgayBatDau
     ) {
       throw new BadRequestException(
         'Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu',
@@ -63,48 +63,48 @@ export class PhanCongGiangDayService {
   // 1. TẠO MÔN HỌC
   // ==================================================
 
-  async taoMonHoc(
-    duLieu: TaoMonHocDto,
+  async TaoMonHoc(
+    DuLieu: TaoMonHocDto,
   ) {
-    const maMonHoc =
-      duLieu.ma_mon_hoc
+    const MaMonHoc =
+      DuLieu.ma_mon_hoc
         ?.trim()
         .toUpperCase();
 
-    const tenMonHoc =
-      duLieu.ten_mon_hoc?.trim();
+    const TenMonHoc =
+      DuLieu.ten_mon_hoc?.trim();
 
     if (
-      !maMonHoc ||
-      !tenMonHoc
+      !MaMonHoc ||
+      !TenMonHoc
     ) {
       throw new BadRequestException(
         'Mã môn học và tên môn học không được để trống',
       );
     }
 
-    const monHocCu =
-      await this.prisma.mon_hoc.findUnique({
+    const MonHocCu =
+      await this.Prisma.mon_hoc.findUnique({
         where: {
           ma_mon_hoc:
-            maMonHoc,
+            MaMonHoc,
         },
       });
 
-    if (monHocCu) {
+    if (MonHocCu) {
       throw new ConflictException(
         'Mã môn học đã tồn tại',
       );
     }
 
-    const monHoc =
-      await this.prisma.mon_hoc.create({
+    const MonHoc =
+      await this.Prisma.mon_hoc.create({
         data: {
           ma_mon_hoc:
-            maMonHoc,
+            MaMonHoc,
 
           ten_mon_hoc:
-            tenMonHoc,
+            TenMonHoc,
         },
       });
 
@@ -113,7 +113,7 @@ export class PhanCongGiangDayService {
         'Tạo môn học thành công',
 
       mon_hoc:
-        monHoc,
+        MonHoc,
     };
   }
 
@@ -121,42 +121,42 @@ export class PhanCongGiangDayService {
   // 2. DANH SÁCH MÔN HỌC
   // ==================================================
 
-  async layDanhSachMonHoc(
-    tuKhoa?: string,
-    trangThai?: string,
+  async LayDanhSachMonHoc(
+    TuKhoa?: string,
+    TrangThai?: string,
   ) {
-    const tim =
-      tuKhoa?.trim();
+    const Tim =
+      TuKhoa?.trim();
 
-    const trangThaiTim =
-      trangThai?.trim();
+    const TrangThaiTim =
+      TrangThai?.trim();
 
-    return this.prisma.mon_hoc.findMany({
+    return this.Prisma.mon_hoc.findMany({
       where: {
-        ...(tim
+        ...(Tim
           ? {
               OR: [
                 {
                   ma_mon_hoc: {
                     contains:
-                      tim,
+                      Tim,
                   },
                 },
 
                 {
                   ten_mon_hoc: {
                     contains:
-                      tim,
+                      Tim,
                   },
                 },
               ],
             }
           : {}),
 
-        ...(trangThaiTim
+        ...(TrangThaiTim
           ? {
               trang_thai:
-                trangThaiTim,
+                TrangThaiTim,
             }
           : {}),
       },
@@ -172,41 +172,41 @@ export class PhanCongGiangDayService {
   // 3. CẬP NHẬT MÔN HỌC
   // ==================================================
 
-  async capNhatMonHoc(
-    id: number,
-    duLieu: CapNhatMonHocDto,
+  async CapNhatMonHoc(
+    Id: number,
+    DuLieu: CapNhatMonHocDto,
   ) {
-    const monHoc =
-      await this.prisma.mon_hoc.findUnique({
+    const MonHoc =
+      await this.Prisma.mon_hoc.findUnique({
         where: {
-          id,
+          Id,
         },
       });
 
-    if (!monHoc) {
+    if (!MonHoc) {
       throw new NotFoundException(
         'Không tìm thấy môn học',
       );
     }
 
     if (
-      duLieu.ten_mon_hoc === undefined &&
-      duLieu.trang_thai === undefined
+      DuLieu.ten_mon_hoc === undefined &&
+      DuLieu.trang_thai === undefined
     ) {
       throw new BadRequestException(
         'Không có dữ liệu cần cập nhật',
       );
     }
 
-    const tenMonHoc =
-      duLieu.ten_mon_hoc?.trim();
+    const TenMonHoc =
+      DuLieu.ten_mon_hoc?.trim();
 
-    const trangThai =
-      duLieu.trang_thai?.trim();
+    const TrangThai =
+      DuLieu.trang_thai?.trim();
 
     if (
-      duLieu.ten_mon_hoc !== undefined &&
-      !tenMonHoc
+      DuLieu.ten_mon_hoc !== undefined &&
+      !TenMonHoc
     ) {
       throw new BadRequestException(
         'Tên môn học không được để trống',
@@ -214,32 +214,32 @@ export class PhanCongGiangDayService {
     }
 
     if (
-      duLieu.trang_thai !== undefined &&
-      !trangThai
+      DuLieu.trang_thai !== undefined &&
+      !TrangThai
     ) {
       throw new BadRequestException(
         'Trạng thái không được để trống',
       );
     }
 
-    const ketQua =
-      await this.prisma.mon_hoc.update({
+    const KetQua =
+      await this.Prisma.mon_hoc.update({
         where: {
-          id,
+          Id,
         },
 
         data: {
-          ...(tenMonHoc
+          ...(TenMonHoc
             ? {
                 ten_mon_hoc:
-                  tenMonHoc,
+                  TenMonHoc,
               }
             : {}),
 
-          ...(trangThai
+          ...(TrangThai
             ? {
                 trang_thai:
-                  trangThai,
+                  TrangThai,
               }
             : {}),
 
@@ -253,7 +253,7 @@ export class PhanCongGiangDayService {
         'Cập nhật môn học thành công',
 
       mon_hoc:
-        ketQua,
+        KetQua,
     };
   }
 
@@ -261,14 +261,14 @@ export class PhanCongGiangDayService {
   // 4. GẮN MÔN HỌC VÀO KHỐI
   // ==================================================
 
-  async ganMonHocChoKhoi(
-    duLieu: GanMonHocChoKhoiDto,
+  async GanMonHocChoKhoi(
+    DuLieu: GanMonHocChoKhoiDto,
   ) {
     if (
       !Number.isInteger(
-        duLieu.mon_hoc_id,
+        DuLieu.mon_hoc_id,
       ) ||
-      duLieu.mon_hoc_id <= 0
+      DuLieu.mon_hoc_id <= 0
     ) {
       throw new BadRequestException(
         'Môn học không hợp lệ',
@@ -277,9 +277,9 @@ export class PhanCongGiangDayService {
 
     if (
       !Number.isInteger(
-        duLieu.khoi_id,
+        DuLieu.khoi_id,
       ) ||
-      duLieu.khoi_id <= 0
+      DuLieu.khoi_id <= 0
     ) {
       throw new BadRequestException(
         'Khối không hợp lệ',
@@ -287,25 +287,25 @@ export class PhanCongGiangDayService {
     }
 
     const [
-      monHoc,
+      MonHoc,
       khoi,
     ] = await Promise.all([
-      this.prisma.mon_hoc.findUnique({
+      this.Prisma.mon_hoc.findUnique({
         where: {
-          id:
-            duLieu.mon_hoc_id,
+          Id:
+            DuLieu.mon_hoc_id,
         },
       }),
 
-      this.prisma.khoi.findUnique({
+      this.Prisma.khoi.findUnique({
         where: {
-          id:
-            duLieu.khoi_id,
+          Id:
+            DuLieu.khoi_id,
         },
       }),
     ]);
 
-    if (!monHoc) {
+    if (!MonHoc) {
       throw new NotFoundException(
         'Không tìm thấy môn học',
       );
@@ -318,7 +318,7 @@ export class PhanCongGiangDayService {
     }
 
     if (
-      monHoc.trang_thai !==
+      MonHoc.trang_thai !==
       'HOAT_DONG'
     ) {
       throw new BadRequestException(
@@ -326,34 +326,34 @@ export class PhanCongGiangDayService {
       );
     }
 
-    const trung =
-      await this.prisma.mon_hoc_khoi.findFirst({
+    const Trung =
+      await this.Prisma.mon_hoc_khoi.findFirst({
         where: {
           mon_hoc_id:
-            duLieu.mon_hoc_id,
+            DuLieu.mon_hoc_id,
 
           khoi_id:
-            duLieu.khoi_id,
+            DuLieu.khoi_id,
         },
       });
 
-    if (trung) {
+    if (Trung) {
       throw new ConflictException(
         'Môn học đã được cấu hình cho khối này',
       );
     }
 
-    const ketQua =
-      await this.prisma.mon_hoc_khoi.create({
+    const KetQua =
+      await this.Prisma.mon_hoc_khoi.create({
         data: {
           mon_hoc_id:
-            duLieu.mon_hoc_id,
+            DuLieu.mon_hoc_id,
 
           khoi_id:
-            duLieu.khoi_id,
+            DuLieu.khoi_id,
 
           mac_dinh_gvcn:
-            duLieu.mac_dinh_gvcn ??
+            DuLieu.mac_dinh_gvcn ??
             false,
         },
 
@@ -368,7 +368,7 @@ export class PhanCongGiangDayService {
         'Gắn môn học cho khối thành công',
 
       mon_hoc_khoi:
-        ketQua,
+        KetQua,
     };
   }
 
@@ -376,15 +376,15 @@ export class PhanCongGiangDayService {
   // 5. DANH SÁCH MÔN THEO KHỐI
   // ==================================================
 
-  async layDanhSachMonHocKhoi(
-    khoiId?: number,
+  async LayDanhSachMonHocKhoi(
+    KhoiId?: number,
   ) {
-    return this.prisma.mon_hoc_khoi.findMany({
+    return this.Prisma.mon_hoc_khoi.findMany({
       where: {
-        ...(khoiId
+        ...(KhoiId
           ? {
               khoi_id:
-                khoiId,
+                KhoiId,
             }
           : {}),
       },
@@ -412,12 +412,12 @@ export class PhanCongGiangDayService {
   // 6. ĐỔI MÔN MẶC ĐỊNH GVCN
   // ==================================================
 
-  async capNhatMonHocKhoi(
-    id: number,
-    duLieu: CapNhatMonHocKhoiDto,
+  async CapNhatMonHocKhoi(
+    Id: number,
+    DuLieu: CapNhatMonHocKhoiDto,
   ) {
     if (
-      typeof duLieu.mac_dinh_gvcn !==
+      typeof DuLieu.mac_dinh_gvcn !==
       'boolean'
     ) {
       throw new BadRequestException(
@@ -425,28 +425,28 @@ export class PhanCongGiangDayService {
       );
     }
 
-    const cauHinh =
-      await this.prisma.mon_hoc_khoi.findUnique({
+    const CauHinh =
+      await this.Prisma.mon_hoc_khoi.findUnique({
         where: {
-          id,
+          Id,
         },
       });
 
-    if (!cauHinh) {
+    if (!CauHinh) {
       throw new NotFoundException(
         'Không tìm thấy cấu hình môn học - khối',
       );
     }
 
-    const ketQua =
-      await this.prisma.mon_hoc_khoi.update({
+    const KetQua =
+      await this.Prisma.mon_hoc_khoi.update({
         where: {
-          id,
+          Id,
         },
 
         data: {
           mac_dinh_gvcn:
-            duLieu.mac_dinh_gvcn,
+            DuLieu.mac_dinh_gvcn,
         },
 
         include: {
@@ -460,7 +460,7 @@ export class PhanCongGiangDayService {
         'Cập nhật cấu hình môn học - khối thành công',
 
       mon_hoc_khoi:
-        ketQua,
+        KetQua,
     };
   }
 
@@ -472,14 +472,14 @@ export class PhanCongGiangDayService {
   // - tự động tạo các môn mac_dinh_gvcn = true
   // ==================================================
 
-  async phanCongGvcn(
-    duLieu: PhanCongGvcnDto,
+  async PhanCongGvcn(
+    DuLieu: PhanCongGvcnDto,
   ) {
     if (
       !Number.isInteger(
-        duLieu.giao_vien_id,
+        DuLieu.giao_vien_id,
       ) ||
-      duLieu.giao_vien_id <= 0
+      DuLieu.giao_vien_id <= 0
     ) {
       throw new BadRequestException(
         'Giáo viên không hợp lệ',
@@ -488,49 +488,49 @@ export class PhanCongGiangDayService {
 
     if (
       !Number.isInteger(
-        duLieu.lop_hoc_id,
+        DuLieu.lop_hoc_id,
       ) ||
-      duLieu.lop_hoc_id <= 0
+      DuLieu.lop_hoc_id <= 0
     ) {
       throw new BadRequestException(
         'Lớp học không hợp lệ',
       );
     }
 
-    const ngayBatDau =
-      this.chuyenNgay(
-        duLieu.ngay_bat_dau,
+    const NgayBatDau =
+      this.ChuyenNgay(
+        DuLieu.ngay_bat_dau,
         'Ngày bắt đầu',
       );
 
-    const ngayKetThuc =
-      duLieu.ngay_ket_thuc
-        ? this.chuyenNgay(
-            duLieu.ngay_ket_thuc,
+    const NgayKetThuc =
+      DuLieu.ngay_ket_thuc
+        ? this.ChuyenNgay(
+            DuLieu.ngay_ket_thuc,
             'Ngày kết thúc',
           )
         : null;
 
-    this.kiemTraKhoangNgay(
-      ngayBatDau,
-      ngayKetThuc,
+    this.KiemTraKhoangNgay(
+      NgayBatDau,
+      NgayKetThuc,
     );
 
     const [
-      giaoVien,
+      GiaoVien,
       lopHoc,
     ] = await Promise.all([
-      this.prisma.giao_vien.findUnique({
+      this.Prisma.giao_vien.findUnique({
         where: {
-          id:
-            duLieu.giao_vien_id,
+          Id:
+            DuLieu.giao_vien_id,
         },
       }),
 
-      this.prisma.lop_hoc.findUnique({
+      this.Prisma.lop_hoc.findUnique({
         where: {
-          id:
-            duLieu.lop_hoc_id,
+          Id:
+            DuLieu.lop_hoc_id,
         },
 
         include: {
@@ -540,14 +540,14 @@ export class PhanCongGiangDayService {
       }),
     ]);
 
-    if (!giaoVien) {
+    if (!GiaoVien) {
       throw new NotFoundException(
         'Không tìm thấy giáo viên',
       );
     }
 
     if (
-      giaoVien.trang_thai !==
+      GiaoVien.trang_thai !==
       'HOAT_DONG'
     ) {
       throw new BadRequestException(
@@ -561,8 +561,8 @@ export class PhanCongGiangDayService {
       );
     }
 
-    const monMacDinh =
-      await this.prisma.mon_hoc_khoi.findMany({
+    const MonMacDinh =
+      await this.Prisma.mon_hoc_khoi.findMany({
         where: {
           khoi_id:
             lopHoc.khoi_id,
@@ -581,17 +581,17 @@ export class PhanCongGiangDayService {
         },
       });
 
-    return this.prisma.$transaction(
-      async (tx) => {
+    return this.Prisma.$transaction(
+      async (Tx) => {
         // ------------------------------------------
         // Kiểm tra lớp đã có GVCN trong thời gian này
         // ------------------------------------------
 
-        const gvcnTrung =
-          await tx.phan_cong_giao_vien.findFirst({
+        const GvcnTrung =
+          await Tx.phan_cong_giao_vien.findFirst({
             where: {
               lop_hoc_id:
-                duLieu.lop_hoc_id,
+                DuLieu.lop_hoc_id,
 
               loai_phan_cong:
                 'GVCN',
@@ -599,11 +599,11 @@ export class PhanCongGiangDayService {
               mon_hoc_id:
                 null,
 
-              ...(ngayKetThuc
+              ...(NgayKetThuc
                 ? {
                     ngay_bat_dau: {
                       lte:
-                        ngayKetThuc,
+                        NgayKetThuc,
                     },
                   }
                 : {}),
@@ -617,14 +617,14 @@ export class PhanCongGiangDayService {
                 {
                   ngay_ket_thuc: {
                     gte:
-                      ngayBatDau,
+                      NgayBatDau,
                   },
                 },
               ],
             },
           });
 
-        if (gvcnTrung) {
+        if (GvcnTrung) {
           throw new ConflictException(
             'Lớp đã có giáo viên chủ nhiệm trong khoảng thời gian này',
           );
@@ -635,23 +635,23 @@ export class PhanCongGiangDayService {
         // ------------------------------------------
 
         for (
-          const cauHinh
-          of monMacDinh
+          const CauHinh
+          of MonMacDinh
         ) {
-          const trung =
-            await tx.phan_cong_giao_vien.findFirst({
+          const Trung =
+            await Tx.phan_cong_giao_vien.findFirst({
               where: {
                 lop_hoc_id:
-                  duLieu.lop_hoc_id,
+                  DuLieu.lop_hoc_id,
 
                 mon_hoc_id:
-                  cauHinh.mon_hoc_id,
+                  CauHinh.mon_hoc_id,
 
-                ...(ngayKetThuc
+                ...(NgayKetThuc
                   ? {
                       ngay_bat_dau: {
                         lte:
-                          ngayKetThuc,
+                          NgayKetThuc,
                       },
                     }
                   : {}),
@@ -665,16 +665,16 @@ export class PhanCongGiangDayService {
                   {
                     ngay_ket_thuc: {
                       gte:
-                        ngayBatDau,
+                        NgayBatDau,
                     },
                   },
                 ],
               },
             });
 
-          if (trung) {
+          if (Trung) {
             throw new ConflictException(
-              `Môn ${cauHinh.mon_hoc.ten_mon_hoc} đã có giáo viên được phân công trong khoảng thời gian này`,
+              `Môn ${CauHinh.mon_hoc.ten_mon_hoc} đã có giáo viên được phân công trong khoảng thời gian này`,
             );
           }
         }
@@ -683,14 +683,14 @@ export class PhanCongGiangDayService {
         // Tạo phân công GVCN chính
         // ------------------------------------------
 
-        const gvcn =
-          await tx.phan_cong_giao_vien.create({
+        const Gvcn =
+          await Tx.phan_cong_giao_vien.create({
             data: {
               giao_vien_id:
-                duLieu.giao_vien_id,
+                DuLieu.giao_vien_id,
 
               lop_hoc_id:
-                duLieu.lop_hoc_id,
+                DuLieu.lop_hoc_id,
 
               mon_hoc_id:
                 null,
@@ -702,10 +702,10 @@ export class PhanCongGiangDayService {
                 'BO_SUNG',
 
               ngay_bat_dau:
-                ngayBatDau,
+                NgayBatDau,
 
               ngay_ket_thuc:
-                ngayKetThuc,
+                NgayKetThuc,
             },
           });
 
@@ -714,19 +714,19 @@ export class PhanCongGiangDayService {
         // ------------------------------------------
 
         for (
-          const cauHinh
-          of monMacDinh
+          const CauHinh
+          of MonMacDinh
         ) {
-          await tx.phan_cong_giao_vien.create({
+          await Tx.phan_cong_giao_vien.create({
             data: {
               giao_vien_id:
-                duLieu.giao_vien_id,
+                DuLieu.giao_vien_id,
 
               lop_hoc_id:
-                duLieu.lop_hoc_id,
+                DuLieu.lop_hoc_id,
 
               mon_hoc_id:
-                cauHinh.mon_hoc_id,
+                CauHinh.mon_hoc_id,
 
               loai_phan_cong:
                 'GVCN',
@@ -735,10 +735,10 @@ export class PhanCongGiangDayService {
                 'TU_DONG_GVCN',
 
               ngay_bat_dau:
-                ngayBatDau,
+                NgayBatDau,
 
               ngay_ket_thuc:
-                ngayKetThuc,
+                NgayKetThuc,
             },
           });
         }
@@ -747,10 +747,10 @@ export class PhanCongGiangDayService {
           thong_bao:
             'Phân công giáo viên chủ nhiệm thành công',
 
-          gvcn,
+          Gvcn,
 
           so_mon_tu_dong:
-            monMacDinh.length,
+            MonMacDinh.length,
         };
       },
     );
@@ -763,14 +763,14 @@ export class PhanCongGiangDayService {
   // Có thể là GVBM hoặc GVCN.
   // ==================================================
 
-  async phanCongMonHoc(
-    duLieu: PhanCongMonHocDto,
+  async PhanCongMonHoc(
+    DuLieu: PhanCongMonHocDto,
   ) {
     if (
       !Number.isInteger(
-        duLieu.giao_vien_id,
+        DuLieu.giao_vien_id,
       ) ||
-      duLieu.giao_vien_id <= 0
+      DuLieu.giao_vien_id <= 0
     ) {
       throw new BadRequestException(
         'Giáo viên không hợp lệ',
@@ -779,9 +779,9 @@ export class PhanCongGiangDayService {
 
     if (
       !Number.isInteger(
-        duLieu.lop_hoc_id,
+        DuLieu.lop_hoc_id,
       ) ||
-      duLieu.lop_hoc_id <= 0
+      DuLieu.lop_hoc_id <= 0
     ) {
       throw new BadRequestException(
         'Lớp học không hợp lệ',
@@ -790,17 +790,17 @@ export class PhanCongGiangDayService {
 
     if (
       !Number.isInteger(
-        duLieu.mon_hoc_id,
+        DuLieu.mon_hoc_id,
       ) ||
-      duLieu.mon_hoc_id <= 0
+      DuLieu.mon_hoc_id <= 0
     ) {
       throw new BadRequestException(
         'Môn học không hợp lệ',
       );
     }
 
-    const loaiPhanCong =
-      duLieu.loai_phan_cong
+    const LoaiPhanCong =
+      DuLieu.loai_phan_cong
         ?.trim()
         .toUpperCase();
 
@@ -808,67 +808,67 @@ export class PhanCongGiangDayService {
       ![
         'GVBM',
         'GVCN',
-      ].includes(loaiPhanCong)
+      ].includes(LoaiPhanCong)
     ) {
       throw new BadRequestException(
         'Loại phân công phải là GVBM hoặc GVCN',
       );
     }
 
-    const ngayBatDau =
-      this.chuyenNgay(
-        duLieu.ngay_bat_dau,
+    const NgayBatDau =
+      this.ChuyenNgay(
+        DuLieu.ngay_bat_dau,
         'Ngày bắt đầu',
       );
 
-    const ngayKetThuc =
-      duLieu.ngay_ket_thuc
-        ? this.chuyenNgay(
-            duLieu.ngay_ket_thuc,
+    const NgayKetThuc =
+      DuLieu.ngay_ket_thuc
+        ? this.ChuyenNgay(
+            DuLieu.ngay_ket_thuc,
             'Ngày kết thúc',
           )
         : null;
 
-    this.kiemTraKhoangNgay(
-      ngayBatDau,
-      ngayKetThuc,
+    this.KiemTraKhoangNgay(
+      NgayBatDau,
+      NgayKetThuc,
     );
 
     const [
-      giaoVien,
+      GiaoVien,
       lopHoc,
-      monHoc,
+      MonHoc,
     ] = await Promise.all([
-      this.prisma.giao_vien.findUnique({
+      this.Prisma.giao_vien.findUnique({
         where: {
-          id:
-            duLieu.giao_vien_id,
+          Id:
+            DuLieu.giao_vien_id,
         },
       }),
 
-      this.prisma.lop_hoc.findUnique({
+      this.Prisma.lop_hoc.findUnique({
         where: {
-          id:
-            duLieu.lop_hoc_id,
+          Id:
+            DuLieu.lop_hoc_id,
         },
       }),
 
-      this.prisma.mon_hoc.findUnique({
+      this.Prisma.mon_hoc.findUnique({
         where: {
-          id:
-            duLieu.mon_hoc_id,
+          Id:
+            DuLieu.mon_hoc_id,
         },
       }),
     ]);
 
-    if (!giaoVien) {
+    if (!GiaoVien) {
       throw new NotFoundException(
         'Không tìm thấy giáo viên',
       );
     }
 
     if (
-      giaoVien.trang_thai !==
+      GiaoVien.trang_thai !==
       'HOAT_DONG'
     ) {
       throw new BadRequestException(
@@ -882,14 +882,14 @@ export class PhanCongGiangDayService {
       );
     }
 
-    if (!monHoc) {
+    if (!MonHoc) {
       throw new NotFoundException(
         'Không tìm thấy môn học',
       );
     }
 
     if (
-      monHoc.trang_thai !==
+      MonHoc.trang_thai !==
       'HOAT_DONG'
     ) {
       throw new BadRequestException(
@@ -899,18 +899,18 @@ export class PhanCongGiangDayService {
 
     // Môn phải thuộc khối của lớp
 
-    const monHocKhoi =
-      await this.prisma.mon_hoc_khoi.findFirst({
+    const MonHocKhoi =
+      await this.Prisma.mon_hoc_khoi.findFirst({
         where: {
           mon_hoc_id:
-            duLieu.mon_hoc_id,
+            DuLieu.mon_hoc_id,
 
           khoi_id:
             lopHoc.khoi_id,
         },
       });
 
-    if (!monHocKhoi) {
+    if (!MonHocKhoi) {
       throw new BadRequestException(
         'Môn học không được cấu hình cho khối của lớp này',
       );
@@ -919,7 +919,7 @@ export class PhanCongGiangDayService {
     // Môn mặc định GVCN không cho GVBM nhận
 
     if (
-      monHocKhoi.mac_dinh_gvcn
+      MonHocKhoi.mac_dinh_gvcn
     ) {
       throw new BadRequestException(
         'Môn này là môn mặc định của GVCN và được hệ thống tự phân công khi chọn GVCN',
@@ -930,19 +930,19 @@ export class PhanCongGiangDayService {
     // GV đó phải thật sự đang là GVCN của lớp.
 
     if (
-      loaiPhanCong ===
+      LoaiPhanCong ===
       'GVCN'
     ) {
-      const gvcn =
-        await this.prisma
+      const Gvcn =
+        await this.Prisma
           .phan_cong_giao_vien
           .findFirst({
             where: {
               giao_vien_id:
-                duLieu.giao_vien_id,
+                DuLieu.giao_vien_id,
 
               lop_hoc_id:
-                duLieu.lop_hoc_id,
+                DuLieu.lop_hoc_id,
 
               mon_hoc_id:
                 null,
@@ -952,10 +952,10 @@ export class PhanCongGiangDayService {
 
               ngay_bat_dau: {
                 lte:
-                  ngayBatDau,
+                  NgayBatDau,
               },
 
-              ...(ngayKetThuc
+              ...(NgayKetThuc
                 ? {
                     OR: [
                       {
@@ -966,7 +966,7 @@ export class PhanCongGiangDayService {
                       {
                         ngay_ket_thuc: {
                           gte:
-                            ngayKetThuc,
+                            NgayKetThuc,
                         },
                       },
                     ],
@@ -978,7 +978,7 @@ export class PhanCongGiangDayService {
             },
           });
 
-      if (!gvcn) {
+      if (!Gvcn) {
         throw new ForbiddenException(
           'Giáo viên này không phải GVCN của lớp trong khoảng thời gian đã chọn',
         );
@@ -987,22 +987,22 @@ export class PhanCongGiangDayService {
 
     // Một lớp + môn chỉ có một GV trong cùng thời gian
 
-    const trung =
-      await this.prisma
+    const Trung =
+      await this.Prisma
         .phan_cong_giao_vien
         .findFirst({
           where: {
             lop_hoc_id:
-              duLieu.lop_hoc_id,
+              DuLieu.lop_hoc_id,
 
             mon_hoc_id:
-              duLieu.mon_hoc_id,
+              DuLieu.mon_hoc_id,
 
-            ...(ngayKetThuc
+            ...(NgayKetThuc
               ? {
                   ngay_bat_dau: {
                     lte:
-                      ngayKetThuc,
+                      NgayKetThuc,
                   },
                 }
               : {}),
@@ -1016,44 +1016,44 @@ export class PhanCongGiangDayService {
               {
                 ngay_ket_thuc: {
                   gte:
-                    ngayBatDau,
+                    NgayBatDau,
                 },
               },
             ],
           },
         });
 
-    if (trung) {
+    if (Trung) {
       throw new ConflictException(
         'Môn học của lớp đã có giáo viên được phân công trong khoảng thời gian này',
       );
     }
 
-    const ketQua =
-      await this.prisma
+    const KetQua =
+      await this.Prisma
         .phan_cong_giao_vien
         .create({
           data: {
             giao_vien_id:
-              duLieu.giao_vien_id,
+              DuLieu.giao_vien_id,
 
             lop_hoc_id:
-              duLieu.lop_hoc_id,
+              DuLieu.lop_hoc_id,
 
             mon_hoc_id:
-              duLieu.mon_hoc_id,
+              DuLieu.mon_hoc_id,
 
             loai_phan_cong:
-              loaiPhanCong,
+              LoaiPhanCong,
 
             nguon_phan_cong:
               'BO_SUNG',
 
             ngay_bat_dau:
-              ngayBatDau,
+              NgayBatDau,
 
             ngay_ket_thuc:
-              ngayKetThuc,
+              NgayKetThuc,
           },
 
           include: {
@@ -1068,7 +1068,7 @@ export class PhanCongGiangDayService {
         'Phân công môn học thành công',
 
       phan_cong:
-        ketQua,
+        KetQua,
     };
   }
 
@@ -1076,23 +1076,23 @@ export class PhanCongGiangDayService {
   // 9. DANH SÁCH PHÂN CÔNG
   // ==================================================
 
-  async layDanhSachPhanCong(
-    lopHocId?: number,
-    giaoVienId?: number,
-    loaiPhanCong?: string,
+  async LayDanhSachPhanCong(
+    LopHocId?: number,
+    GiaoVienId?: number,
+    LoaiPhanCong?: string,
   ) {
-    const loaiPhanCongTim =
-      loaiPhanCong
+    const LoaiPhanCongTim =
+      LoaiPhanCong
         ?.trim()
         .toUpperCase();
 
     if (
-      loaiPhanCongTim &&
+      LoaiPhanCongTim &&
       ![
         'GVCN',
         'GVBM',
       ].includes(
-        loaiPhanCongTim,
+        LoaiPhanCongTim,
       )
     ) {
       throw new BadRequestException(
@@ -1100,28 +1100,28 @@ export class PhanCongGiangDayService {
       );
     }
 
-    return this.prisma
+    return this.Prisma
       .phan_cong_giao_vien
       .findMany({
         where: {
-          ...(lopHocId
+          ...(LopHocId
             ? {
                 lop_hoc_id:
-                  lopHocId,
+                  LopHocId,
               }
             : {}),
 
-          ...(giaoVienId
+          ...(GiaoVienId
             ? {
                 giao_vien_id:
-                  giaoVienId,
+                  GiaoVienId,
               }
             : {}),
 
-          ...(loaiPhanCongTim
+          ...(LoaiPhanCongTim
             ? {
                 loai_phan_cong:
-                  loaiPhanCongTim,
+                  LoaiPhanCongTim,
               }
             : {}),
         },
@@ -1141,7 +1141,7 @@ export class PhanCongGiangDayService {
         include: {
           giao_vien: {
             select: {
-              id: true,
+              Id: true,
               ma_giao_vien: true,
               ho_ten: true,
               trang_thai: true,
@@ -1164,36 +1164,36 @@ export class PhanCongGiangDayService {
   // 10. GIÁO VIÊN XEM PHÂN CÔNG CỦA MÌNH
   // ==================================================
 
-  async layPhanCongCuaToi(
-    taiKhoanId: number,
+  async LayPhanCongCuaToi(
+    TaiKhoanId: number,
   ) {
-    const giaoVien =
-      await this.prisma.giao_vien.findUnique({
+    const GiaoVien =
+      await this.Prisma.giao_vien.findUnique({
         where: {
           tai_khoan_id:
-            taiKhoanId,
+            TaiKhoanId,
         },
 
         select: {
-          id: true,
+          Id: true,
           ma_giao_vien: true,
           ho_ten: true,
         },
       });
 
-    if (!giaoVien) {
+    if (!GiaoVien) {
       throw new NotFoundException(
         'Không tìm thấy hồ sơ giáo viên',
       );
     }
 
-    const phanCong =
-      await this.prisma
+    const PhanCong =
+      await this.Prisma
         .phan_cong_giao_vien
         .findMany({
           where: {
             giao_vien_id:
-              giaoVien.id,
+              GiaoVien.Id,
           },
 
           orderBy: {
@@ -1215,10 +1215,10 @@ export class PhanCongGiangDayService {
 
     return {
       giao_vien:
-        giaoVien,
+        GiaoVien,
 
       phan_cong:
-        phanCong,
+        PhanCong,
     };
   }
 
@@ -1228,34 +1228,34 @@ export class PhanCongGiangDayService {
   // Không xóa để giữ lịch sử.
   // ==================================================
 
-  async ketThucPhanCong(
-    id: number,
-    duLieu: KetThucPhanCongDto,
+  async KetThucPhanCong(
+    Id: number,
+    DuLieu: KetThucPhanCongDto,
   ) {
-    const phanCong =
-      await this.prisma
+    const PhanCong =
+      await this.Prisma
         .phan_cong_giao_vien
         .findUnique({
           where: {
-            id,
+            Id,
           },
         });
 
-    if (!phanCong) {
+    if (!PhanCong) {
       throw new NotFoundException(
         'Không tìm thấy phân công',
       );
     }
 
-    const ngayKetThuc =
-      this.chuyenNgay(
-        duLieu.ngay_ket_thuc,
+    const NgayKetThuc =
+      this.ChuyenNgay(
+        DuLieu.ngay_ket_thuc,
         'Ngày kết thúc',
       );
 
     if (
-      ngayKetThuc <
-      phanCong.ngay_bat_dau
+      NgayKetThuc <
+      PhanCong.ngay_bat_dau
     ) {
       throw new BadRequestException(
         'Ngày kết thúc không được trước ngày bắt đầu',
@@ -1266,7 +1266,7 @@ export class PhanCongGiangDayService {
     // Phải kết thúc phân công GVCN chính.
 
     if (
-      phanCong.nguon_phan_cong ===
+      PhanCong.nguon_phan_cong ===
       'TU_DONG_GVCN'
     ) {
       throw new BadRequestException(
@@ -1278,36 +1278,36 @@ export class PhanCongGiangDayService {
     // kết thúc luôn các môn do GVCN đảm nhiệm trong cùng lớp.
 
     if (
-      phanCong.loai_phan_cong ===
+      PhanCong.loai_phan_cong ===
         'GVCN' &&
-      phanCong.mon_hoc_id ===
+      PhanCong.mon_hoc_id ===
         null
     ) {
-      return this.prisma.$transaction(
-        async (tx) => {
-          const gvcn =
-            await tx
+      return this.Prisma.$transaction(
+        async (Tx) => {
+          const Gvcn =
+            await Tx
               .phan_cong_giao_vien
               .update({
                 where: {
-                  id,
+                  Id,
                 },
 
                 data: {
                   ngay_ket_thuc:
-                    ngayKetThuc,
+                    NgayKetThuc,
                 },
               });
 
-          await tx
+          await Tx
             .phan_cong_giao_vien
             .updateMany({
               where: {
                 giao_vien_id:
-                  phanCong.giao_vien_id,
+                  PhanCong.giao_vien_id,
 
                 lop_hoc_id:
-                  phanCong.lop_hoc_id,
+                  PhanCong.lop_hoc_id,
 
                 loai_phan_cong:
                   'GVCN',
@@ -1319,10 +1319,10 @@ export class PhanCongGiangDayService {
 
                 ngay_bat_dau: {
                   gte:
-                    phanCong.ngay_bat_dau,
+                    PhanCong.ngay_bat_dau,
 
                   lte:
-                    ngayKetThuc,
+                    NgayKetThuc,
                 },
 
                 OR: [
@@ -1334,7 +1334,7 @@ export class PhanCongGiangDayService {
                   {
                     ngay_ket_thuc: {
                       gt:
-                        ngayKetThuc,
+                        NgayKetThuc,
                     },
                   },
                 ],
@@ -1342,7 +1342,7 @@ export class PhanCongGiangDayService {
 
               data: {
                 ngay_ket_thuc:
-                  ngayKetThuc,
+                  NgayKetThuc,
               },
             });
 
@@ -1351,7 +1351,7 @@ export class PhanCongGiangDayService {
               'Kết thúc phân công GVCN thành công',
 
             phan_cong:
-              gvcn,
+              Gvcn,
           };
         },
       );
@@ -1359,17 +1359,17 @@ export class PhanCongGiangDayService {
 
     // GVBM hoặc phân công môn bổ sung
 
-    const ketQua =
-      await this.prisma
+    const KetQua =
+      await this.Prisma
         .phan_cong_giao_vien
         .update({
           where: {
-            id,
+            Id,
           },
 
           data: {
             ngay_ket_thuc:
-              ngayKetThuc,
+              NgayKetThuc,
           },
         });
 
@@ -1378,7 +1378,7 @@ export class PhanCongGiangDayService {
         'Kết thúc phân công thành công',
 
       phan_cong:
-        ketQua,
+        KetQua,
     };
   }
 }
