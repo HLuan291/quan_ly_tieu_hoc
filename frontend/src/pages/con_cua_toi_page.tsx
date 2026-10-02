@@ -2,9 +2,11 @@ import {
   useEffect,
   useMemo,
   useState,
+  useRef,
 } from 'react';
 
 import Api from '../api/api';
+import { LayNhanQuyUoc, QuyUoc } from '../utils/quy_uoc_nghiep_vu';
 
 import {
   LayThongBaoLoi,
@@ -90,6 +92,8 @@ interface DiemDanhResponse {
 }
 
 export default function ConCuaToiPage() {
+  const LanTaiKetQua = useRef(0);
+  const LanTaiDiemDanh = useRef(0);
   const [
     PhuHuynh,
     SetPhuHuynh,
@@ -227,6 +231,7 @@ export default function ConCuaToiPage() {
     );
 
   async function TaiKetQua() {
+    const LanTai = ++LanTaiKetQua.current;
     if (
       !HocSinhId ||
       !DotDanhGiaId
@@ -245,10 +250,12 @@ export default function ConCuaToiPage() {
           `/danh_gia_hoc_tap/con/${HocSinhId}/dot/${DotDanhGiaId}`,
         );
 
+      if (LanTai !== LanTaiKetQua.current) return;
       SetKetQua(
         Response.data,
       );
     } catch (Error: unknown) {
+      if (LanTai !== LanTaiKetQua.current) return;
       SetLoi(
         LayThongBaoLoi(
           Error,
@@ -258,6 +265,7 @@ export default function ConCuaToiPage() {
   }
 
   async function TaiDiemDanh() {
+    const LanTai = ++LanTaiDiemDanh.current;
     if (!HocSinhId) {
       SetLoi(
         'Vui lòng chọn học sinh.',
@@ -273,10 +281,12 @@ export default function ConCuaToiPage() {
           `/diem_danh_nghi_hoc/diem_danh/con/${HocSinhId}`,
         );
 
+      if (LanTai !== LanTaiDiemDanh.current) return;
       SetDiemDanh(
         Response.data,
       );
     } catch (Error: unknown) {
+      if (LanTai !== LanTaiDiemDanh.current) return;
       SetLoi(
         LayThongBaoLoi(
           Error,
@@ -326,6 +336,8 @@ export default function ConCuaToiPage() {
           }
           onChange={
             (Event) => {
+              LanTaiKetQua.current++;
+              LanTaiDiemDanh.current++;
               SetHocSinhId(
                 Event.target.value,
               );
@@ -459,7 +471,7 @@ export default function ConCuaToiPage() {
                     }
                     {' - '}
                     {
-                      Item.trang_thai
+                      LayNhanQuyUoc(QuyUoc.DiemDanh, Item.trang_thai)
                     }
                     {' - Lớp '}
                     {
@@ -498,6 +510,7 @@ export default function ConCuaToiPage() {
             }
             onChange={
               (Event) => {
+                LanTaiKetQua.current++;
                 SetDotDanhGiaId(
                   Event.target.value,
                 );
@@ -575,7 +588,7 @@ export default function ConCuaToiPage() {
                     }
                   </strong>
                   : {
-                    Item.muc_danh_gia
+                    LayNhanQuyUoc(QuyUoc.DanhGiaMon, Item.muc_danh_gia)
                   }
 
                   {Item.nhan_xet && (
@@ -655,7 +668,7 @@ export default function ConCuaToiPage() {
                   }: {' '}
                   <strong>
                     {
-                      Item.muc_danh_gia
+                      LayNhanQuyUoc(QuyUoc.NangLucPhamChat, Item.muc_danh_gia)
                     }
                   </strong>
 

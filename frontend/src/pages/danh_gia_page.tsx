@@ -10,6 +10,7 @@ import type {
 } from 'react';
 
 import Api from '../api/api';
+import { QuyUoc } from '../utils/quy_uoc_nghiep_vu';
 
 import {
   DocJwt,
@@ -49,12 +50,14 @@ interface PhanCong {
   lop_hoc_id: number;
   mon_hoc_id: number | null;
   loai_phan_cong: string;
+  ngay_bat_dau: string;
+  ngay_ket_thuc: string | null;
   lop_hoc: {
     id: number;
     ten_lop: string;
     khoi_id: number;
     nam_hoc: NamHoc;
-    Khoi: Khoi;
+    khoi: Khoi;
   };
   mon_hoc: MonHoc | null;
 }
@@ -98,6 +101,7 @@ interface TieuChi {
 }
 
 export default function DanhGiaPage() {
+  const [CauHinhDaTai, SetCauHinhDaTai] = useState('');
   const NguoiDung =
     DocJwt();
 
@@ -347,7 +351,10 @@ export default function DanhGiaPage() {
               );
 
             SetPhanCong(
-              Response.data.phan_cong,
+              Response.data.phan_cong.filter((Item) => {
+                const HomNay = new Date().toISOString().slice(0, 10);
+                return Item.ngay_bat_dau.slice(0, 10) <= HomNay && (!Item.ngay_ket_thuc || Item.ngay_ket_thuc.slice(0, 10) >= HomNay);
+              }),
             );
           }
         } catch (Error: unknown) {
@@ -366,7 +373,11 @@ export default function DanhGiaPage() {
 
   useEffect(
     () => {
-      void TaiDanhMuc();
+      let DaHuy = false;
+      void Promise.resolve().then(() => {
+        if (!DaHuy) return TaiDanhMuc();
+      });
+      return () => { DaHuy = true; };
     },
     [
       TaiDanhMuc,
@@ -446,6 +457,9 @@ export default function DanhGiaPage() {
     );
 
     SetHocSinhId('');
+    SetMonId('');
+    SetCauHinhDiem([]);
+    SetCauHinhDiemId('');
 
     if (!Id) {
       return;
@@ -481,6 +495,7 @@ export default function DanhGiaPage() {
   }
 
   async function TaiCauHinhDiem() {
+    const LuaChonKhiTai = `${LopHocId}|${DotId}|${MonId}`;
     const Lop =
       LopDuocPhanCong.find(
         (Item) =>
@@ -514,6 +529,7 @@ export default function DanhGiaPage() {
           },
         );
 
+      SetCauHinhDaTai(LuaChonKhiTai);
       SetCauHinhDiem(
         Response.data,
       );
@@ -591,6 +607,10 @@ export default function DanhGiaPage() {
     Event: FormEvent,
   ) {
     Event.preventDefault();
+    if (CauHinhDaTai !== `${LopHocId}|${DotId}|${MonId}` || !CauHinhDiemId) {
+      SetLoi('Vui lòng tải lại cấu hình điểm cho lớp, đợt và môn đang chọn.');
+      return;
+    }
 
     try {
       SetLoi('');
@@ -1520,7 +1540,7 @@ export default function DanhGiaPage() {
             Mức đánh giá môn học
           </label>
 
-          <input
+          <select
             value={
               MucDanhGia
             }
@@ -1530,10 +1550,14 @@ export default function DanhGiaPage() {
                   Event.target.value,
                 )
             }
-            placeholder="Nhập mức đánh giá theo quy định của trường"
             required
             className="mt-4 w-full rounded-lg border px-3 py-2"
-          />
+          >
+            <option value="">Chọn mức đánh giá</option>
+            {QuyUoc.DanhGiaMon.map((Muc) => (
+              <option key={Muc.Ma} value={Muc.Ma}>{Muc.Ten}</option>
+            ))}
+          </select>
 
           <label className="mt-3 block text-sm font-medium text-slate-700">
             Nhận xét
@@ -1726,7 +1750,7 @@ export default function DanhGiaPage() {
             Mức đánh giá
           </label>
 
-          <input
+          <select
             value={
               MucNangLuc
             }
@@ -1736,10 +1760,14 @@ export default function DanhGiaPage() {
                   Event.target.value,
                 )
             }
-            placeholder="Nhập mức đánh giá theo quy định của trường"
             required
             className="mt-3 w-full rounded-lg border px-3 py-2"
-          />
+          >
+            <option value="">Chọn mức đánh giá</option>
+            {QuyUoc.NangLucPhamChat.map((Muc) => (
+              <option key={Muc.Ma} value={Muc.Ma}>{Muc.Ten}</option>
+            ))}
+          </select>
 
           <button
             type="submit"

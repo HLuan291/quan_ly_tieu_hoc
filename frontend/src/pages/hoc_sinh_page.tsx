@@ -190,6 +190,7 @@ export default function HocSinhPage() {
   ] = useState<
     Array<{
       ten_dang_nhap: string;
+      so_dien_thoai: string;
       mat_khau_ban_dau: string;
       ho_ten: string;
     }>
@@ -237,7 +238,12 @@ export default function HocSinhPage() {
 
   useEffect(
     () => {
-      void TaiDanhSach();
+      // Hủy lần khởi tạo chưa chạy khi effect bị dọn (bao gồm StrictMode).
+      let DaHuy = false;
+      void Promise.resolve().then(() => {
+        if (!DaHuy) return TaiDanhSach();
+      });
+      return () => { DaHuy = true; };
     },
     [
       TaiDanhSach,
@@ -633,7 +639,7 @@ export default function HocSinhPage() {
               >
                 {TaiKhoan.ho_ten}: {' '}
                 <strong>
-                  {TaiKhoan.ten_dang_nhap}
+                  {TaiKhoan.so_dien_thoai}
                 </strong>
                 {' / '}
                 <strong>

@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 
 import { PrismaService } from '../prisma.service';
+import { KiemTraGiaTriQuyUoc, QuyUoc } from '../quy_uoc_nghiep_vu';
 
 import {
   CapNhatKetQuaMonHocDto,
@@ -26,6 +27,15 @@ export class DanhGiaHocTapService {
     private readonly Prisma: PrismaService,
   ) {}
 
+  private DieuKienPhanCongHienTai() {
+    const HomNay = new Date();
+    HomNay.setUTCHours(0, 0, 0, 0);
+    return {
+      ngay_bat_dau: { lte: HomNay },
+      OR: [{ ngay_ket_thuc: null }, { ngay_ket_thuc: { gte: HomNay } }],
+    };
+  }
+
   // ==================================================
   // HÀM DÙNG CHUNG
   // ==================================================
@@ -38,7 +48,7 @@ export class DanhGiaHocTapService {
       `${GiaTri}T00:00:00.000Z`,
     );
 
-    if (Number.isNaN(Ngay.getTime())) {
+    if (typeof GiaTri !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(GiaTri) || Number.isNaN(Ngay.getTime()) || Ngay.toISOString().slice(0, 10) !== GiaTri) {
       throw new BadRequestException(
         `${tenTruong} không hợp lệ`,
       );
@@ -180,6 +190,7 @@ export class DanhGiaHocTapService {
         .phan_cong_giao_vien
         .findFirst({
           where: {
+          ...this.DieuKienPhanCongHienTai(),
             giao_vien_id:
               GiaoVienId,
 
@@ -238,6 +249,7 @@ export class DanhGiaHocTapService {
         .phan_cong_giao_vien
         .findFirst({
           where: {
+          ...this.DieuKienPhanCongHienTai(),
             giao_vien_id:
               GiaoVienId,
 
@@ -915,14 +927,7 @@ export class DanhGiaHocTapService {
         DuLieu.dot_danh_gia_id,
       );
 
-    const MucDanhGia =
-      DuLieu.muc_danh_gia?.trim();
-
-    if (!MucDanhGia) {
-      throw new BadRequestException(
-        'Mức đánh giá không được để trống',
-      );
-    }
+    const MucDanhGia = KiemTraGiaTriQuyUoc(DuLieu.muc_danh_gia, QuyUoc.DanhGiaMon, 'Mức đánh giá môn học');
 
     const CauHinh =
       await this.Prisma
@@ -1769,14 +1774,7 @@ export class DanhGiaHocTapService {
       );
     }
 
-    const MucDanhGia =
-      DuLieu.muc_danh_gia?.trim();
-
-    if (!MucDanhGia) {
-      throw new BadRequestException(
-        'Mức đánh giá không được để trống',
-      );
-    }
+    const MucDanhGia = KiemTraGiaTriQuyUoc(DuLieu.muc_danh_gia, QuyUoc.NangLucPhamChat, 'Mức đánh giá năng lực/phẩm chất');
 
     const KetQuaCu =
       await this.Prisma
@@ -1897,15 +1895,18 @@ export class DanhGiaHocTapService {
       );
     }
 
-    const MucKetQua =
+    const MucKetQuaNhap =
       DuLieu.muc_ket_qua_giao_duc
         ?.trim() ||
       null;
 
-    const KetQuaHoanThanh =
+    const KetQuaHoanThanhNhap =
       DuLieu.ket_qua_hoan_thanh_lop
         ?.trim() ||
       null;
+
+    const MucKetQua = MucKetQuaNhap === null ? null : KiemTraGiaTriQuyUoc(MucKetQuaNhap, QuyUoc.TongKetGiaoDuc, 'Mức kết quả giáo dục');
+    const KetQuaHoanThanh = KetQuaHoanThanhNhap === null ? null : KiemTraGiaTriQuyUoc(KetQuaHoanThanhNhap, QuyUoc.HoanThanhLop, 'Kết quả hoàn thành lớp');
 
     const TongKetCu =
       await this.Prisma
@@ -2042,6 +2043,7 @@ export class DanhGiaHocTapService {
         .phan_cong_giao_vien
         .findFirst({
           where: {
+          ...this.DieuKienPhanCongHienTai(),
             giao_vien_id:
               GiaoVien.id,
 

@@ -1,5 +1,6 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Req, UseGuards, ForbiddenException } from '@nestjs/common';
 import { AppService } from './app.service';
+import { JwtAuthGuard } from './auth/jwt-auth.guard';
 
 @Controller()
 export class AppController {
@@ -14,7 +15,9 @@ export class AppController {
   }
 
   @Get('kiem-tra-db')
-  KiemTraDatabase() {
+  @UseGuards(JwtAuthGuard)
+  KiemTraDatabase(@Req() Request: { nguoi_dung?: { vai_tro: string } }) {
+    if (Request.nguoi_dung?.vai_tro !== 'ADMIN') throw new ForbiddenException('Chỉ Admin được kiểm tra database');
     return this.AppService.KiemTraDatabase();
   }
 }

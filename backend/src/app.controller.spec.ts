@@ -10,6 +10,8 @@ import {
 import {
   AppService,
 } from './app.service';
+import { JwtService } from '@nestjs/jwt';
+import { PrismaService } from './prisma.service';
 
 describe(
   'AppController',
@@ -29,6 +31,8 @@ describe(
 
               providers: [
                 AppService,
+                { provide: JwtService, useValue: {} },
+                { provide: PrismaService, useValue: { tai_khoan: { count: jest.fn() } } },
               ],
             })
             .compile();

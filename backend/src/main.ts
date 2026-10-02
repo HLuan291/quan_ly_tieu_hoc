@@ -5,6 +5,7 @@ import {
 import {
   AppModule,
 } from './app.module';
+import { KiemTraBodyPipe } from './kiem_tra_body.pipe';
 
 async function Bootstrap() {
   const App =
@@ -12,9 +13,11 @@ async function Bootstrap() {
       AppModule,
     );
 
+  App.useGlobalPipes(new KiemTraBodyPipe());
+
   App.enableCors({
     origin:
-      'http://localhost:5173',
+      process.env.FRONTEND_ORIGIN || 'http://localhost:5173',
 
     credentials:
       true,

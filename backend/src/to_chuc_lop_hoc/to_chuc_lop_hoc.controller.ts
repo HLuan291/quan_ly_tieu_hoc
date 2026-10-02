@@ -293,7 +293,7 @@ export class ToChucLopHocController {
     this.KiemTraAdmin(Request);
 
     return this.Service
-      .layLichSuXepLopHocSinh(
+      .LayLichSuXepLopHocSinh(
         HocSinhId,
       );
   }

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const Api = axios.create({
-  baseURL: 'http://localhost:3000',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
 });
 
 Api.interceptors.request.use(
@@ -27,7 +27,7 @@ Api.interceptors.response.use(
   (Error) => {
     if (
       Error.response?.status ===
-      401
+      401 && Error.config?.url !== '/auth/login'
     ) {
       localStorage.removeItem(
         'access_token',

@@ -8,6 +8,7 @@ import type {
 } from 'react';
 
 import Api from '../api/api';
+import { QuyUoc } from '../utils/quy_uoc_nghiep_vu';
 
 import {
   LayThongBaoLoi,
@@ -84,6 +85,8 @@ export default function DiemDanhPage() {
     Loi,
     SetLoi,
   ] = useState('');
+  const [SoDaTai, SetSoDaTai] = useState('');
+  const SoDangChon = `${LopHocId}|${NgayHoc}|${BuoiHoc}`;
 
   useEffect(
     () => {
@@ -129,6 +132,7 @@ export default function DiemDanhPage() {
 
     try {
       SetLoi('');
+      const SoCanTai = SoDangChon;
 
       const Response =
         await Api.get<SoDiemDanhResponse>(
@@ -173,6 +177,7 @@ export default function DiemDanhPage() {
           }),
         ),
       );
+      SetSoDaTai(SoCanTai);
     } catch (Error: unknown) {
       SetLoi(
         LayThongBaoLoi(
@@ -186,16 +191,19 @@ export default function DiemDanhPage() {
     Event: FormEvent,
   ) {
     Event.preventDefault();
+    if (SoDaTai !== SoDangChon) {
+      SetLoi('Hãy tải lại sổ điểm danh cho lớp, ngày và buổi đang chọn.');
+      return;
+    }
 
     if (
       DanhSach.some(
         (Item) =>
-          !Item.trang_thai
-            .trim(),
+          !QuyUoc.DiemDanh.some((TrangThai) => TrangThai.Ma === Item.trang_thai),
       )
     ) {
       SetLoi(
-        'Hãy nhập trạng thái cho tất cả học sinh.',
+        'Hãy chọn trạng thái hợp lệ cho tất cả học sinh.',
       );
       return;
     }
@@ -373,7 +381,7 @@ export default function DiemDanhPage() {
         </div>
       </div>
 
-      {DanhSach.length > 0 && (
+      {DanhSach.length > 0 && SoDaTai === SoDangChon && (
         <form
           onSubmit={
             LuuDiemDanh
@@ -424,7 +432,7 @@ export default function DiemDanhPage() {
                       </td>
 
                       <td className="px-3 py-3">
-                        <input
+                        <select
                           value={
                             Item.trang_thai
                           }
@@ -450,9 +458,18 @@ export default function DiemDanhPage() {
                                   ),
                               )
                           }
-                          placeholder="Trạng thái theo quy ước trường"
+                          required
+                          aria-label={`Trạng thái điểm danh ${Item.ho_ten}`}
                           className="w-56 rounded-lg border border-slate-300 px-3 py-2"
-                        />
+                        >
+                          <option value="">Chọn trạng thái</option>
+                          {Item.trang_thai && !QuyUoc.DiemDanh.some((TrangThai) => TrangThai.Ma === Item.trang_thai) && (
+                            <option value={Item.trang_thai} disabled>Chọn lại trạng thái (giá trị cũ: {Item.trang_thai})</option>
+                          )}
+                          {QuyUoc.DiemDanh.map((TrangThai) => (
+                            <option key={TrangThai.Ma} value={TrangThai.Ma}>{TrangThai.Ten}</option>
+                          ))}
+                        </select>
                       </td>
 
                       <td className="px-3 py-3">

@@ -115,7 +115,7 @@ export class HoSoHocSinhController {
     );
 
     return this.HoSoHocSinhService
-      .taoHocSinhKemPhuHuynh(
+      .TaoHocSinhKemPhuHuynh(
         Body,
       );
   }
@@ -546,7 +546,7 @@ export class HoSoHocSinhController {
     );
 
     return this.HoSoHocSinhService
-      .huyLienKetPhuHuynhHocSinh(
+      .HuyLienKetPhuHuynhHocSinh(
         HocSinhId,
         PhuHuynhId,
       );

@@ -236,7 +236,21 @@ export class GiaoVienService {
     )}`;
   }
 
-  async TaoGiaoVien(
+  async TaoGiaoVien(DuLieu: DuLieuTaoGiaoVien) {
+    // Mã tuần tự có thể bị một yêu cầu khác dùng trước khi transaction commit.
+    // Mỗi lần thử dùng transaction mới; unique constraint vẫn bảo vệ dữ liệu.
+    for (let LanThu = 0; LanThu < 3; LanThu++) {
+      try {
+        return await this.TaoGiaoVienMotLan(DuLieu);
+      } catch (Loi: unknown) {
+        if (!(Loi && typeof Loi === 'object' && 'code' in Loi && Loi.code === 'P2002')) throw Loi;
+        if (LanThu === 2) throw new ConflictException('Thông tin giáo viên bị trùng khi tạo đồng thời; vui lòng thử lại');
+      }
+    }
+    throw new ConflictException('Không thể cấp mã giáo viên');
+  }
+
+  private async TaoGiaoVienMotLan(
     DuLieu: DuLieuTaoGiaoVien,
   ) {
     if (

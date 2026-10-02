@@ -9,6 +9,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { PrismaService } from '../prisma.service';
+import { TaoDauPhien } from './phien_dang_nhap';
 
 interface RequestCoNguoiDung extends Request {
   nguoi_dung?: {
@@ -22,6 +23,7 @@ interface JwtPayload {
   sub: number;
   vai_tro: string;
   phai_doi_mat_khau?: boolean;
+  phien_mat_khau?: string;
 }
 
 @Injectable()
@@ -40,20 +42,20 @@ export class JwtAuthGuard implements CanActivate {
         .getRequest<RequestCoNguoiDung>();
 
     const Authorization =
-      Request.headers.Authorization;
+      Request.headers.authorization;
 
-    if (!Authorization) {
+    if (typeof Authorization !== 'string' || !Authorization.trim()) {
       throw new UnauthorizedException(
         'Chưa cung cấp Token đăng nhập',
       );
     }
 
-    const [LoaiToken, Token] =
-      Authorization.split(' ');
+    const [LoaiToken, Token, PhanDu] =
+      Authorization.trim().split(/\s+/);
 
     if (
-      LoaiToken !== 'Bearer' ||
-      !Token
+      LoaiToken.toLowerCase() !== 'bearer' ||
+      !Token || PhanDu
     ) {
       throw new UnauthorizedException(
         'Token không hợp lệ',
@@ -90,6 +92,10 @@ export class JwtAuthGuard implements CanActivate {
         throw new UnauthorizedException(
           'Tài khoản không tồn tại',
         );
+      }
+
+      if (Payload.phien_mat_khau !== TaoDauPhien(TaiKhoan.mat_khau_bam)) {
+        throw new UnauthorizedException('Phiên đăng nhập đã hết hiệu lực. Vui lòng đăng nhập lại');
       }
 
       if (

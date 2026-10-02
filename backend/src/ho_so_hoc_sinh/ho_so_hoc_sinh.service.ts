@@ -89,13 +89,26 @@ export class HoSoHocSinhService {
   ) {
 
     if (
-      !/^\d{10,15}$/.test(
+      !/^\d{10}$/.test(
         SoDienThoai,
       )
     ) {
       throw new BadRequestException(
         'Số điện thoại phải gồm đúng 10 chữ số',
       );
+    }
+  }
+
+  private KiemTraNgayHocSinh(NgaySinh: Date, NgayNhapHoc: Date) {
+    const HomNay = this.HomNay();
+    if (NgaySinh > HomNay || NgayNhapHoc > HomNay || NgayNhapHoc < NgaySinh) {
+      throw new BadRequestException('Ngày sinh và ngày nhập học không được trong tương lai; ngày nhập học không được trước ngày sinh');
+    }
+  }
+
+  private KiemTraHoTen(HoTen: string) {
+    if (!HoTen.trim().split(/\s+/).every((Tu) => /^\p{Lu}/u.test(Tu))) {
+      throw new BadRequestException('Họ tên phải viết hoa chữ cái đầu của mỗi từ');
     }
   }
 
@@ -476,6 +489,11 @@ export class HoSoHocSinhService {
         .so_dien_thoai_lien_he
         .trim();
 
+    const NgaySinh = this.ChuyenNgay(HocSinh.ngay_sinh, 'Ngày sinh');
+    const NgayNhapHoc = this.ChuyenNgay(HocSinh.ngay_nhap_hoc, 'Ngày nhập học');
+    this.KiemTraNgayHocSinh(NgaySinh, NgayNhapHoc);
+    this.KiemTraHoTen(HocSinh.ho_ten);
+
 
     this.KiemTraSoDienThoai(
       SoDienThoaiLienHe,
@@ -515,6 +533,8 @@ export class HoSoHocSinhService {
             .trim(),
         );
 
+        this.KiemTraHoTen(PhuHuynh.ho_ten!);
+
         this.KiemTraNamSinhPhuHuynh(
           PhuHuynh.nam_sinh,
         );
@@ -530,6 +550,7 @@ export class HoSoHocSinhService {
       phu_huynh_id: number;
       ho_ten: string;
       ten_dang_nhap: string;
+      so_dien_thoai: string;
       mat_khau_ban_dau: string;
     }> = [];
 
@@ -551,11 +572,7 @@ export class HoSoHocSinhService {
                 ho_ten:
                   HocSinh.ho_ten.trim(),
 
-                ngay_sinh:
-                  this.ChuyenNgay(
-                    HocSinh.ngay_sinh,
-                    'Ngày sinh',
-                  ),
+          ngay_sinh: NgaySinh,
 
                 gioi_tinh:
                   HocSinh.gioi_tinh.trim(),
@@ -582,11 +599,7 @@ export class HoSoHocSinhService {
                     .dia_chi_hien_tai
                     .trim(),
 
-                ngay_nhap_hoc:
-                  this.ChuyenNgay(
-                    HocSinh.ngay_nhap_hoc,
-                    'Ngày nhập học',
-                  ),
+          ngay_nhap_hoc: NgayNhapHoc,
 
                 // Dùng default nghiệp vụ của DB
                 trang_thai:
@@ -777,6 +790,7 @@ export class HoSoHocSinhService {
 
 
               TaiKhoanMoi.push({
+                so_dien_thoai: PhuHuynh.so_dien_thoai,
                 phu_huynh_id:
                   PhuHuynh.id,
 
@@ -1193,6 +1207,13 @@ export class HoSoHocSinhService {
       );
     }
 
+    const NgaySinh = DuLieu.ngay_sinh !== undefined
+      ? this.ChuyenNgay(DuLieu.ngay_sinh, 'Ngày sinh') : HocSinh.ngay_sinh;
+    const NgayNhapHoc = DuLieu.ngay_nhap_hoc !== undefined
+      ? this.ChuyenNgay(DuLieu.ngay_nhap_hoc, 'Ngày nhập học') : HocSinh.ngay_nhap_hoc;
+    this.KiemTraNgayHocSinh(NgaySinh, NgayNhapHoc);
+    if (DuLieu.ho_ten !== undefined) this.KiemTraHoTen(DuLieu.ho_ten);
+
 
     if (
       Object.values(
@@ -1318,15 +1339,7 @@ export class HoSoHocSinhService {
             : {}),
 
 
-          ...(DuLieu.ngay_sinh
-            ? {
-                ngay_sinh:
-                  this.ChuyenNgay(
-                    DuLieu.ngay_sinh,
-                    'Ngày sinh',
-                  ),
-              }
-            : {}),
+        ngay_sinh: NgaySinh,
 
 
           ...(DuLieu.gioi_tinh !== undefined
@@ -1389,15 +1402,8 @@ export class HoSoHocSinhService {
             : {}),
 
 
-          ...(DuLieu.ngay_nhap_hoc
-            ? {
-                ngay_nhap_hoc:
-                  this.ChuyenNgay(
-                    DuLieu.ngay_nhap_hoc,
-                    'Ngày nhập học',
-                  ),
-              }
-            : {}),
+        ngay_nhap_hoc: NgayNhapHoc,
+        ngay_cap_nhat: new Date(),
 
 
           ...(DuLieu.ghi_chu !== undefined
@@ -1847,6 +1853,8 @@ export class HoSoHocSinhService {
       );
     }
 
+    if (DuLieu.ho_ten !== undefined) this.KiemTraHoTen(DuLieu.ho_ten);
+
 
     this.KiemTraNamSinhPhuHuynh(
       DuLieu.nam_sinh,
@@ -1929,13 +1937,14 @@ export class HoSoHocSinhService {
           }
 
 
-          return Tx.phu_huynh.update({
+      return Tx.phu_huynh.update({
             where: {
               id,
             },
 
 
-            data: {
+        data: {
+          ngay_cap_nhat: new Date(),
 
               ...(DuLieu.ho_ten !== undefined
                 ? {
@@ -2280,10 +2289,12 @@ export class HoSoHocSinhService {
             }
 
 
-            const SoDienThoai =
+        const SoDienThoai =
               DuLieu
                 .so_dien_thoai
-                .trim();
+            .trim();
+
+        this.KiemTraHoTen(DuLieu.ho_ten);
 
 
             this.KiemTraSoDienThoai(

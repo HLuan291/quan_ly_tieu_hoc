@@ -289,7 +289,12 @@ export default function GiaoVienPage() {
 
   useEffect(
     () => {
-      void TaiDanhSach();
+      // Hủy lần khởi tạo chưa chạy khi effect bị dọn (bao gồm StrictMode).
+      let DaHuy = false;
+      void Promise.resolve().then(() => {
+        if (!DaHuy) return TaiDanhSach();
+      });
+      return () => { DaHuy = true; };
     },
     [
       TaiDanhSach,

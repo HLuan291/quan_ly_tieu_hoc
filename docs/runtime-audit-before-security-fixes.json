@@ -1,0 +1,941 @@
+{
+  "thoi_diem": "2026-10-02T16:33:34.232Z",
+  "database": "audit_quan_ly_tieu_hoc_1790958809",
+  "loai_du_lieu": "Dữ liệu giả; DB được tạo từ Prisma schema, không phải DB của người dùng",
+  "tong": 105,
+  "dat": 99,
+  "khong_dat": 6,
+  "ket_qua": [
+    {
+      "ten": "HTTP trang gốc",
+      "method": "GET",
+      "endpoint": "/",
+      "vai_tro": "KHACH",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Không token",
+      "method": "GET",
+      "endpoint": "/giao_vien",
+      "vai_tro": "KHACH",
+      "mong_doi": 401,
+      "thuc_te": 401,
+      "dat": true
+    },
+    {
+      "ten": "Sai kiểu login",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "vai_tro": "KHACH",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Sai mật khẩu",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "vai_tro": "KHACH",
+      "mong_doi": 401,
+      "thuc_te": 401,
+      "dat": true
+    },
+    {
+      "ten": "Đăng nhập ADMIN",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "vai_tro": "KHACH",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Kết nối MySQL",
+      "method": "GET",
+      "endpoint": "/kiem-tra-db",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Danh sách giáo viên rỗng",
+      "method": "GET",
+      "endpoint": "/giao_vien",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Tạo giáo viên",
+      "method": "POST",
+      "endpoint": "/giao_vien",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Trùng SĐT giáo viên",
+      "method": "POST",
+      "endpoint": "/giao_vien",
+      "vai_tro": "ADMIN",
+      "mong_doi": 409,
+      "thuc_te": 409,
+      "dat": true
+    },
+    {
+      "ten": "Tên giáo viên sai kiểu",
+      "method": "POST",
+      "endpoint": "/giao_vien",
+      "vai_tro": "ADMIN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Ngày giáo viên không tồn tại",
+      "method": "POST",
+      "endpoint": "/giao_vien",
+      "vai_tro": "ADMIN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Sửa giáo viên",
+      "method": "PATCH",
+      "endpoint": "/giao_vien/1",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Giáo viên không tồn tại",
+      "method": "PATCH",
+      "endpoint": "/giao_vien/999999",
+      "vai_tro": "ADMIN",
+      "mong_doi": 404,
+      "thuc_te": 404,
+      "dat": true
+    },
+    {
+      "ten": "Đăng nhập giáo viên lần đầu",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "vai_tro": "KHACH",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Bắt buộc đổi mật khẩu",
+      "method": "GET",
+      "endpoint": "/phan_cong_giang_day/phan_cong/cua_toi",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Đổi mật khẩu giáo viên",
+      "method": "POST",
+      "endpoint": "/auth/doi-mat-khau",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Đăng nhập GIAO_VIEN sau đổi mật khẩu",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "vai_tro": "KHACH",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Giáo viên không sửa hồ sơ giáo viên",
+      "method": "PATCH",
+      "endpoint": "/giao_vien/1",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Tạo năm học",
+      "method": "POST",
+      "endpoint": "/to_chuc_lop_hoc/nam_hoc",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Trùng năm học",
+      "method": "POST",
+      "endpoint": "/to_chuc_lop_hoc/nam_hoc",
+      "vai_tro": "ADMIN",
+      "mong_doi": 409,
+      "thuc_te": 409,
+      "dat": true
+    },
+    {
+      "ten": "Năm học sai khoảng năm",
+      "method": "POST",
+      "endpoint": "/to_chuc_lop_hoc/nam_hoc",
+      "vai_tro": "ADMIN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Tạo lớp",
+      "method": "POST",
+      "endpoint": "/to_chuc_lop_hoc/lop_hoc",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Tạo lớp ngoài phạm vi",
+      "method": "POST",
+      "endpoint": "/to_chuc_lop_hoc/lop_hoc",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Tạo lớp thiếu ID",
+      "method": "POST",
+      "endpoint": "/to_chuc_lop_hoc/lop_hoc",
+      "vai_tro": "ADMIN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Tạo lớp trùng",
+      "method": "POST",
+      "endpoint": "/to_chuc_lop_hoc/lop_hoc",
+      "vai_tro": "ADMIN",
+      "mong_doi": 409,
+      "thuc_te": 409,
+      "dat": true
+    },
+    {
+      "ten": "Tạo học sinh và phụ huynh",
+      "method": "POST",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Tạo học sinh ngoài phạm vi",
+      "method": "POST",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Học sinh ngày tương lai",
+      "method": "POST",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh",
+      "vai_tro": "ADMIN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Học sinh SĐT 11 số",
+      "method": "POST",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh",
+      "vai_tro": "ADMIN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Phụ huynh null",
+      "method": "POST",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh",
+      "vai_tro": "ADMIN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Sửa học sinh",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/1",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Sửa ngày nhập học trước sinh",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/1",
+      "vai_tro": "ADMIN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Xếp lớp",
+      "method": "POST",
+      "endpoint": "/to_chuc_lop_hoc/xep_lop",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Xếp lớp ngoài phạm vi",
+      "method": "POST",
+      "endpoint": "/to_chuc_lop_hoc/xep_lop",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Trùng thời gian xếp lớp",
+      "method": "POST",
+      "endpoint": "/to_chuc_lop_hoc/xep_lop",
+      "vai_tro": "ADMIN",
+      "mong_doi": 409,
+      "thuc_te": 409,
+      "dat": true
+    },
+    {
+      "ten": "Lịch sử xếp lớp",
+      "method": "GET",
+      "endpoint": "/to_chuc_lop_hoc/xep_lop/hoc_sinh/1",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Tạo môn",
+      "method": "POST",
+      "endpoint": "/phan_cong_giang_day/mon_hoc",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Tạo môn bộ môn",
+      "method": "POST",
+      "endpoint": "/phan_cong_giang_day/mon_hoc",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Gắn môn mặc định GVCN",
+      "method": "POST",
+      "endpoint": "/phan_cong_giang_day/mon_hoc_khoi",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Gắn môn bộ môn",
+      "method": "POST",
+      "endpoint": "/phan_cong_giang_day/mon_hoc_khoi",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Sửa môn",
+      "method": "PATCH",
+      "endpoint": "/phan_cong_giang_day/mon_hoc/1",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Sửa môn khối",
+      "method": "PATCH",
+      "endpoint": "/phan_cong_giang_day/mon_hoc_khoi/1",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Phân công GVCN",
+      "method": "POST",
+      "endpoint": "/phan_cong_giang_day/phan_cong/gvcn",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Trùng GVCN",
+      "method": "POST",
+      "endpoint": "/phan_cong_giang_day/phan_cong/gvcn",
+      "vai_tro": "ADMIN",
+      "mong_doi": 409,
+      "thuc_te": 409,
+      "dat": true
+    },
+    {
+      "ten": "Phân công GVBM",
+      "method": "POST",
+      "endpoint": "/phan_cong_giang_day/phan_cong/mon_hoc",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Phân công của giáo viên",
+      "method": "GET",
+      "endpoint": "/phan_cong_giang_day/phan_cong/cua_toi",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Phạm vi học sinh giáo viên",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Giáo viên chỉ thấy học sinh lớp được phân công",
+      "dat": true
+    },
+    {
+      "ten": "Giáo viên không xem học sinh lớp khác",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/2",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Tải điểm danh",
+      "method": "GET",
+      "endpoint": "/diem_danh_nghi_hoc/diem_danh?lop_hoc_id=1&ngay_hoc=2026-10-02&buoi_hoc=SANG",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Ghi điểm danh",
+      "method": "POST",
+      "endpoint": "/diem_danh_nghi_hoc/diem_danh",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Cập nhật điểm danh cùng buổi",
+      "method": "POST",
+      "endpoint": "/diem_danh_nghi_hoc/diem_danh",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Không nhân đôi điểm danh",
+      "dat": true
+    },
+    {
+      "ten": "Điểm danh trùng xếp lớp trong body",
+      "method": "POST",
+      "endpoint": "/diem_danh_nghi_hoc/diem_danh",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Ngày điểm danh sai",
+      "method": "POST",
+      "endpoint": "/diem_danh_nghi_hoc/diem_danh",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Đăng nhập phụ huynh lần đầu bằng SĐT",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "vai_tro": "KHACH",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Đổi mật khẩu phụ huynh",
+      "method": "POST",
+      "endpoint": "/auth/doi-mat-khau",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Đăng nhập PHU_HUYNH",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "vai_tro": "KHACH",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Phụ huynh không đăng nhập bằng username",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "vai_tro": "KHACH",
+      "mong_doi": 401,
+      "thuc_te": 401,
+      "dat": true
+    },
+    {
+      "ten": "Phụ huynh xem con mình",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/phu_huynh/me",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Phụ huynh chỉ thấy con mình",
+      "dat": true
+    },
+    {
+      "ten": "Phụ huynh xem điểm danh con",
+      "method": "GET",
+      "endpoint": "/diem_danh_nghi_hoc/diem_danh/con/1",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Phụ huynh không xem con người khác",
+      "method": "GET",
+      "endpoint": "/diem_danh_nghi_hoc/diem_danh/con/2",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Gửi đơn nghỉ",
+      "method": "POST",
+      "endpoint": "/diem_danh_nghi_hoc/don_xin_nghi",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Gửi đơn để từ chối",
+      "method": "POST",
+      "endpoint": "/diem_danh_nghi_hoc/don_xin_nghi",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Gửi đơn ngày kết thúc trước bắt đầu",
+      "method": "POST",
+      "endpoint": "/diem_danh_nghi_hoc/don_xin_nghi",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Gửi đơn cho con người khác",
+      "method": "POST",
+      "endpoint": "/diem_danh_nghi_hoc/don_xin_nghi",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Giáo viên xem đơn lớp",
+      "method": "GET",
+      "endpoint": "/diem_danh_nghi_hoc/don_xin_nghi/lop/1",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Duyệt đơn",
+      "method": "PATCH",
+      "endpoint": "/diem_danh_nghi_hoc/don_xin_nghi/1/xu_ly",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Không xử lý lại đơn",
+      "method": "PATCH",
+      "endpoint": "/diem_danh_nghi_hoc/don_xin_nghi/1/xu_ly",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Từ chối thiếu lý do",
+      "method": "PATCH",
+      "endpoint": "/diem_danh_nghi_hoc/don_xin_nghi/2/xu_ly",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Từ chối đơn",
+      "method": "PATCH",
+      "endpoint": "/diem_danh_nghi_hoc/don_xin_nghi/2/xu_ly",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Tạo đợt cuối năm",
+      "method": "POST",
+      "endpoint": "/danh_gia_hoc_tap/dot_danh_gia",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Cấu hình môn đánh giá",
+      "method": "POST",
+      "endpoint": "/danh_gia_hoc_tap/cau_hinh_danh_gia_mon",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Cấu hình điểm nhập tay",
+      "method": "POST",
+      "endpoint": "/danh_gia_hoc_tap/cau_hinh_diem",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Cấu hình điểm tự tính",
+      "method": "POST",
+      "endpoint": "/danh_gia_hoc_tap/cau_hinh_diem",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Tạo tiêu chí",
+      "method": "POST",
+      "endpoint": "/danh_gia_hoc_tap/tieu_chi_danh_gia",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Danh sách học sinh đánh giá",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/lop/1/hoc_sinh",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Nhập kết quả môn",
+      "method": "PUT",
+      "endpoint": "/danh_gia_hoc_tap/ket_qua_mon_hoc",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Nhập điểm định kỳ",
+      "method": "POST",
+      "endpoint": "/danh_gia_hoc_tap/diem_dinh_ky",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Điểm lớn hơn 10",
+      "method": "POST",
+      "endpoint": "/danh_gia_hoc_tap/diem_dinh_ky",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Điểm trùng",
+      "method": "POST",
+      "endpoint": "/danh_gia_hoc_tap/diem_dinh_ky",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 409,
+      "thuc_te": 409,
+      "dat": true
+    },
+    {
+      "ten": "Không nhập tay điểm tự tính",
+      "method": "POST",
+      "endpoint": "/danh_gia_hoc_tap/diem_dinh_ky",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Nhập kiểm tra lại",
+      "method": "POST",
+      "endpoint": "/danh_gia_hoc_tap/diem_dinh_ky/1/kiem_tra_lai",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Nhập năng lực phẩm chất",
+      "method": "PUT",
+      "endpoint": "/danh_gia_hoc_tap/nang_luc_pham_chat",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Nhập tổng kết",
+      "method": "PUT",
+      "endpoint": "/danh_gia_hoc_tap/tong_ket_giao_duc",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Phụ huynh xem kết quả đầy đủ",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/con/1/dot/1",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Kết quả trả đủ môn/điểm/năng lực/tổng kết",
+      "dat": true
+    },
+    {
+      "ten": "Phụ huynh không xem kết quả con khác",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/con/2/dot/1",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "ADMIN xem kết quả học sinh",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/hoc_sinh/1/dot/1",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Giáo viên không xem kết quả lớp khác",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/hoc_sinh/2/dot/1",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Phụ huynh không dùng API nhân viên",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/hoc_sinh/1/dot/1",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Token hết hạn",
+      "method": "GET",
+      "endpoint": "/giao_vien",
+      "vai_tro": "HET_HAN",
+      "mong_doi": 401,
+      "thuc_te": 401,
+      "dat": true
+    },
+    {
+      "ten": "ENUM: không lưu trạng thái điểm danh tùy ý",
+      "method": "POST",
+      "endpoint": "/diem_danh_nghi_hoc/diem_danh",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 201,
+      "dat": false,
+      "thong_bao": "API chấp nhận dữ liệu/quyền đang kỳ vọng bị từ chối"
+    },
+    {
+      "ten": "ENUM: không lưu mức đánh giá tùy ý",
+      "method": "PUT",
+      "endpoint": "/danh_gia_hoc_tap/ket_qua_mon_hoc",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 200,
+      "dat": false,
+      "thong_bao": "API chấp nhận dữ liệu/quyền đang kỳ vọng bị từ chối"
+    },
+    {
+      "ten": "PUBLIC: không lộ số tài khoản cho khách",
+      "method": "GET",
+      "endpoint": "/kiem-tra-db",
+      "vai_tro": "KHACH",
+      "mong_doi": 401,
+      "thuc_te": 200,
+      "dat": false,
+      "thong_bao": "API chấp nhận dữ liệu/quyền đang kỳ vọng bị từ chối"
+    },
+    {
+      "ten": "Kết thúc phân công bộ môn",
+      "method": "PATCH",
+      "endpoint": "/phan_cong_giang_day/phan_cong/3/ket_thuc",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Kết thúc GVCN và môn tự động",
+      "method": "PATCH",
+      "endpoint": "/phan_cong_giang_day/phan_cong/1/ket_thuc",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "QUYEN: giáo viên hết phân công không ghi đánh giá mới",
+      "method": "PUT",
+      "endpoint": "/danh_gia_hoc_tap/ket_qua_mon_hoc",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 200,
+      "dat": false,
+      "thong_bao": "API chấp nhận dữ liệu/quyền đang kỳ vọng bị từ chối"
+    },
+    {
+      "ten": "QUYEN: giáo viên hết GVCN không ghi tổng kết mới",
+      "method": "PUT",
+      "endpoint": "/danh_gia_hoc_tap/tong_ket_giao_duc",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 200,
+      "dat": false,
+      "thong_bao": "API chấp nhận dữ liệu/quyền đang kỳ vọng bị từ chối"
+    },
+    {
+      "ten": "Cấp lại mật khẩu giáo viên",
+      "method": "POST",
+      "endpoint": "/giao_vien/1/cap_lai_mat_khau",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Đăng nhập sau cấp lại mật khẩu",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "vai_tro": "KHACH",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Đổi mật khẩu sau reset",
+      "method": "POST",
+      "endpoint": "/auth/doi-mat-khau",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "SESSION: token cũ sau reset không dùng lại",
+      "method": "GET",
+      "endpoint": "/phan_cong_giang_day/phan_cong/cua_toi",
+      "vai_tro": "TOKEN_CU",
+      "mong_doi": 401,
+      "thuc_te": 200,
+      "dat": false,
+      "thong_bao": "API chấp nhận dữ liệu/quyền đang kỳ vọng bị từ chối"
+    },
+    {
+      "ten": "Tài khoản khóa bị chặn với token đang có",
+      "method": "GET",
+      "endpoint": "/giao_vien",
+      "vai_tro": "ADMIN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    }
+  ]
+}

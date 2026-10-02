@@ -1,0 +1,10 @@
+{
+  "tong": 1,
+  "dat": 0,
+  "ket_qua": [
+    {
+      "ten": "UI bị gián đoạn: browserType.launch: Failed to launch chromium because executable doesn't exist at /root/.cache/ms-playwright/chromium-1234/chrome-linux64/chrome",
+      "dat": false
+    }
+  ]
+}

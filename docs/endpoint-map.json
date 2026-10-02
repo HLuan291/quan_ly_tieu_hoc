@@ -1,0 +1,737 @@
+[
+  {
+    "method": "GET",
+    "endpoint": "/",
+    "vai_tro": "Công khai",
+    "bao_ve": false,
+    "file": "src/app.controller.ts",
+    "ham": "GetHello",
+    "frontend": []
+  },
+  {
+    "method": "GET",
+    "endpoint": "/kiem-tra-db",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/app.controller.ts",
+    "ham": "KiemTraDatabase",
+    "frontend": []
+  },
+  {
+    "method": "POST",
+    "endpoint": "/auth/login",
+    "vai_tro": "Công khai",
+    "bao_ve": false,
+    "file": "src/auth/auth.controller.ts",
+    "ham": "DangNhap",
+    "frontend": [
+      "dang_nhap_page.tsx"
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "/auth/doi-mat-khau",
+    "vai_tro": "ADMIN, GIAO_VIEN, PHU_HUYNH (có thể giới hạn dữ liệu theo vai trò)",
+    "bao_ve": true,
+    "file": "src/auth/auth.controller.ts",
+    "ham": "DoiMatKhau",
+    "frontend": [
+      "doi_mat_khau_page.tsx"
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "/danh_gia_hoc_tap/dot_danh_gia",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/danh_gia_hoc_tap/danh_gia_hoc_tap.controller.ts",
+    "ham": "TaoDotDanhGia",
+    "frontend": [
+      "danh_gia_page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "/danh_gia_hoc_tap/dot_danh_gia",
+    "vai_tro": "ADMIN, GIAO_VIEN, PHU_HUYNH (có thể giới hạn dữ liệu theo vai trò)",
+    "bao_ve": true,
+    "file": "src/danh_gia_hoc_tap/danh_gia_hoc_tap.controller.ts",
+    "ham": "LayDanhSachDotDanhGia",
+    "frontend": [
+      "con_cua_toi_page.tsx",
+      "danh_gia_page.tsx"
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "/danh_gia_hoc_tap/cau_hinh_danh_gia_mon",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/danh_gia_hoc_tap/danh_gia_hoc_tap.controller.ts",
+    "ham": "TaoCauHinhDanhGiaMon",
+    "frontend": [
+      "danh_gia_page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "/danh_gia_hoc_tap/cau_hinh_danh_gia_mon",
+    "vai_tro": "ADMIN, GIAO_VIEN, PHU_HUYNH (có thể giới hạn dữ liệu theo vai trò)",
+    "bao_ve": true,
+    "file": "src/danh_gia_hoc_tap/danh_gia_hoc_tap.controller.ts",
+    "ham": "LayCauHinhDanhGiaMon",
+    "frontend": []
+  },
+  {
+    "method": "POST",
+    "endpoint": "/danh_gia_hoc_tap/cau_hinh_diem",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/danh_gia_hoc_tap/danh_gia_hoc_tap.controller.ts",
+    "ham": "TaoCauHinhDiem",
+    "frontend": [
+      "danh_gia_page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "/danh_gia_hoc_tap/cau_hinh_diem",
+    "vai_tro": "ADMIN, GIAO_VIEN, PHU_HUYNH (có thể giới hạn dữ liệu theo vai trò)",
+    "bao_ve": true,
+    "file": "src/danh_gia_hoc_tap/danh_gia_hoc_tap.controller.ts",
+    "ham": "LayCauHinhDiem",
+    "frontend": [
+      "danh_gia_page.tsx"
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "/danh_gia_hoc_tap/tieu_chi_danh_gia",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/danh_gia_hoc_tap/danh_gia_hoc_tap.controller.ts",
+    "ham": "TaoTieuChiDanhGia",
+    "frontend": [
+      "danh_gia_page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "/danh_gia_hoc_tap/tieu_chi_danh_gia",
+    "vai_tro": "ADMIN, GIAO_VIEN, PHU_HUYNH (có thể giới hạn dữ liệu theo vai trò)",
+    "bao_ve": true,
+    "file": "src/danh_gia_hoc_tap/danh_gia_hoc_tap.controller.ts",
+    "ham": "LayDanhSachTieuChi",
+    "frontend": [
+      "danh_gia_page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "/danh_gia_hoc_tap/lop/:lop_hoc_id/hoc_sinh",
+    "vai_tro": "GIAO_VIEN",
+    "bao_ve": true,
+    "file": "src/danh_gia_hoc_tap/danh_gia_hoc_tap.controller.ts",
+    "ham": "LayHocSinhDeDanhGia",
+    "frontend": [
+      "danh_gia_page.tsx"
+    ]
+  },
+  {
+    "method": "PUT",
+    "endpoint": "/danh_gia_hoc_tap/ket_qua_mon_hoc",
+    "vai_tro": "GIAO_VIEN",
+    "bao_ve": true,
+    "file": "src/danh_gia_hoc_tap/danh_gia_hoc_tap.controller.ts",
+    "ham": "CapNhatKetQuaMonHoc",
+    "frontend": [
+      "danh_gia_page.tsx"
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "/danh_gia_hoc_tap/diem_dinh_ky",
+    "vai_tro": "GIAO_VIEN",
+    "bao_ve": true,
+    "file": "src/danh_gia_hoc_tap/danh_gia_hoc_tap.controller.ts",
+    "ham": "NhapDiemDinhKy",
+    "frontend": [
+      "danh_gia_page.tsx"
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "/danh_gia_hoc_tap/diem_dinh_ky/:Id/kiem_tra_lai",
+    "vai_tro": "GIAO_VIEN",
+    "bao_ve": true,
+    "file": "src/danh_gia_hoc_tap/danh_gia_hoc_tap.controller.ts",
+    "ham": "NhapDiemKiemTraLai",
+    "frontend": []
+  },
+  {
+    "method": "PUT",
+    "endpoint": "/danh_gia_hoc_tap/nang_luc_pham_chat",
+    "vai_tro": "GIAO_VIEN",
+    "bao_ve": true,
+    "file": "src/danh_gia_hoc_tap/danh_gia_hoc_tap.controller.ts",
+    "ham": "CapNhatNangLucPhamChat",
+    "frontend": [
+      "danh_gia_page.tsx"
+    ]
+  },
+  {
+    "method": "PUT",
+    "endpoint": "/danh_gia_hoc_tap/tong_ket_giao_duc",
+    "vai_tro": "GIAO_VIEN",
+    "bao_ve": true,
+    "file": "src/danh_gia_hoc_tap/danh_gia_hoc_tap.controller.ts",
+    "ham": "CapNhatTongKetGiaoDuc",
+    "frontend": []
+  },
+  {
+    "method": "GET",
+    "endpoint": "/danh_gia_hoc_tap/hoc_sinh/:hoc_sinh_id/dot/:dot_danh_gia_id",
+    "vai_tro": "ADMIN, GIAO_VIEN (phạm vi phân công)",
+    "bao_ve": true,
+    "file": "src/danh_gia_hoc_tap/danh_gia_hoc_tap.controller.ts",
+    "ham": "LayKetQuaHocSinhTheoDot",
+    "frontend": []
+  },
+  {
+    "method": "GET",
+    "endpoint": "/danh_gia_hoc_tap/con/:hoc_sinh_id/dot/:dot_danh_gia_id",
+    "vai_tro": "PHU_HUYNH",
+    "bao_ve": true,
+    "file": "src/danh_gia_hoc_tap/danh_gia_hoc_tap.controller.ts",
+    "ham": "LayKetQuaCuaCon",
+    "frontend": [
+      "con_cua_toi_page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "/diem_danh_nghi_hoc/lop_chu_nhiem_cua_toi",
+    "vai_tro": "GIAO_VIEN",
+    "bao_ve": true,
+    "file": "src/diem_danh_nghi_hoc/diem_danh_nghi_hoc.controller.ts",
+    "ham": "LayLopChuNhiemCuaToi",
+    "frontend": [
+      "diem_danh_page.tsx",
+      "don_xin_nghi_page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "/diem_danh_nghi_hoc/diem_danh",
+    "vai_tro": "ADMIN, GIAO_VIEN (phạm vi phân công)",
+    "bao_ve": true,
+    "file": "src/diem_danh_nghi_hoc/diem_danh_nghi_hoc.controller.ts",
+    "ham": "LaySoDiemDanh",
+    "frontend": [
+      "diem_danh_page.tsx"
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "/diem_danh_nghi_hoc/diem_danh",
+    "vai_tro": "GIAO_VIEN",
+    "bao_ve": true,
+    "file": "src/diem_danh_nghi_hoc/diem_danh_nghi_hoc.controller.ts",
+    "ham": "DiemDanhHangLoat",
+    "frontend": [
+      "diem_danh_page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "/diem_danh_nghi_hoc/diem_danh/con/:hoc_sinh_id",
+    "vai_tro": "PHU_HUYNH",
+    "bao_ve": true,
+    "file": "src/diem_danh_nghi_hoc/diem_danh_nghi_hoc.controller.ts",
+    "ham": "LayDiemDanhCuaCon",
+    "frontend": [
+      "con_cua_toi_page.tsx"
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "/diem_danh_nghi_hoc/don_xin_nghi",
+    "vai_tro": "PHU_HUYNH",
+    "bao_ve": true,
+    "file": "src/diem_danh_nghi_hoc/diem_danh_nghi_hoc.controller.ts",
+    "ham": "TaoDonXinNghi",
+    "frontend": [
+      "don_xin_nghi_page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "/diem_danh_nghi_hoc/don_xin_nghi/cua_toi",
+    "vai_tro": "PHU_HUYNH",
+    "bao_ve": true,
+    "file": "src/diem_danh_nghi_hoc/diem_danh_nghi_hoc.controller.ts",
+    "ham": "LayDonXinNghiCuaToi",
+    "frontend": [
+      "don_xin_nghi_page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "/diem_danh_nghi_hoc/don_xin_nghi/lop/:lop_hoc_id",
+    "vai_tro": "GIAO_VIEN",
+    "bao_ve": true,
+    "file": "src/diem_danh_nghi_hoc/diem_danh_nghi_hoc.controller.ts",
+    "ham": "LayDonXinNghiCuaLop",
+    "frontend": [
+      "don_xin_nghi_page.tsx"
+    ]
+  },
+  {
+    "method": "PATCH",
+    "endpoint": "/diem_danh_nghi_hoc/don_xin_nghi/:id/xu_ly",
+    "vai_tro": "GIAO_VIEN",
+    "bao_ve": true,
+    "file": "src/diem_danh_nghi_hoc/diem_danh_nghi_hoc.controller.ts",
+    "ham": "XuLyDonXinNghi",
+    "frontend": [
+      "don_xin_nghi_page.tsx"
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "/giao_vien",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/giao_vien/giao_vien.controller.ts",
+    "ham": "TaoGiaoVien",
+    "frontend": [
+      "giao_vien_page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "/giao_vien",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/giao_vien/giao_vien.controller.ts",
+    "ham": "LayDanhSachGiaoVien",
+    "frontend": [
+      "giao_vien_page.tsx",
+      "phan_cong_page.tsx"
+    ]
+  },
+  {
+    "method": "PATCH",
+    "endpoint": "/giao_vien/:id",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/giao_vien/giao_vien.controller.ts",
+    "ham": "CapNhatGiaoVien",
+    "frontend": [
+      "giao_vien_page.tsx"
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "/giao_vien/:id/cap_lai_mat_khau",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/giao_vien/giao_vien.controller.ts",
+    "ham": "CapLaiMatKhauGiaoVien",
+    "frontend": [
+      "giao_vien_page.tsx"
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "/ho_so_hoc_sinh/hoc_sinh",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/ho_so_hoc_sinh/ho_so_hoc_sinh.controller.ts",
+    "ham": "TaoHocSinh",
+    "frontend": [
+      "hoc_sinh_page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "/ho_so_hoc_sinh/hoc_sinh",
+    "vai_tro": "ADMIN, GIAO_VIEN, PHU_HUYNH (có thể giới hạn dữ liệu theo vai trò)",
+    "bao_ve": true,
+    "file": "src/ho_so_hoc_sinh/ho_so_hoc_sinh.controller.ts",
+    "ham": "LayDanhSachHocSinh",
+    "frontend": [
+      "hoc_sinh_page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "/ho_so_hoc_sinh/hoc_sinh/:Id",
+    "vai_tro": "ADMIN, GIAO_VIEN, PHU_HUYNH (có thể giới hạn dữ liệu theo vai trò)",
+    "bao_ve": true,
+    "file": "src/ho_so_hoc_sinh/ho_so_hoc_sinh.controller.ts",
+    "ham": "LayChiTietHocSinh",
+    "frontend": []
+  },
+  {
+    "method": "PATCH",
+    "endpoint": "/ho_so_hoc_sinh/hoc_sinh/:Id",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/ho_so_hoc_sinh/ho_so_hoc_sinh.controller.ts",
+    "ham": "CapNhatHocSinh",
+    "frontend": []
+  },
+  {
+    "method": "PATCH",
+    "endpoint": "/ho_so_hoc_sinh/hoc_sinh/:Id/trang_thai",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/ho_so_hoc_sinh/ho_so_hoc_sinh.controller.ts",
+    "ham": "CapNhatTrangThaiHocSinh",
+    "frontend": []
+  },
+  {
+    "method": "PATCH",
+    "endpoint": "/ho_so_hoc_sinh/hoc_sinh/:Id/suc_khoe",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/ho_so_hoc_sinh/ho_so_hoc_sinh.controller.ts",
+    "ham": "CapNhatSucKhoeHocSinh",
+    "frontend": [
+      "hoc_sinh_page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "/ho_so_hoc_sinh/phu_huynh",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/ho_so_hoc_sinh/ho_so_hoc_sinh.controller.ts",
+    "ham": "LayDanhSachPhuHuynh",
+    "frontend": []
+  },
+  {
+    "method": "GET",
+    "endpoint": "/ho_so_hoc_sinh/phu_huynh/me",
+    "vai_tro": "PHU_HUYNH",
+    "bao_ve": true,
+    "file": "src/ho_so_hoc_sinh/ho_so_hoc_sinh.controller.ts",
+    "ham": "LayPhuHuynhCuaToi",
+    "frontend": [
+      "con_cua_toi_page.tsx",
+      "don_xin_nghi_page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "/ho_so_hoc_sinh/phu_huynh/:Id",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/ho_so_hoc_sinh/ho_so_hoc_sinh.controller.ts",
+    "ham": "LayChiTietPhuHuynh",
+    "frontend": [
+      "con_cua_toi_page.tsx",
+      "don_xin_nghi_page.tsx"
+    ]
+  },
+  {
+    "method": "PATCH",
+    "endpoint": "/ho_so_hoc_sinh/phu_huynh/:Id",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/ho_so_hoc_sinh/ho_so_hoc_sinh.controller.ts",
+    "ham": "CapNhatPhuHuynh",
+    "frontend": []
+  },
+  {
+    "method": "POST",
+    "endpoint": "/ho_so_hoc_sinh/phu_huynh/:Id/tao_tai_khoan",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/ho_so_hoc_sinh/ho_so_hoc_sinh.controller.ts",
+    "ham": "TaoTaiKhoanPhuHuynh",
+    "frontend": []
+  },
+  {
+    "method": "POST",
+    "endpoint": "/ho_so_hoc_sinh/phu_huynh/:Id/cap_lai_mat_khau",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/ho_so_hoc_sinh/ho_so_hoc_sinh.controller.ts",
+    "ham": "CapLaiMatKhauPhuHuynh",
+    "frontend": []
+  },
+  {
+    "method": "POST",
+    "endpoint": "/ho_so_hoc_sinh/hoc_sinh/:Id/phu_huynh",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/ho_so_hoc_sinh/ho_so_hoc_sinh.controller.ts",
+    "ham": "ThemPhuHuynhVaoHocSinh",
+    "frontend": []
+  },
+  {
+    "method": "PATCH",
+    "endpoint": "/ho_so_hoc_sinh/hoc_sinh/:hoc_sinh_id/phu_huynh/:phu_huynh_id/moi_quan_he",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/ho_so_hoc_sinh/ho_so_hoc_sinh.controller.ts",
+    "ham": "CapNhatMoiQuanHe",
+    "frontend": []
+  },
+  {
+    "method": "DELETE",
+    "endpoint": "/ho_so_hoc_sinh/hoc_sinh/:hoc_sinh_id/phu_huynh/:phu_huynh_id",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/ho_so_hoc_sinh/ho_so_hoc_sinh.controller.ts",
+    "ham": "HuyLienKet",
+    "frontend": []
+  },
+  {
+    "method": "POST",
+    "endpoint": "/phan_cong_giang_day/mon_hoc",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/phan_cong_giang_day/phan_cong_giang_day.controller.ts",
+    "ham": "TaoMonHoc",
+    "frontend": [
+      "phan_cong_page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "/phan_cong_giang_day/mon_hoc",
+    "vai_tro": "ADMIN, GIAO_VIEN, PHU_HUYNH (có thể giới hạn dữ liệu theo vai trò)",
+    "bao_ve": true,
+    "file": "src/phan_cong_giang_day/phan_cong_giang_day.controller.ts",
+    "ham": "LayDanhSachMonHoc",
+    "frontend": [
+      "danh_gia_page.tsx",
+      "phan_cong_page.tsx"
+    ]
+  },
+  {
+    "method": "PATCH",
+    "endpoint": "/phan_cong_giang_day/mon_hoc/:Id",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/phan_cong_giang_day/phan_cong_giang_day.controller.ts",
+    "ham": "CapNhatMonHoc",
+    "frontend": []
+  },
+  {
+    "method": "POST",
+    "endpoint": "/phan_cong_giang_day/mon_hoc_khoi",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/phan_cong_giang_day/phan_cong_giang_day.controller.ts",
+    "ham": "GanMonHocChoKhoi",
+    "frontend": [
+      "phan_cong_page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "/phan_cong_giang_day/mon_hoc_khoi",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/phan_cong_giang_day/phan_cong_giang_day.controller.ts",
+    "ham": "LayDanhSachMonHocKhoi",
+    "frontend": [
+      "phan_cong_page.tsx"
+    ]
+  },
+  {
+    "method": "PATCH",
+    "endpoint": "/phan_cong_giang_day/mon_hoc_khoi/:Id",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/phan_cong_giang_day/phan_cong_giang_day.controller.ts",
+    "ham": "CapNhatMonHocKhoi",
+    "frontend": []
+  },
+  {
+    "method": "POST",
+    "endpoint": "/phan_cong_giang_day/phan_cong/gvcn",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/phan_cong_giang_day/phan_cong_giang_day.controller.ts",
+    "ham": "PhanCongGvcn",
+    "frontend": [
+      "phan_cong_page.tsx"
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "/phan_cong_giang_day/phan_cong/mon_hoc",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/phan_cong_giang_day/phan_cong_giang_day.controller.ts",
+    "ham": "PhanCongMonHoc",
+    "frontend": [
+      "phan_cong_page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "/phan_cong_giang_day/phan_cong",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/phan_cong_giang_day/phan_cong_giang_day.controller.ts",
+    "ham": "LayDanhSachPhanCong",
+    "frontend": [
+      "phan_cong_page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "/phan_cong_giang_day/phan_cong/cua_toi",
+    "vai_tro": "GIAO_VIEN",
+    "bao_ve": true,
+    "file": "src/phan_cong_giang_day/phan_cong_giang_day.controller.ts",
+    "ham": "LayPhanCongCuaToi",
+    "frontend": [
+      "danh_gia_page.tsx",
+      "phan_cong_page.tsx"
+    ]
+  },
+  {
+    "method": "PATCH",
+    "endpoint": "/phan_cong_giang_day/phan_cong/:Id/ket_thuc",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/phan_cong_giang_day/phan_cong_giang_day.controller.ts",
+    "ham": "KetThucPhanCong",
+    "frontend": [
+      "phan_cong_page.tsx"
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "/to_chuc_lop_hoc/nam_hoc",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/to_chuc_lop_hoc/to_chuc_lop_hoc.controller.ts",
+    "ham": "TaoNamHoc",
+    "frontend": [
+      "lop_hoc_page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "/to_chuc_lop_hoc/nam_hoc",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/to_chuc_lop_hoc/to_chuc_lop_hoc.controller.ts",
+    "ham": "LayDanhSachNamHoc",
+    "frontend": [
+      "danh_gia_page.tsx",
+      "lop_hoc_page.tsx"
+    ]
+  },
+  {
+    "method": "PATCH",
+    "endpoint": "/to_chuc_lop_hoc/nam_hoc/:Id",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/to_chuc_lop_hoc/to_chuc_lop_hoc.controller.ts",
+    "ham": "CapNhatNamHoc",
+    "frontend": []
+  },
+  {
+    "method": "GET",
+    "endpoint": "/to_chuc_lop_hoc/khoi",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/to_chuc_lop_hoc/to_chuc_lop_hoc.controller.ts",
+    "ham": "LayDanhSachKhoi",
+    "frontend": [
+      "danh_gia_page.tsx",
+      "lop_hoc_page.tsx",
+      "phan_cong_page.tsx"
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "/to_chuc_lop_hoc/lop_hoc",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/to_chuc_lop_hoc/to_chuc_lop_hoc.controller.ts",
+    "ham": "TaoLopHoc",
+    "frontend": [
+      "lop_hoc_page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "/to_chuc_lop_hoc/lop_hoc",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/to_chuc_lop_hoc/to_chuc_lop_hoc.controller.ts",
+    "ham": "LayDanhSachLopHoc",
+    "frontend": [
+      "lop_hoc_page.tsx",
+      "phan_cong_page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "/to_chuc_lop_hoc/lop_hoc/:Id",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/to_chuc_lop_hoc/to_chuc_lop_hoc.controller.ts",
+    "ham": "LayChiTietLopHoc",
+    "frontend": []
+  },
+  {
+    "method": "PATCH",
+    "endpoint": "/to_chuc_lop_hoc/lop_hoc/:Id",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/to_chuc_lop_hoc/to_chuc_lop_hoc.controller.ts",
+    "ham": "CapNhatLopHoc",
+    "frontend": []
+  },
+  {
+    "method": "GET",
+    "endpoint": "/to_chuc_lop_hoc/hoc_sinh_chua_xep_lop",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/to_chuc_lop_hoc/to_chuc_lop_hoc.controller.ts",
+    "ham": "LayHocSinhChuaXepLop",
+    "frontend": [
+      "lop_hoc_page.tsx"
+    ]
+  },
+  {
+    "method": "POST",
+    "endpoint": "/to_chuc_lop_hoc/xep_lop",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/to_chuc_lop_hoc/to_chuc_lop_hoc.controller.ts",
+    "ham": "XepHocSinhVaoLop",
+    "frontend": [
+      "lop_hoc_page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "/to_chuc_lop_hoc/xep_lop/hoc_sinh/:hoc_sinh_id",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/to_chuc_lop_hoc/to_chuc_lop_hoc.controller.ts",
+    "ham": "LayLichSuXepLop",
+    "frontend": []
+  },
+  {
+    "method": "PATCH",
+    "endpoint": "/to_chuc_lop_hoc/xep_lop/:Id",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/to_chuc_lop_hoc/to_chuc_lop_hoc.controller.ts",
+    "ham": "CapNhatXepLop",
+    "frontend": []
+  }
+]

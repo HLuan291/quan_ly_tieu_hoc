@@ -173,7 +173,12 @@ export default function LopHocPage() {
 
   useEffect(
     () => {
-      void TaiDuLieu();
+      // Hủy lần khởi tạo chưa chạy khi effect bị dọn (bao gồm StrictMode).
+      let DaHuy = false;
+      void Promise.resolve().then(() => {
+        if (!DaHuy) return TaiDuLieu();
+      });
+      return () => { DaHuy = true; };
     },
     [
       TaiDuLieu,

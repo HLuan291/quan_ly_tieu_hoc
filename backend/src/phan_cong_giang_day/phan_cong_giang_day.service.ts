@@ -36,7 +36,7 @@ export class PhanCongGiangDayService {
       `${GiaTri}T00:00:00.000Z`,
     );
 
-    if (Number.isNaN(Ngay.getTime())) {
+    if (typeof GiaTri !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(GiaTri) || Number.isNaN(Ngay.getTime()) || Ngay.toISOString().slice(0, 10) !== GiaTri) {
       throw new BadRequestException(
         `${TenTruong} không hợp lệ`,
       );
@@ -179,7 +179,7 @@ export class PhanCongGiangDayService {
     const MonHoc =
       await this.Prisma.mon_hoc.findUnique({
         where: {
-          Id,
+          id: Id,
         },
       });
 
@@ -225,7 +225,7 @@ export class PhanCongGiangDayService {
     const KetQua =
       await this.Prisma.mon_hoc.update({
         where: {
-          Id,
+          id: Id,
         },
 
         data: {
@@ -428,7 +428,7 @@ export class PhanCongGiangDayService {
     const CauHinh =
       await this.Prisma.mon_hoc_khoi.findUnique({
         where: {
-          Id,
+          id: Id,
         },
       });
 
@@ -441,7 +441,7 @@ export class PhanCongGiangDayService {
     const KetQua =
       await this.Prisma.mon_hoc_khoi.update({
         where: {
-          Id,
+          id: Id,
         },
 
         data: {
@@ -1237,7 +1237,7 @@ export class PhanCongGiangDayService {
         .phan_cong_giao_vien
         .findUnique({
           where: {
-            Id,
+            id: Id,
           },
         });
 
@@ -1290,7 +1290,7 @@ export class PhanCongGiangDayService {
               .phan_cong_giao_vien
               .update({
                 where: {
-                  Id,
+                  id: Id,
                 },
 
                 data: {
@@ -1364,7 +1364,7 @@ export class PhanCongGiangDayService {
         .phan_cong_giao_vien
         .update({
           where: {
-            Id,
+            id: Id,
           },
 
           data: {

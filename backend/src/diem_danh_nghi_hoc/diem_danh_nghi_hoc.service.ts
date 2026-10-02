@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 
 import { PrismaService } from '../prisma.service';
+import { KiemTraGiaTriQuyUoc, QuyUoc } from '../quy_uoc_nghiep_vu';
 
 import {
   DiemDanhHangLoatDto,
@@ -31,7 +32,7 @@ export class DiemDanhNghiHocService {
       `${giaTri}T00:00:00.000Z`,
     );
 
-    if (Number.isNaN(Ngay.getTime())) {
+    if (typeof giaTri !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(giaTri) || Number.isNaN(Ngay.getTime()) || Ngay.toISOString().slice(0, 10) !== giaTri) {
       throw new BadRequestException(
         `${tenTruong} không hợp lệ`,
       );
@@ -480,13 +481,7 @@ export class DiemDanhNghiHocService {
           const Item
           of DuLieu.danh_sach
         ) {
-          if (
-            !Item.trang_thai?.trim()
-          ) {
-            throw new BadRequestException(
-              'Trạng thái điểm danh không được để trống',
-            );
-          }
+          const TrangThai = KiemTraGiaTriQuyUoc(Item.trang_thai, QuyUoc.DiemDanh, 'Trạng thái điểm danh');
 
           const XepLop =
             await tx.xep_lop.findFirst({
@@ -548,9 +543,7 @@ export class DiemDanhNghiHocService {
 
                 data: {
                   trang_thai:
-                    Item.trang_thai
-                      .trim()
-                      .toUpperCase(),
+                    TrangThai,
 
                   ghi_chu:
                     Item.ghi_chu
@@ -582,9 +575,7 @@ export class DiemDanhNghiHocService {
                     BuoiHoc,
 
                   trang_thai:
-                    Item.trang_thai
-                      .trim()
-                      .toUpperCase(),
+                    TrangThai,
 
                   ghi_chu:
                     Item.ghi_chu
