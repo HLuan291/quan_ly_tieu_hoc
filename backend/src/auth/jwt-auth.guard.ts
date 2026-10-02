@@ -8,7 +8,7 @@ import {
 
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { PrismaService } from '../Prisma.service';
+import { PrismaService } from '../prisma.service';
 
 interface RequestCoNguoiDung extends Request {
   nguoi_dung?: {
