@@ -7,54 +7,54 @@ import {
 
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
-import { PrismaService } from '../prisma.service';
+import { PrismaService } from '../Prisma.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly prisma: PrismaService,
-    private readonly jwtService: JwtService,
+    private readonly Prisma: PrismaService,
+    private readonly JwtService: JwtService,
   ) {}
 
-  async dangNhap(
-    tenDangNhapHoacSoDienThoai: string,
-    matKhau: string,
+  async DangNhap(
+    TenDangNhapHoacSoDienThoai: string,
+    MatKhau: string,
   ) {
-    if (!tenDangNhapHoacSoDienThoai || !matKhau) {
+    if (!TenDangNhapHoacSoDienThoai || !MatKhau) {
       throw new BadRequestException(
         'Vui lòng nhập đầy đủ thông tin đăng nhập',
       );
     }
 
-    const giaTriDangNhap =
-      tenDangNhapHoacSoDienThoai.trim();
+    const GiaTriDangNhap =
+      TenDangNhapHoacSoDienThoai.trim();
 
-    const taiKhoan =
-      await this.prisma.tai_khoan.findFirst({
+    const TaiKhoan =
+      await this.Prisma.tai_khoan.findFirst({
         where: {
           OR: [
             {
               ten_dang_nhap:
-                giaTriDangNhap,
+                GiaTriDangNhap,
             },
             {
               so_dien_thoai:
-                giaTriDangNhap,
+                GiaTriDangNhap,
             },
           ],
         },
       });
 
-    if (!taiKhoan) {
+    if (!TaiKhoan) {
       throw new UnauthorizedException(
         'Tên đăng nhập, số điện thoại hoặc mật khẩu không đúng',
       );
     }
 
     if (
-      taiKhoan.vai_tro === 'PHU_HUYNH' &&
-      giaTriDangNhap !==
-        taiKhoan.so_dien_thoai
+      TaiKhoan.vai_tro === 'PHU_HUYNH' &&
+      GiaTriDangNhap !==
+        TaiKhoan.so_dien_thoai
     ) {
       throw new UnauthorizedException(
         'Tên đăng nhập, số điện thoại hoặc mật khẩu không đúng',
@@ -62,7 +62,7 @@ export class AuthService {
     }
 
     if (
-      taiKhoan.trang_thai !==
+      TaiKhoan.trang_thai !==
       'HOAT_DONG'
     ) {
       throw new ForbiddenException(
@@ -70,33 +70,33 @@ export class AuthService {
       );
     }
 
-    const matKhauDung =
+    const MatKhauDung =
       await argon2.verify(
-        taiKhoan.mat_khau_bam,
-        matKhau,
+        TaiKhoan.mat_khau_bam,
+        MatKhau,
       );
 
-    if (!matKhauDung) {
+    if (!MatKhauDung) {
       throw new UnauthorizedException(
         'Tên đăng nhập, số điện thoại hoặc mật khẩu không đúng',
       );
     }
 
-    const payload = {
+    const Payload = {
       sub:
-        taiKhoan.id,
+        TaiKhoan.id,
 
       vai_tro:
-        taiKhoan.vai_tro,
+        TaiKhoan.vai_tro,
 
       phai_doi_mat_khau:
-        taiKhoan.phai_doi_mat_khau,
+        TaiKhoan.phai_doi_mat_khau,
     };
 
-    await this.prisma.tai_khoan.update({
+    await this.Prisma.tai_khoan.update({
       where: {
         id:
-          taiKhoan.id,
+          TaiKhoan.id,
       },
 
       data: {
@@ -107,62 +107,62 @@ export class AuthService {
 
     return {
       access_token:
-        await this.jwtService.signAsync(
-          payload,
+        await this.JwtService.signAsync(
+          Payload,
         ),
 
       tai_khoan: {
         id:
-          taiKhoan.id,
+          TaiKhoan.id,
 
         ten_dang_nhap:
-          taiKhoan.ten_dang_nhap,
+          TaiKhoan.ten_dang_nhap,
 
         so_dien_thoai:
-          taiKhoan.so_dien_thoai,
+          TaiKhoan.so_dien_thoai,
 
         vai_tro:
-          taiKhoan.vai_tro,
+          TaiKhoan.vai_tro,
 
         phai_doi_mat_khau:
-          taiKhoan.phai_doi_mat_khau,
+          TaiKhoan.phai_doi_mat_khau,
       },
     };
   }
 
-  async doiMatKhau(
-    taiKhoanId: number,
-    matKhauCu: string,
-    matKhauMoi: string,
+  async DoiMatKhau(
+    TaiKhoanId: number,
+    MatKhauCu: string,
+    MatKhauMoi: string,
   ) {
-    if (!matKhauCu || !matKhauMoi) {
+    if (!MatKhauCu || !MatKhauMoi) {
       throw new BadRequestException(
         'Vui lòng nhập đầy đủ mật khẩu',
       );
     }
 
-    if (matKhauMoi.length < 8) {
+    if (MatKhauMoi.length < 8) {
       throw new BadRequestException(
         'Mật khẩu mới phải có ít nhất 8 ký tự',
       );
     }
 
-    const taiKhoan =
-      await this.prisma.tai_khoan.findUnique({
+    const TaiKhoan =
+      await this.Prisma.tai_khoan.findUnique({
         where: {
           id:
-            taiKhoanId,
+            TaiKhoanId,
         },
       });
 
-    if (!taiKhoan) {
+    if (!TaiKhoan) {
       throw new UnauthorizedException(
         'Tài khoản không tồn tại',
       );
     }
 
     if (
-      taiKhoan.trang_thai !==
+      TaiKhoan.trang_thai !==
       'HOAT_DONG'
     ) {
       throw new ForbiddenException(
@@ -170,44 +170,44 @@ export class AuthService {
       );
     }
 
-    const matKhauCuDung =
+    const MatKhauCuDung =
       await argon2.verify(
-        taiKhoan.mat_khau_bam,
-        matKhauCu,
+        TaiKhoan.mat_khau_bam,
+        MatKhauCu,
       );
 
-    if (!matKhauCuDung) {
+    if (!MatKhauCuDung) {
       throw new BadRequestException(
         'Mật khẩu hiện tại không đúng',
       );
     }
 
-    const trungMatKhauCu =
+    const TrungMatKhauCu =
       await argon2.verify(
-        taiKhoan.mat_khau_bam,
-        matKhauMoi,
+        TaiKhoan.mat_khau_bam,
+        MatKhauMoi,
       );
 
-    if (trungMatKhauCu) {
+    if (TrungMatKhauCu) {
       throw new BadRequestException(
         'Mật khẩu mới phải khác mật khẩu hiện tại',
       );
     }
 
-    const matKhauBamMoi =
+    const MatKhauBamMoi =
       await argon2.hash(
-        matKhauMoi,
+        MatKhauMoi,
       );
 
-    await this.prisma.tai_khoan.update({
+    await this.Prisma.tai_khoan.update({
       where: {
         id:
-          taiKhoanId,
+          TaiKhoanId,
       },
 
       data: {
         mat_khau_bam:
-          matKhauBamMoi,
+          MatKhauBamMoi,
 
         phai_doi_mat_khau:
           false,
@@ -217,12 +217,12 @@ export class AuthService {
       },
     });
 
-    const payloadMoi = {
+    const PayloadMoi = {
       sub:
-        taiKhoan.id,
+        TaiKhoan.id,
 
       vai_tro:
-        taiKhoan.vai_tro,
+        TaiKhoan.vai_tro,
 
       phai_doi_mat_khau:
         false,
@@ -233,8 +233,8 @@ export class AuthService {
         'Đổi mật khẩu thành công',
 
       access_token:
-        await this.jwtService.signAsync(
-          payloadMoi,
+        await this.JwtService.signAsync(
+          PayloadMoi,
         ),
 
       phai_doi_mat_khau:
