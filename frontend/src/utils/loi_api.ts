@@ -1,26 +1,30 @@
 import axios from 'axios';
 
-export function layThongBaoLoi(
-  error: unknown,
+export function LayThongBaoLoi(
+  Error: unknown,
 ) {
   if (
-    axios.isAxiosError(error)
+    axios.isAxiosError(
+      Error,
+    )
   ) {
-    const message =
-      error.response?.data
+    const Message =
+      Error.response?.data
         ?.message;
 
     if (
-      Array.isArray(message)
+      Array.isArray(
+        Message,
+      )
     ) {
-      return message.join(', ');
+      return Message.join(', ');
     }
 
     if (
-      typeof message ===
+      typeof Message ===
       'string'
     ) {
-      return message;
+      return Message;
     }
   }
 
