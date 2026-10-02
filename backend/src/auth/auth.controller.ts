@@ -22,49 +22,49 @@ interface RequestCoNguoiDung extends Request {
 @Controller('auth')
 export class AuthController {
   constructor(
-    private readonly authService: AuthService,
+    private readonly AuthService: AuthService,
   ) {}
 
   // Đăng nhập
   @Post('login')
-  dangNhap(
+  DangNhap(
     @Body()
-    body: {
+    Body: {
       ten_dang_nhap_hoac_so_dien_thoai: string;
       mat_khau: string;
     },
   ) {
-    return this.authService.dangNhap(
-      body.ten_dang_nhap_hoac_so_dien_thoai,
-      body.mat_khau,
+    return this.AuthService.DangNhap(
+      Body.ten_dang_nhap_hoac_so_dien_thoai,
+      Body.mat_khau,
     );
   }
 
   // Đổi mật khẩu
   @UseGuards(JwtAuthGuard)
   @Post('doi-mat-khau')
-  doiMatKhau(
-    @Req() request: RequestCoNguoiDung,
+  DoiMatKhau(
+    @Req() Request: RequestCoNguoiDung,
 
     @Body()
-    body: {
+    Body: {
       mat_khau_cu: string;
       mat_khau_moi: string;
     },
   ) {
-    const taiKhoanId =
-      request.nguoi_dung?.sub;
+    const TaiKhoanId =
+      Request.nguoi_dung?.sub;
 
-    if (!taiKhoanId) {
+    if (!TaiKhoanId) {
       throw new BadRequestException(
         'Không xác định được tài khoản',
       );
     }
 
-    return this.authService.doiMatKhau(
-      taiKhoanId,
-      body.mat_khau_cu,
-      body.mat_khau_moi,
+    return this.AuthService.DoiMatKhau(
+      TaiKhoanId,
+      Body.mat_khau_cu,
+      Body.mat_khau_moi,
     );
   }
 }
