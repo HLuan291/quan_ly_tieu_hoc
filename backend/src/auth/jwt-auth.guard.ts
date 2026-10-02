@@ -8,7 +8,7 @@ import {
 
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
-import { PrismaService } from '../prisma.service';
+import { PrismaService } from '../Prisma.service';
 
 interface RequestCoNguoiDung extends Request {
   nguoi_dung?: {
@@ -27,33 +27,33 @@ interface JwtPayload {
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
   constructor(
-    private readonly jwtService: JwtService,
-    private readonly prisma: PrismaService,
+    private readonly JwtService: JwtService,
+    private readonly Prisma: PrismaService,
   ) {}
 
   async canActivate(
-    context: ExecutionContext,
+    Context: ExecutionContext,
   ): Promise<boolean> {
-    const request =
-      context
+    const Request =
+      Context
         .switchToHttp()
         .getRequest<RequestCoNguoiDung>();
 
-    const authorization =
-      request.headers.authorization;
+    const Authorization =
+      Request.headers.Authorization;
 
-    if (!authorization) {
+    if (!Authorization) {
       throw new UnauthorizedException(
-        'Chưa cung cấp token đăng nhập',
+        'Chưa cung cấp Token đăng nhập',
       );
     }
 
-    const [loaiToken, token] =
-      authorization.split(' ');
+    const [LoaiToken, Token] =
+      Authorization.split(' ');
 
     if (
-      loaiToken !== 'Bearer' ||
-      !token
+      LoaiToken !== 'Bearer' ||
+      !Token
     ) {
       throw new UnauthorizedException(
         'Token không hợp lệ',
@@ -61,39 +61,39 @@ export class JwtAuthGuard implements CanActivate {
     }
 
     try {
-      const payload =
-        await this.jwtService
+      const Payload =
+        await this.JwtService
           .verifyAsync<JwtPayload>(
-            token,
+            Token,
           );
 
       if (
         !Number.isInteger(
-          payload.sub,
+          Payload.sub,
         ) ||
-        payload.sub <= 0
+        Payload.sub <= 0
       ) {
         throw new UnauthorizedException(
           'Token không hợp lệ',
         );
       }
 
-      const taiKhoan =
-        await this.prisma.tai_khoan.findUnique({
+      const TaiKhoan =
+        await this.Prisma.tai_khoan.findUnique({
           where: {
             id:
-              payload.sub,
+              Payload.sub,
           },
         });
 
-      if (!taiKhoan) {
+      if (!TaiKhoan) {
         throw new UnauthorizedException(
           'Tài khoản không tồn tại',
         );
       }
 
       if (
-        taiKhoan.trang_thai !==
+        TaiKhoan.trang_thai !==
         'HOAT_DONG'
       ) {
         throw new ForbiddenException(
@@ -101,25 +101,30 @@ export class JwtAuthGuard implements CanActivate {
         );
       }
 
-      request.nguoi_dung = {
+      Request.nguoi_dung = {
         sub:
-          taiKhoan.id,
+          TaiKhoan.id,
 
         vai_tro:
-          taiKhoan.vai_tro,
+          TaiKhoan.vai_tro,
 
         phai_doi_mat_khau:
-          taiKhoan.phai_doi_mat_khau,
+          TaiKhoan.phai_doi_mat_khau,
       };
 
-      const laApiDoiMatKhau =
-        request.method === 'POST' &&
-        request.path ===
+      const DuongDan =
+        Request.originalUrl
+          .split('?')[0]
+          .replace(/\/+$/, '');
+
+      const LaApiDoiMatKhau =
+        Request.method === 'POST' &&
+        DuongDan ===
           '/auth/doi-mat-khau';
 
       if (
-        taiKhoan.phai_doi_mat_khau &&
-        !laApiDoiMatKhau
+        TaiKhoan.phai_doi_mat_khau &&
+        !LaApiDoiMatKhau
       ) {
         throw new ForbiddenException(
           'Bạn phải đổi mật khẩu trước khi sử dụng hệ thống',
@@ -127,14 +132,14 @@ export class JwtAuthGuard implements CanActivate {
       }
 
       return true;
-    } catch (error) {
+    } catch (Error) {
       if (
-        error instanceof
+        Error instanceof
           ForbiddenException ||
-        error instanceof
+        Error instanceof
           UnauthorizedException
       ) {
-        throw error;
+        throw Error;
       }
 
       throw new UnauthorizedException(
