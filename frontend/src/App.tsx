@@ -90,7 +90,7 @@ export default function App() {
           <Route
             element={
               <BaoVeRoute
-                vaiTroChoPhep={[
+                VaiTroChoPhep={[
                   'ADMIN',
                 ]}
               />
@@ -114,7 +114,7 @@ export default function App() {
           <Route
             element={
               <BaoVeRoute
-                vaiTroChoPhep={[
+                VaiTroChoPhep={[
                   'ADMIN',
                   'GIAO_VIEN',
                 ]}
@@ -146,7 +146,7 @@ export default function App() {
           <Route
             element={
               <BaoVeRoute
-                vaiTroChoPhep={[
+                VaiTroChoPhep={[
                   'GIAO_VIEN',
                 ]}
               />
@@ -163,7 +163,7 @@ export default function App() {
           <Route
             element={
               <BaoVeRoute
-                vaiTroChoPhep={[
+                VaiTroChoPhep={[
                   'GIAO_VIEN',
                   'PHU_HUYNH',
                 ]}
@@ -181,7 +181,7 @@ export default function App() {
           <Route
             element={
               <BaoVeRoute
-                vaiTroChoPhep={[
+                VaiTroChoPhep={[
                   'PHU_HUYNH',
                 ]}
               />
