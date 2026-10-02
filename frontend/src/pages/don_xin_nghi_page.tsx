@@ -10,15 +10,15 @@ import type {
 import api from '../api/api';
 
 import {
-  docJwt,
+  DocJwt,
 } from '../auth/auth';
 
 import {
-  layThongBaoLoi,
+  LayThongBaoLoi,
 } from '../utils/loi_api';
 
 interface Con {
-  id: number;
+  Id: number;
   ma_hoc_sinh: string;
   ho_ten: string;
 }
@@ -31,7 +31,7 @@ interface PhuHuynhMeResponse {
 }
 
 interface DonXinNghi {
-  id: number;
+  Id: number;
   hoc_sinh_id: number;
   ngay_bat_dau: string;
   ngay_ket_thuc: string;
@@ -47,10 +47,10 @@ interface DonXinNghi {
 }
 
 interface LopChuNhiem {
-  id: number;
+  Id: number;
   lop_hoc_id: number;
   lop_hoc: {
-    id: number;
+    Id: number;
     ten_lop: string;
     nam_hoc: {
       ten_nam_hoc: string;
@@ -59,30 +59,30 @@ interface LopChuNhiem {
 }
 
 export default function DonXinNghiPage() {
-  const nguoiDung =
-    docJwt();
+  const NguoiDung =
+    DocJwt();
 
-  const laPhuHuynh =
-    nguoiDung?.vai_tro ===
+  const LaPhuHuynh =
+    NguoiDung?.vai_tro ===
     'PHU_HUYNH';
 
-  const laGiaoVien =
-    nguoiDung?.vai_tro ===
+  const LaGiaoVien =
+    NguoiDung?.vai_tro ===
     'GIAO_VIEN';
 
   const [
-    con,
-    setCon,
+    Con,
+    SetCon,
   ] = useState<Con[]>([]);
 
   const [
-    hocSinhId,
-    setHocSinhId,
+    HocSinhId,
+    SetHocSinhId,
   ] = useState('');
 
   const [
-    ngayBatDau,
-    setNgayBatDau,
+    NgayBatDau,
+    SetNgayBatDau,
   ] = useState(
     new Date()
       .toISOString()
@@ -90,8 +90,8 @@ export default function DonXinNghiPage() {
   );
 
   const [
-    ngayKetThuc,
-    setNgayKetThuc,
+    NgayKetThuc,
+    SetNgayKetThuc,
   ] = useState(
     new Date()
       .toISOString()
@@ -99,45 +99,45 @@ export default function DonXinNghiPage() {
   );
 
   const [
-    buoiNghi,
-    setBuoiNghi,
+    BuoiNghi,
+    SetBuoiNghi,
   ] = useState('CA_NGAY');
 
   const [
-    lyDo,
-    setLyDo,
+    LyDo,
+    SetLyDo,
   ] = useState('');
 
   const [
-    don,
-    setDon,
+    Don,
+    SetDon,
   ] = useState<DonXinNghi[]>([]);
 
   const [
-    lop,
-    setLop,
+    Lop,
+    SetLop,
   ] = useState<LopChuNhiem[]>([]);
 
   const [
-    lopHocId,
-    setLopHocId,
+    LopHocId,
+    SetLopHocId,
   ] = useState('');
 
   const [
-    loi,
-    setLoi,
+    Loi,
+    SetLoi,
   ] = useState('');
 
   useEffect(
     () => {
-      async function khoiTao() {
+      async function KhoiTao() {
         try {
-          setLoi('');
+          SetLoi('');
 
-          if (laPhuHuynh) {
+          if (LaPhuHuynh) {
             const [
-              phuHuynhResponse,
-              donResponse,
+              PhuHuynhResponse,
+              DonResponse,
             ] =
               await Promise.all([
                 api.get<PhuHuynhMeResponse>(
@@ -149,198 +149,198 @@ export default function DonXinNghiPage() {
                 ),
               ]);
 
-            const danhSachCon =
-              phuHuynhResponse.data
+            const DanhSachCon =
+              PhuHuynhResponse.data
                 .phu_huynh_hoc_sinh
                 .map(
-                  (item) =>
-                    item.hoc_sinh,
+                  (Item) =>
+                    Item.hoc_sinh,
                 );
 
-            setCon(
-              danhSachCon,
+            SetCon(
+              DanhSachCon,
             );
 
             if (
-              danhSachCon[0]
+              DanhSachCon[0]
             ) {
-              setHocSinhId(
+              SetHocSinhId(
                 String(
-                  danhSachCon[0].id,
+                  DanhSachCon[0].Id,
                 ),
               );
             }
 
-            setDon(
-              donResponse.data,
+            SetDon(
+              DonResponse.data,
             );
           }
 
-          if (laGiaoVien) {
-            const response =
+          if (LaGiaoVien) {
+            const Response =
               await api.get<LopChuNhiem[]>(
                 '/diem_danh_nghi_hoc/lop_chu_nhiem_cua_toi',
               );
 
-            setLop(
-              response.data,
+            SetLop(
+              Response.data,
             );
 
             if (
-              response.data[0]
+              Response.data[0]
             ) {
-              const id =
+              const Id =
                 String(
-                  response.data[0]
+                  Response.data[0]
                     .lop_hoc_id,
                 );
 
-              setLopHocId(
-                id,
+              SetLopHocId(
+                Id,
               );
 
-              await taiDonCuaLop(
-                id,
+              await TaiDonCuaLop(
+                Id,
               );
             }
           }
-        } catch (error: unknown) {
-          setLoi(
-            layThongBaoLoi(
-              error,
+        } catch (Error: unknown) {
+          SetLoi(
+            LayThongBaoLoi(
+              Error,
             ),
           );
         }
       }
 
-      void khoiTao();
+      void KhoiTao();
     },
     [
-      laGiaoVien,
-      laPhuHuynh,
+      LaGiaoVien,
+      LaPhuHuynh,
     ],
   );
 
-  async function taiDonCuaLop(
-    id: string,
+  async function TaiDonCuaLop(
+    Id: string,
   ) {
-    if (!id) {
-      setDon([]);
+    if (!Id) {
+      SetDon([]);
       return;
     }
 
     try {
-      const response =
+      const Response =
         await api.get<DonXinNghi[]>(
-          `/diem_danh_nghi_hoc/don_xin_nghi/lop/${id}`,
+          `/diem_danh_nghi_hoc/don_xin_nghi/Lop/${Id}`,
         );
 
-      setDon(
-        response.data,
+      SetDon(
+        Response.data,
       );
-    } catch (error: unknown) {
-      setLoi(
-        layThongBaoLoi(
-          error,
+    } catch (Error: unknown) {
+      SetLoi(
+        LayThongBaoLoi(
+          Error,
         ),
       );
     }
   }
 
-  async function guiDon(
-    event: FormEvent,
+  async function GuiDon(
+    Event: FormEvent,
   ) {
-    event.preventDefault();
+    Event.preventDefault();
 
     try {
-      setLoi('');
+      SetLoi('');
 
       await api.post(
         '/diem_danh_nghi_hoc/don_xin_nghi',
         {
           hoc_sinh_id:
             Number(
-              hocSinhId,
+              HocSinhId,
             ),
 
           ngay_bat_dau:
-            ngayBatDau,
+            NgayBatDau,
 
           ngay_ket_thuc:
-            ngayKetThuc,
+            NgayKetThuc,
 
           buoi_nghi:
-            buoiNghi,
+            BuoiNghi,
 
           ly_do:
-            lyDo,
+            LyDo,
         },
       );
 
-      setLyDo('');
+      SetLyDo('');
 
-      const response =
+      const Response =
         await api.get<DonXinNghi[]>(
           '/diem_danh_nghi_hoc/don_xin_nghi/cua_toi',
         );
 
-      setDon(
-        response.data,
+      SetDon(
+        Response.data,
       );
-    } catch (error: unknown) {
-      setLoi(
-        layThongBaoLoi(
-          error,
+    } catch (Error: unknown) {
+      SetLoi(
+        LayThongBaoLoi(
+          Error,
         ),
       );
     }
   }
 
-  async function xuLyDon(
-    item: DonXinNghi,
-    trangThai: 'DA_DUYET' | 'TU_CHOI',
+  async function XuLyDon(
+    Item: DonXinNghi,
+    TrangThai: 'DA_DUYET' | 'TU_CHOI',
   ) {
-    let lyDoTuChoi:
+    let LyDoTuChoi:
       string | undefined;
 
     if (
-      trangThai ===
+      TrangThai ===
       'TU_CHOI'
     ) {
-      const giaTri =
+      const GiaTri =
         window.prompt(
           'Nhập lý do từ chối',
         );
 
-      if (!giaTri) {
+      if (!GiaTri) {
         return;
       }
 
-      lyDoTuChoi =
-        giaTri;
+      LyDoTuChoi =
+        GiaTri;
     }
 
     try {
-      setLoi('');
+      SetLoi('');
 
       await api.patch(
-        `/diem_danh_nghi_hoc/don_xin_nghi/${item.id}/xu_ly`,
+        `/diem_danh_nghi_hoc/don_xin_nghi/${Item.Id}/xu_ly`,
         {
           trang_thai:
-            trangThai,
+            TrangThai,
 
           ly_do_tu_choi:
-            lyDoTuChoi,
+            LyDoTuChoi,
         },
       );
 
-      await taiDonCuaLop(
-        lopHocId,
+      await TaiDonCuaLop(
+        LopHocId,
       );
-    } catch (error: unknown) {
-      setLoi(
-        layThongBaoLoi(
-          error,
+    } catch (Error: unknown) {
+      SetLoi(
+        LayThongBaoLoi(
+          Error,
         ),
       );
     }
@@ -353,21 +353,21 @@ export default function DonXinNghiPage() {
       </h1>
 
       <p className="mt-1 text-sm text-slate-500">
-        {laPhuHuynh
-          ? 'Phụ huynh gửi và theo dõi đơn xin nghỉ của con.'
+        {LaPhuHuynh
+          ? 'Phụ huynh gửi và theo dõi đơn xin nghỉ của Con.'
           : 'GVCN xem và xử lý đơn xin nghỉ của học sinh.'}
       </p>
 
-      {loi && (
+      {Loi && (
         <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
-          {loi}
+          {Loi}
         </div>
       )}
 
-      {laPhuHuynh && (
+      {LaPhuHuynh && (
         <form
           onSubmit={
-            guiDon
+            GuiDon
           }
           className="mt-6 rounded-xl bg-white p-5 shadow-sm"
         >
@@ -375,15 +375,19 @@ export default function DonXinNghiPage() {
             Gửi đơn xin nghỉ
           </h2>
 
-          <div className="mt-4 grid gap-3 md:grid-cols-2">
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Học sinh
+              </label>
             <select
               value={
-                hocSinhId
+                HocSinhId
               }
               onChange={
-                (event) =>
-                  setHocSinhId(
-                    event.target.value,
+                (Event) =>
+                  SetHocSinhId(
+                    Event.target.value,
                   )
               }
               required
@@ -393,34 +397,39 @@ export default function DonXinNghiPage() {
                 Chọn học sinh
               </option>
 
-              {con.map(
-                (item) => (
+              {Con.map(
+                (Item) => (
                   <option
                     key={
-                      item.id
+                      Item.Id
                     }
                     value={
-                      item.id
+                      Item.Id
                     }
                   >
                     {
-                      item.ma_hoc_sinh
+                      Item.ma_hoc_sinh
                     } - {
-                      item.ho_ten
+                      Item.ho_ten
                     }
                   </option>
                 ),
               )}
             </select>
+            </div>
 
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Buổi nghỉ
+              </label>
             <select
               value={
-                buoiNghi
+                BuoiNghi
               }
               onChange={
-                (event) =>
-                  setBuoiNghi(
-                    event.target.value,
+                (Event) =>
+                  SetBuoiNghi(
+                    Event.target.value,
                   )
               }
               className="rounded-lg border border-slate-300 px-3 py-2"
@@ -435,51 +444,75 @@ export default function DonXinNghiPage() {
                 Cả ngày
               </option>
             </select>
+            </div>
 
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Từ ngày
+              </label>
             <input
               type="date"
               value={
-                ngayBatDau
+                NgayBatDau
               }
               onChange={
-                (event) =>
-                  setNgayBatDau(
-                    event.target.value,
+                (Event) =>
+                  SetNgayBatDau(
+                    Event.target.value,
                   )
               }
               required
-              className="rounded-lg border border-slate-300 px-3 py-2"
+              min={
+                new Date()
+                  .toISOString()
+                  .slice(0, 10)
+              }
+              className="w-full rounded-lg border border-slate-300 px-3 py-2"
             />
+            </div>
 
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Đến ngày
+              </label>
             <input
               type="date"
               value={
-                ngayKetThuc
+                NgayKetThuc
               }
               onChange={
-                (event) =>
-                  setNgayKetThuc(
-                    event.target.value,
+                (Event) =>
+                  SetNgayKetThuc(
+                    Event.target.value,
                   )
               }
+              min={
+                NgayBatDau
+              }
               required
-              className="rounded-lg border border-slate-300 px-3 py-2"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2"
             />
+            </div>
 
+            <div className="md:col-span-2">
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Lý do xin nghỉ
+              </label>
             <textarea
               value={
-                lyDo
+                LyDo
               }
               onChange={
-                (event) =>
-                  setLyDo(
-                    event.target.value,
+                (Event) =>
+                  SetLyDo(
+                    Event.target.value,
                   )
               }
-              placeholder="Lý do xin nghỉ"
+              placeholder="VD: Học sinh bị sốt, cần nghỉ để theo dõi sức khỏe"
               required
-              className="rounded-lg border border-slate-300 px-3 py-2 md:col-span-2"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2"
             />
+            </div>
           </div>
 
           <button
@@ -491,7 +524,7 @@ export default function DonXinNghiPage() {
         </form>
       )}
 
-      {laGiaoVien && (
+      {LaGiaoVien && (
         <div className="mt-6 rounded-xl bg-white p-5 shadow-sm">
           <label className="text-sm font-medium">
             Lớp chủ nhiệm
@@ -499,16 +532,16 @@ export default function DonXinNghiPage() {
 
           <select
             value={
-              lopHocId
+              LopHocId
             }
             onChange={
-              (event) => {
-                setLopHocId(
-                  event.target.value,
+              (Event) => {
+                SetLopHocId(
+                  Event.target.value,
                 );
 
-                void taiDonCuaLop(
-                  event.target.value,
+                void TaiDonCuaLop(
+                  Event.target.value,
                 );
               }
             }
@@ -518,22 +551,22 @@ export default function DonXinNghiPage() {
               Chọn lớp
             </option>
 
-            {lop.map(
-              (item) => (
+            {Lop.map(
+              (Item) => (
                 <option
                   key={
-                    item.id
+                    Item.Id
                   }
                   value={
-                    item.lop_hoc_id
+                    Item.lop_hoc_id
                   }
                 >
                   {
-                    item.lop_hoc
+                    Item.lop_hoc
                       .nam_hoc
                       .ten_nam_hoc
                   } - {
-                    item.lop_hoc
+                    Item.lop_hoc
                       .ten_lop
                   }
                 </option>
@@ -567,7 +600,7 @@ export default function DonXinNghiPage() {
                 <th className="px-3 py-3">
                   Trạng thái
                 </th>
-                {laGiaoVien && (
+                {LaGiaoVien && (
                   <th className="px-3 py-3">
                     Xử lý
                   </th>
@@ -576,37 +609,37 @@ export default function DonXinNghiPage() {
             </thead>
 
             <tbody>
-              {don.map(
-                (item) => (
+              {Don.map(
+                (Item) => (
                   <tr
                     key={
-                      item.id
+                      Item.Id
                     }
                     className="border-b"
                   >
                     <td className="px-3 py-3">
                       {
-                        item.hoc_sinh
+                        Item.hoc_sinh
                           ?.ho_ten ??
-                        con.find(
-                          (hocSinh) =>
-                            hocSinh.id ===
-                            item.hoc_sinh_id,
+                        Con.find(
+                          (HocSinh) =>
+                            HocSinh.Id ===
+                            Item.hoc_sinh_id,
                         )
                           ?.ho_ten ??
-                        item.hoc_sinh_id
+                        Item.hoc_sinh_id
                       }
                     </td>
 
                     <td className="px-3 py-3">
                       {
-                        item.ngay_bat_dau
+                        Item.ngay_bat_dau
                           .slice(
                             0,
                             10,
                           )
                       } - {
-                        item.ngay_ket_thuc
+                        Item.ngay_ket_thuc
                           .slice(
                             0,
                             10,
@@ -616,33 +649,33 @@ export default function DonXinNghiPage() {
 
                     <td className="px-3 py-3">
                       {
-                        item.buoi_nghi
+                        Item.buoi_nghi
                       }
                     </td>
 
                     <td className="px-3 py-3">
                       {
-                        item.ly_do
+                        Item.ly_do
                       }
                     </td>
 
                     <td className="px-3 py-3">
                       {
-                        item.trang_thai
+                        Item.trang_thai
                       }
                     </td>
 
-                    {laGiaoVien && (
+                    {LaGiaoVien && (
                       <td className="px-3 py-3">
-                        {item.trang_thai ===
+                        {Item.trang_thai ===
                           'CHO_DUYET' && (
                           <>
                             <button
                               type="button"
                               onClick={
                                 () =>
-                                  void xuLyDon(
-                                    item,
+                                  void XuLyDon(
+                                    Item,
                                     'DA_DUYET',
                                   )
                               }
@@ -655,8 +688,8 @@ export default function DonXinNghiPage() {
                               type="button"
                               onClick={
                                 () =>
-                                  void xuLyDon(
-                                    item,
+                                  void XuLyDon(
+                                    Item,
                                     'TU_CHOI',
                                   )
                               }
@@ -674,7 +707,7 @@ export default function DonXinNghiPage() {
             </tbody>
           </table>
 
-          {don.length === 0 && (
+          {Don.length === 0 && (
             <p className="py-6 text-center text-slate-500">
               Chưa có đơn xin nghỉ.
             </p>
