@@ -1,32 +1,32 @@
 import axios from 'axios';
 
-const api = axios.create({
+const Api = axios.create({
   baseURL: 'http://localhost:3000',
 });
 
-api.interceptors.request.use(
-  (config) => {
-    const token =
+Api.interceptors.request.use(
+  (Config) => {
+    const Token =
       localStorage.getItem(
         'access_token',
       );
 
-    if (token) {
-      config.headers.Authorization =
-        `Bearer ${token}`;
+    if (Token) {
+      Config.headers.Authorization =
+        `Bearer ${Token}`;
     }
 
-    return config;
+    return Config;
   },
 );
 
-api.interceptors.response.use(
-  (response) =>
-    response,
+Api.interceptors.response.use(
+  (Response) =>
+    Response,
 
-  (error) => {
+  (Error) => {
     if (
-      error.response?.status ===
+      Error.response?.status ===
       401
     ) {
       localStorage.removeItem(
@@ -37,14 +37,14 @@ api.interceptors.response.use(
         '/dang_nhap';
     }
 
-    const message =
-      error.response?.data
+    const Message =
+      Error.response?.data
         ?.message;
 
     if (
-      error.response?.status ===
+      Error.response?.status ===
         403 &&
-      message ===
+      Message ===
         'Bạn phải đổi mật khẩu trước khi sử dụng hệ thống' &&
       window.location.pathname !==
         '/doi_mat_khau'
@@ -54,9 +54,9 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(
-      error,
+      Error,
     );
   },
 );
 
-export default api;
+export default Api;
