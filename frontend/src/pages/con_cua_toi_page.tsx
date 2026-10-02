@@ -6,7 +6,7 @@ import {
 import api from '../api/api';
 
 import {
-  layThongBaoLoi,
+  LayThongBaoLoi,
 } from '../utils/loi_api';
 
 interface Con {
@@ -180,7 +180,7 @@ export default function ConCuaToiPage() {
           }
         } catch (error: unknown) {
           setLoi(
-            layThongBaoLoi(
+            LayThongBaoLoi(
               error,
             ),
           );
@@ -213,7 +213,7 @@ export default function ConCuaToiPage() {
       );
     } catch (error: unknown) {
       setLoi(
-        layThongBaoLoi(
+        LayThongBaoLoi(
           error,
         ),
       );
@@ -238,7 +238,7 @@ export default function ConCuaToiPage() {
       );
     } catch (error: unknown) {
       setLoi(
-        layThongBaoLoi(
+        LayThongBaoLoi(
           error,
         ),
       );
