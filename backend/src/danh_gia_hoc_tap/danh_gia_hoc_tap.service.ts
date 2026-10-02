@@ -1037,7 +1037,7 @@ export class DanhGiaHocTapService {
     DuLieu: NhapDiemDinhKyDto,
   ) {
     this.KiemTraDiem(
-      DuLieu.Diem,
+      DuLieu.diem,
     );
 
     const GiaoVien =
@@ -1124,8 +1124,8 @@ export class DanhGiaHocTapService {
                 cau_hinh_diem_id:
                   DuLieu.cau_hinh_diem_id,
 
-                Diem:
-                  DuLieu.Diem,
+                diem:
+                  DuLieu.diem,
 
                 giao_vien_cap_nhat_id:
                   GiaoVien.id,
@@ -1140,8 +1140,8 @@ export class DanhGiaHocTapService {
               lan_thu:
                 1,
 
-              Diem:
-                DuLieu.Diem,
+              diem:
+                DuLieu.diem,
 
               ngay_kiem_tra:
                 NgayKiemTra,
@@ -1167,7 +1167,7 @@ export class DanhGiaHocTapService {
       thong_bao:
         'Nhập điểm định kỳ thành công',
 
-      Diem:
+      diem:
         KetQua,
     };
   }
@@ -1182,7 +1182,7 @@ export class DanhGiaHocTapService {
     DuLieu: NhapDiemKiemTraLaiDto,
   ) {
     this.KiemTraDiem(
-      DuLieu.Diem,
+      DuLieu.diem,
     );
 
     const GiaoVien =
@@ -1275,8 +1275,8 @@ export class DanhGiaHocTapService {
                 lan_thu:
                   LanMoi,
 
-                Diem:
-                  DuLieu.Diem,
+                diem:
+                  DuLieu.diem,
 
                 ngay_kiem_tra:
                   NgayKiemTra,
@@ -1299,8 +1299,8 @@ export class DanhGiaHocTapService {
 
             data: {
               // Điểm hiện hành = lần kiểm tra mới nhất
-              Diem:
-                DuLieu.Diem,
+              diem:
+                DuLieu.diem,
 
               giao_vien_cap_nhat_id:
                 GiaoVien.id,
@@ -1414,7 +1414,7 @@ export class DanhGiaHocTapService {
           },
 
           select: {
-            Diem: true,
+            diem: true,
           },
         });
 
@@ -1429,7 +1429,7 @@ export class DanhGiaHocTapService {
       DiemThanhPhan.reduce(
         (GiaTri, Item) =>
           GiaTri +
-          Number(Item.Diem),
+          Number(Item.diem),
         0,
       );
 
@@ -1466,7 +1466,7 @@ export class DanhGiaHocTapService {
             },
 
             data: {
-              Diem:
+              diem:
                 DiemTuTinh,
 
               giao_vien_cap_nhat_id:
@@ -1487,7 +1487,7 @@ export class DanhGiaHocTapService {
               cau_hinh_diem_id:
                 CauHinh.id,
 
-              Diem:
+              diem:
                 DiemTuTinh,
 
               giao_vien_cap_nhat_id:
