@@ -11,13 +11,13 @@ import {
 } from './auth';
 
 interface Props {
-  vaiTroChoPhep?: VaiTro[];
+  VaiTroChoPhep?: VaiTro[];
 }
 
 export default function BaoVeRoute({
-  vaiTroChoPhep,
+  VaiTroChoPhep,
 }: Props) {
-  const location =
+  const Location =
     useLocation();
 
   if (!DaDangNhap()) {
@@ -29,10 +29,10 @@ export default function BaoVeRoute({
     );
   }
 
-  const nguoiDung =
+  const NguoiDung =
     DocJwt();
 
-  if (!nguoiDung) {
+  if (!NguoiDung) {
     return (
       <Navigate
         to="/dang_nhap"
@@ -42,8 +42,8 @@ export default function BaoVeRoute({
   }
 
   if (
-    nguoiDung.phai_doi_mat_khau &&
-    location.pathname !==
+    NguoiDung.phai_doi_mat_khau &&
+    Location.pathname !==
       '/doi_mat_khau'
   ) {
     return (
@@ -55,9 +55,9 @@ export default function BaoVeRoute({
   }
 
   if (
-    vaiTroChoPhep &&
-    !vaiTroChoPhep.includes(
-      nguoiDung.vai_tro,
+    VaiTroChoPhep &&
+    !VaiTroChoPhep.includes(
+      NguoiDung.vai_tro,
     )
   ) {
     return (
