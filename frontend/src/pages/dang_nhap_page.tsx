@@ -26,7 +26,7 @@ import {
   LuuToken,
 } from '../auth/auth';
 
-const schema = z.object({
+const Schema = z.object({
   ten_dang_nhap_hoac_so_dien_thoai: z
     .string()
     .min(
@@ -43,7 +43,7 @@ const schema = z.object({
 });
 
 type FormData =
-  z.infer<typeof schema>;
+  z.infer<typeof Schema>;
 
 interface LoginResponse {
   access_token: string;
@@ -54,49 +54,49 @@ interface LoginResponse {
 }
 
 export default function DangNhapPage() {
-  const navigate =
+  const Navigate =
     useNavigate();
 
   const [
-    loi,
-    setLoi,
+    Loi,
+    SetLoi,
   ] = useState('');
 
   const [
-    dangGui,
-    setDangGui,
+    DangGui,
+    SetDangGui,
   ] = useState(false);
 
   const {
-    register,
-    handleSubmit,
+    Register,
+    HandleSubmit,
     formState: {
-      errors,
+      Errors,
     },
   } = useForm<FormData>({
     resolver:
-      zodResolver(schema),
+      zodResolver(Schema),
   });
 
-  async function dangNhap(
-    duLieu: FormData,
+  async function DangNhap(
+    DuLieu: FormData,
   ) {
     try {
-      setDangGui(true);
-      setLoi('');
+      SetDangGui(true);
+      SetLoi('');
 
-      const response =
+      const Response =
         await api.post<LoginResponse>(
           '/auth/login',
-          duLieu,
+          DuLieu,
         );
 
       LuuToken(
-        response.data.access_token,
+        Response.data.access_token,
       );
 
-      navigate(
-        response.data.tai_khoan
+      Navigate(
+        Response.data.tai_khoan
           .phai_doi_mat_khau
           ? '/doi_mat_khau'
           : '/dashboard',
@@ -104,33 +104,33 @@ export default function DangNhapPage() {
           replace: true,
         },
       );
-    } catch (error: unknown) {
+    } catch (Error: unknown) {
       if (
-        axios.isAxiosError(error)
+        axios.isAxiosError(Error)
       ) {
-        const message =
-          error.response?.data
-            ?.message;
+        const Message =
+          Error.Response?.data
+            ?.Message;
 
         if (
-          Array.isArray(message)
+          Array.isArray(Message)
         ) {
-          setLoi(
-            message.join(', '),
+          SetLoi(
+            Message.join(', '),
           );
         } else {
-          setLoi(
-            message ||
+          SetLoi(
+            Message ||
               'Đăng nhập thất bại',
           );
         }
       } else {
-        setLoi(
+        SetLoi(
           'Đăng nhập thất bại',
         );
       }
     } finally {
-      setDangGui(false);
+      SetDangGui(false);
     }
   }
 
@@ -184,8 +184,8 @@ export default function DangNhapPage() {
 
         <form
           onSubmit={
-            handleSubmit(
-              dangNhap,
+            HandleSubmit(
+              DangNhap,
             )
           }
           className="
@@ -206,7 +206,7 @@ export default function DangNhapPage() {
             </label>
 
             <input
-              {...register(
+              {...Register(
                 'ten_dang_nhap_hoac_so_dien_thoai',
               )}
               className="
@@ -222,7 +222,7 @@ export default function DangNhapPage() {
               placeholder="Nhập tài khoản hoặc số điện thoại"
             />
 
-            {errors
+            {Errors
               .ten_dang_nhap_hoac_so_dien_thoai && (
               <p
                 className="
@@ -232,9 +232,9 @@ export default function DangNhapPage() {
                 "
               >
                 {
-                  errors
+                  Errors
                     .ten_dang_nhap_hoac_so_dien_thoai
-                    .message
+                    .Message
                 }
               </p>
             )}
@@ -254,7 +254,7 @@ export default function DangNhapPage() {
             </label>
 
             <input
-              {...register(
+              {...Register(
                 'mat_khau',
               )}
               type="password"
@@ -271,7 +271,7 @@ export default function DangNhapPage() {
               placeholder="Nhập mật khẩu"
             />
 
-            {errors.mat_khau && (
+            {Errors.mat_khau && (
               <p
                 className="
                   mt-1
@@ -280,15 +280,15 @@ export default function DangNhapPage() {
                 "
               >
                 {
-                  errors
+                  Errors
                     .mat_khau
-                    .message
+                    .Message
                 }
               </p>
             )}
           </div>
 
-          {loi && (
+          {Loi && (
             <div
               className="
                 rounded-lg
@@ -298,13 +298,13 @@ export default function DangNhapPage() {
                 text-red-600
               "
             >
-              {loi}
+              {Loi}
             </div>
           )}
 
           <button
             type="submit"
-            disabled={dangGui}
+            disabled={DangGui}
             className="
               w-full
               rounded-lg
@@ -318,7 +318,7 @@ export default function DangNhapPage() {
               disabled:opacity-50
             "
           >
-            {dangGui
+            {DangGui
               ? 'Đang đăng nhập...'
               : 'Đăng nhập'}
           </button>
