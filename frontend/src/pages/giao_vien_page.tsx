@@ -11,7 +11,7 @@ import type {
 
 import axios from 'axios';
 
-import api from '../api/api';
+import Api from '../api/api';
 
 interface TaiKhoanGiaoVien {
   ten_dang_nhap: string;
@@ -247,7 +247,7 @@ export default function GiaoVienPage() {
           SetLoi('');
 
           const Response =
-            await api.get<DanhSachGiaoVienResponse>(
+            await Api.get<DanhSachGiaoVienResponse>(
               '/giao_vien',
               {
                 params: {
@@ -495,13 +495,13 @@ export default function GiaoVienPage() {
       if (
         GiaoVienDangSua
       ) {
-        await api.patch(
+        await Api.patch(
           `/giao_vien/${GiaoVienDangSua.id}`,
           Form,
         );
       } else {
         const Response =
-          await api.post<TaoGiaoVienResponse>(
+          await Api.post<TaoGiaoVienResponse>(
             '/giao_vien',
             Form,
           );
@@ -552,7 +552,7 @@ export default function GiaoVienPage() {
       SetLoi('');
 
       const Response =
-        await api.post<CapLaiMatKhauResponse>(
+        await Api.post<CapLaiMatKhauResponse>(
           `/giao_vien/${GiaoVienItem.id}/cap_lai_mat_khau`,
         );
 
