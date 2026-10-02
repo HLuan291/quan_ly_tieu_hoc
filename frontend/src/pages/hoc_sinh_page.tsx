@@ -12,11 +12,11 @@ import type {
 import api from '../api/api';
 
 import {
-  docJwt as DocJwt,
+  DocJwt,
 } from '../auth/auth';
 
 import {
-  layThongBaoLoi as LayThongBaoLoi,
+  LayThongBaoLoi,
 } from '../utils/loi_api';
 
 interface XepLopTomTat {
