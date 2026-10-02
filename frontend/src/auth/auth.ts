@@ -12,65 +12,65 @@ export interface JwtPayload {
   exp?: number;
 }
 
-export function layToken() {
+export function LayToken() {
   return localStorage.getItem(
     'access_token',
   );
 }
 
-export function luuToken(
-  token: string,
+export function LuuToken(
+  Token: string,
 ) {
   localStorage.setItem(
     'access_token',
-    token,
+    Token,
   );
 }
 
-export function dangXuat() {
+export function DangXuat() {
   localStorage.removeItem(
     'access_token',
   );
 }
 
-export function docJwt():
+export function DocJwt():
   JwtPayload | null {
 
-  const token =
-    layToken();
+  const Token =
+    LayToken();
 
-  if (!token) {
+  if (!Token) {
     return null;
   }
 
   try {
-    const phanPayload =
-      token.split('.')[1];
+    const PhanPayload =
+      Token.split('.')[1];
 
-    if (!phanPayload) {
+    if (!PhanPayload) {
       return null;
     }
 
-    let base64 =
-      phanPayload
+    let Base64 =
+      PhanPayload
         .replace(/-/g, '+')
         .replace(/_/g, '/');
 
     while (
-      base64.length % 4 !== 0
+      Base64.length % 4 !== 0
     ) {
-      base64 += '=';
+      Base64 += '=';
     }
 
-    const json =
+    const Json =
       decodeURIComponent(
-        atob(base64)
+        atob(Base64)
           .split('')
           .map(
-            (kyTu) =>
+            (KyTu) =>
               `%${(
                 '00' +
-                kyTu
+                KyTu
                   .charCodeAt(0)
                   .toString(16)
               ).slice(-2)}`,
@@ -78,50 +78,50 @@ export function docJwt():
           .join(''),
       );
 
-    const payload =
+    const Payload =
       JSON.parse(
-        json,
+        Json,
       ) as Partial<JwtPayload>;
 
     if (
       !Number.isInteger(
-        payload.sub,
+        Payload.sub,
       ) ||
       ![
         'ADMIN',
         'GIAO_VIEN',
         'PHU_HUYNH',
       ].includes(
-        payload.vai_tro ?? '',
+        Payload.vai_tro ?? '',
       ) ||
       typeof
-        payload.phai_doi_mat_khau !==
+        Payload.phai_doi_mat_khau !==
         'boolean'
     ) {
       return null;
     }
 
-    return payload as JwtPayload;
+    return Payload as JwtPayload;
 
   } catch {
     return null;
   }
 }
 
-export function daDangNhap() {
-  const nguoiDung =
-    docJwt();
+export function DaDangNhap() {
+  const NguoiDung =
+    DocJwt();
 
-  if (!nguoiDung) {
+  if (!NguoiDung) {
     return false;
   }
 
   if (
-    nguoiDung.exp &&
-    nguoiDung.exp * 1000 <
+    NguoiDung.exp &&
+    NguoiDung.exp * 1000 <
       Date.now()
   ) {
-    dangXuat();
+    DangXuat();
 
     return false;
   }
