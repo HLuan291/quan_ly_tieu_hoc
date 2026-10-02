@@ -7,7 +7,7 @@ import type {
   FormEvent,
 } from 'react';
 
-import api from '../api/api';
+import Api from '../api/api';
 
 import {
   LayThongBaoLoi,
@@ -90,7 +90,7 @@ export default function DiemDanhPage() {
       async function TaiLop() {
         try {
           const Response =
-            await api.get<LopChuNhiem[]>(
+            await Api.get<LopChuNhiem[]>(
               '/diem_danh_nghi_hoc/lop_chu_nhiem_cua_toi',
             );
 
@@ -131,7 +131,7 @@ export default function DiemDanhPage() {
       SetLoi('');
 
       const Response =
-        await api.get<SoDiemDanhResponse>(
+        await Api.get<SoDiemDanhResponse>(
           '/diem_danh_nghi_hoc/diem_danh',
           {
             params: {
@@ -203,7 +203,7 @@ export default function DiemDanhPage() {
     try {
       SetLoi('');
 
-      await api.post(
+      await Api.post(
         '/diem_danh_nghi_hoc/diem_danh',
         {
           lop_hoc_id:
