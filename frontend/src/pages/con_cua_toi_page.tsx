@@ -1,9 +1,10 @@
 import {
   useEffect,
+  useMemo,
   useState,
 } from 'react';
 
-import api from '../api/api';
+import Api from '../api/api';
 
 import {
   LayThongBaoLoi,
@@ -90,169 +91,199 @@ interface DiemDanhResponse {
 
 export default function ConCuaToiPage() {
   const [
-    phuHuynh,
-    setPhuHuynh,
+    PhuHuynh,
+    SetPhuHuynh,
   ] = useState<PhuHuynhMeResponse | null>(
     null,
   );
 
   const [
-    hocSinhId,
-    setHocSinhId,
+    HocSinhId,
+    SetHocSinhId,
   ] = useState('');
 
   const [
-    dotDanhGia,
-    setDotDanhGia,
+    DotDanhGia,
+    SetDotDanhGia,
   ] = useState<DotDanhGia[]>([]);
 
   const [
-    dotDanhGiaId,
-    setDotDanhGiaId,
+    DotDanhGiaId,
+    SetDotDanhGiaId,
   ] = useState('');
 
   const [
-    ketQua,
-    setKetQua,
+    KetQua,
+    SetKetQua,
   ] = useState<KetQuaResponse | null>(
     null,
   );
 
   const [
-    diemDanh,
-    setDiemDanh,
+    DiemDanh,
+    SetDiemDanh,
   ] = useState<DiemDanhResponse | null>(
     null,
   );
 
   const [
-    loi,
-    setLoi,
+    Loi,
+    SetLoi,
   ] = useState('');
 
   useEffect(
     () => {
-      async function taiDuLieu() {
+      async function TaiDuLieu() {
         try {
+          SetLoi('');
+
           const [
-            phuHuynhResponse,
-            dotResponse,
+            PhuHuynhResponse,
+            DotResponse,
           ] =
             await Promise.all([
-              api.get<PhuHuynhMeResponse>(
+              Api.get<PhuHuynhMeResponse>(
                 '/ho_so_hoc_sinh/phu_huynh/me',
               ),
 
-              api.get<DotDanhGia[]>(
+              Api.get<DotDanhGia[]>(
                 '/danh_gia_hoc_tap/dot_danh_gia',
               ),
             ]);
 
-          setPhuHuynh(
-            phuHuynhResponse.data,
+          SetPhuHuynh(
+            PhuHuynhResponse.data,
           );
 
-          setDotDanhGia(
-            dotResponse.data,
+          SetDotDanhGia(
+            DotResponse.data,
           );
 
-          const conDau =
-            phuHuynhResponse.data
+          const ConDau =
+            PhuHuynhResponse.data
               .phu_huynh_hoc_sinh[0]
               ?.hoc_sinh;
 
-          if (conDau) {
-            setHocSinhId(
+          if (ConDau) {
+            SetHocSinhId(
               String(
-                conDau.id,
+                ConDau.id,
               ),
             );
           }
 
           if (
-            dotResponse.data[0]
+            DotResponse.data[0]
           ) {
-            setDotDanhGiaId(
+            SetDotDanhGiaId(
               String(
-                dotResponse.data[0].id,
+                DotResponse.data[0].id,
               ),
             );
           }
-        } catch (error: unknown) {
-          setLoi(
+        } catch (Error: unknown) {
+          SetLoi(
             LayThongBaoLoi(
-              error,
+              Error,
             ),
           );
         }
       }
 
-      void taiDuLieu();
+      void TaiDuLieu();
     },
     [],
   );
 
-  async function taiKetQua() {
+  const DanhSachCon =
+    useMemo(
+      () =>
+        PhuHuynh
+          ?.phu_huynh_hoc_sinh
+          .map(
+            (Item) =>
+              Item.hoc_sinh,
+          ) ??
+        [],
+      [
+        PhuHuynh,
+      ],
+    );
+
+  const ConDangChon =
+    useMemo(
+      () =>
+        DanhSachCon.find(
+          (Item) =>
+            String(
+              Item.id,
+            ) ===
+            HocSinhId,
+        ),
+      [
+        DanhSachCon,
+        HocSinhId,
+      ],
+    );
+
+  async function TaiKetQua() {
     if (
-      !hocSinhId ||
-      !dotDanhGiaId
+      !HocSinhId ||
+      !DotDanhGiaId
     ) {
+      SetLoi(
+        'Vui lòng chọn học sinh và đợt đánh giá.',
+      );
       return;
     }
 
     try {
-      setLoi('');
+      SetLoi('');
 
-      const response =
-        await api.get<KetQuaResponse>(
-          `/danh_gia_hoc_tap/con/${hocSinhId}/dot/${dotDanhGiaId}`,
+      const Response =
+        await Api.get<KetQuaResponse>(
+          `/danh_gia_hoc_tap/con/${HocSinhId}/dot/${DotDanhGiaId}`,
         );
 
-      setKetQua(
-        response.data,
+      SetKetQua(
+        Response.data,
       );
-    } catch (error: unknown) {
-      setLoi(
+    } catch (Error: unknown) {
+      SetLoi(
         LayThongBaoLoi(
-          error,
+          Error,
         ),
       );
     }
   }
 
-  async function taiDiemDanh() {
-    if (!hocSinhId) {
+  async function TaiDiemDanh() {
+    if (!HocSinhId) {
+      SetLoi(
+        'Vui lòng chọn học sinh.',
+      );
       return;
     }
 
     try {
-      setLoi('');
+      SetLoi('');
 
-      const response =
-        await api.get<DiemDanhResponse>(
-          `/diem_danh_nghi_hoc/diem_danh/con/${hocSinhId}`,
+      const Response =
+        await Api.get<DiemDanhResponse>(
+          `/diem_danh_nghi_hoc/diem_danh/con/${HocSinhId}`,
         );
 
-      setDiemDanh(
-        response.data,
+      SetDiemDanh(
+        Response.data,
       );
-    } catch (error: unknown) {
-      setLoi(
+    } catch (Error: unknown) {
+      SetLoi(
         LayThongBaoLoi(
-          error,
+          Error,
         ),
       );
     }
   }
-
-  const danhSachCon =
-    phuHuynh
-      ?.phu_huynh_hoc_sinh
-      .map(
-        (item) =>
-          item.hoc_sinh,
-      ) ??
-    [];
 
   return (
     <div>
@@ -261,67 +292,119 @@ export default function ConCuaToiPage() {
       </h1>
 
       <p className="mt-1 text-sm text-slate-500">
-        Xem thông tin học tập và điểm danh của học sinh được liên kết.
+        Xem thông tin, điểm danh và kết quả học tập của học sinh được liên kết.
       </p>
 
-      {loi && (
+      {Loi && (
         <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
-          {loi}
+          {Loi}
         </div>
       )}
 
       <div className="mt-6 rounded-xl bg-white p-5 shadow-sm">
         <p className="font-semibold">
           Phụ huynh: {
-            phuHuynh?.ho_ten ??
+            PhuHuynh?.ho_ten ??
+            'Đang tải...'
+          }
+        </p>
+
+        <p className="mt-1 text-sm text-slate-500">
+          Số điện thoại: {
+            PhuHuynh?.so_dien_thoai ??
             '...'
           }
         </p>
 
+        <label className="mt-4 block text-sm font-medium text-slate-700">
+          Chọn học sinh
+        </label>
+
         <select
           value={
-            hocSinhId
+            HocSinhId
           }
           onChange={
-            (event) => {
-              setHocSinhId(
-                event.target.value,
+            (Event) => {
+              SetHocSinhId(
+                Event.target.value,
               );
 
-              setKetQua(
+              SetKetQua(
                 null,
               );
 
-              setDiemDanh(
+              SetDiemDanh(
                 null,
               );
             }
           }
-          className="mt-4 w-full max-w-md rounded-lg border border-slate-300 px-3 py-2"
+          className="mt-1 w-full max-w-md rounded-lg border border-slate-300 px-3 py-2"
         >
           <option value="">
             Chọn học sinh
           </option>
 
-          {danhSachCon.map(
-            (item) => (
+          {DanhSachCon.map(
+            (Item) => (
               <option
                 key={
-                  item.id
+                  Item.id
                 }
                 value={
-                  item.id
+                  Item.id
                 }
               >
                 {
-                  item.ma_hoc_sinh
+                  Item.ma_hoc_sinh
                 } - {
-                  item.ho_ten
+                  Item.ho_ten
                 }
               </option>
             ),
           )}
         </select>
+
+        {ConDangChon && (
+          <div className="mt-4 grid gap-3 rounded-lg bg-slate-50 p-4 text-sm md:grid-cols-3">
+            <div>
+              <span className="text-slate-500">
+                Mã học sinh:
+              </span>{' '}
+              <strong>
+                {
+                  ConDangChon.ma_hoc_sinh
+                }
+              </strong>
+            </div>
+
+            <div>
+              <span className="text-slate-500">
+                Ngày sinh:
+              </span>{' '}
+              <strong>
+                {
+                  ConDangChon.ngay_sinh
+                    .slice(
+                      0,
+                      10,
+                    )
+                }
+              </strong>
+            </div>
+
+            <div>
+              <span className="text-slate-500">
+                Trạng thái:
+              </span>{' '}
+              <strong>
+                {
+                  ConDangChon.trang_thai
+                }
+              </strong>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="mt-6 grid gap-5 lg:grid-cols-2">
@@ -330,42 +413,69 @@ export default function ConCuaToiPage() {
             Điểm danh
           </h2>
 
+          <p className="mt-1 text-sm text-slate-500">
+            Xem lịch sử điểm danh theo ngày và buổi học.
+          </p>
+
           <button
             type="button"
             onClick={
               () =>
-                void taiDiemDanh()
+                void TaiDiemDanh()
             }
             className="mt-3 rounded-lg bg-blue-600 px-4 py-2 text-white"
           >
             Xem điểm danh
           </button>
 
-          {diemDanh && (
+          {DiemDanh && (
             <div className="mt-4 max-h-80 overflow-auto">
-              {diemDanh.diem_danh.map(
-                (item) => (
+              {DiemDanh.diem_danh.length === 0 && (
+                <p className="py-4 text-sm text-slate-500">
+                  Chưa có dữ liệu điểm danh.
+                </p>
+              )}
+
+              {DiemDanh.diem_danh.map(
+                (Item) => (
                   <div
                     key={
-                      item.id
+                      Item.id
                     }
                     className="border-b py-2 text-sm"
                   >
+                    <strong>
+                      {
+                        Item.ngay_hoc
+                          .slice(
+                            0,
+                            10,
+                          )
+                      }
+                    </strong>
+                    {' - '}
                     {
-                      item.ngay_hoc
-                        .slice(
-                          0,
-                          10,
-                        )
-                    } - {
-                      item.buoi_hoc
-                    } - {
-                      item.trang_thai
-                    } {
-                      item.ghi_chu
-                        ? `(${item.ghi_chu})`
-                        : ''
+                      Item.buoi_hoc
                     }
+                    {' - '}
+                    {
+                      Item.trang_thai
+                    }
+                    {' - Lớp '}
+                    {
+                      Item.xep_lop
+                        .lop_hoc
+                        .ten_lop
+                    }
+
+                    {Item.ghi_chu && (
+                      <span>
+                        {' - '}
+                        {
+                          Item.ghi_chu
+                        }
+                      </span>
+                    )}
                   </div>
                 ),
               )}
@@ -378,37 +488,46 @@ export default function ConCuaToiPage() {
             Kết quả học tập
           </h2>
 
+          <label className="mt-3 block text-sm font-medium text-slate-700">
+            Đợt đánh giá
+          </label>
+
           <select
             value={
-              dotDanhGiaId
+              DotDanhGiaId
             }
             onChange={
-              (event) =>
-                setDotDanhGiaId(
-                  event.target.value,
-                )
+              (Event) => {
+                SetDotDanhGiaId(
+                  Event.target.value,
+                );
+
+                SetKetQua(
+                  null,
+                );
+              }
             }
-            className="mt-3 w-full rounded-lg border border-slate-300 px-3 py-2"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
           >
             <option value="">
               Chọn đợt đánh giá
             </option>
 
-            {dotDanhGia.map(
-              (item) => (
+            {DotDanhGia.map(
+              (Item) => (
                 <option
                   key={
-                    item.id
+                    Item.id
                   }
                   value={
-                    item.id
+                    Item.id
                   }
                 >
                   {
-                    item.nam_hoc
+                    Item.nam_hoc
                       .ten_nam_hoc
                   } - {
-                    item.ten_dot
+                    Item.ten_dot
                   }
                 </option>
               ),
@@ -419,7 +538,7 @@ export default function ConCuaToiPage() {
             type="button"
             onClick={
               () =>
-                void taiKetQua()
+                void TaiKetQua()
             }
             className="mt-3 rounded-lg bg-blue-600 px-4 py-2 text-white"
           >
@@ -428,36 +547,42 @@ export default function ConCuaToiPage() {
         </div>
       </div>
 
-      {ketQua && (
+      {KetQua && (
         <div className="mt-6 space-y-5">
           <div className="rounded-xl bg-white p-5 shadow-sm">
             <h2 className="font-semibold">
-              Môn học
+              Kết quả môn học
             </h2>
 
-            {ketQua.ket_qua_mon_hoc.map(
-              (item) => (
+            {KetQua.ket_qua_mon_hoc.length === 0 && (
+              <p className="mt-3 text-sm text-slate-500">
+                Chưa có kết quả môn học.
+              </p>
+            )}
+
+            {KetQua.ket_qua_mon_hoc.map(
+              (Item) => (
                 <div
                   key={
-                    item.id
+                    Item.id
                   }
                   className="border-b py-3 text-sm"
                 >
                   <strong>
                     {
-                      item.mon_hoc
+                      Item.mon_hoc
                         .ten_mon_hoc
                     }
                   </strong>
                   : {
-                    item.muc_danh_gia
+                    Item.muc_danh_gia
                   }
 
-                  {item.nhan_xet && (
+                  {Item.nhan_xet && (
                     <span>
                       {' - '}
                       {
-                        item.nhan_xet
+                        Item.nhan_xet
                       }
                     </span>
                   )}
@@ -471,26 +596,32 @@ export default function ConCuaToiPage() {
               Điểm định kỳ
             </h2>
 
-            {ketQua.diem_dinh_ky.map(
-              (item) => (
+            {KetQua.diem_dinh_ky.length === 0 && (
+              <p className="mt-3 text-sm text-slate-500">
+                Chưa có điểm định kỳ.
+              </p>
+            )}
+
+            {KetQua.diem_dinh_ky.map(
+              (Item) => (
                 <div
                   key={
-                    item.id
+                    Item.id
                   }
                   className="border-b py-3 text-sm"
                 >
                   {
-                    item.cau_hinh_diem
+                    Item.cau_hinh_diem
                       .mon_hoc
                       .ten_mon_hoc
                   } - {
-                    item.cau_hinh_diem
+                    Item.cau_hinh_diem
                       .ten_hien_thi
                   }: {' '}
                   <strong>
                     {
                       String(
-                        item.diem,
+                        Item.diem,
                       )
                     }
                   </strong>
@@ -504,27 +635,72 @@ export default function ConCuaToiPage() {
               Năng lực / phẩm chất
             </h2>
 
-            {ketQua.nang_luc_pham_chat.map(
-              (item) => (
+            {KetQua.nang_luc_pham_chat.length === 0 && (
+              <p className="mt-3 text-sm text-slate-500">
+                Chưa có đánh giá năng lực/phẩm chất.
+              </p>
+            )}
+
+            {KetQua.nang_luc_pham_chat.map(
+              (Item) => (
                 <div
                   key={
-                    item.id
+                    Item.id
                   }
                   className="border-b py-3 text-sm"
                 >
                   {
-                    item.tieu_chi_danh_gia
+                    Item.tieu_chi_danh_gia
                       .ten_tieu_chi
                   }: {' '}
                   <strong>
                     {
-                      item.muc_danh_gia
+                      Item.muc_danh_gia
                     }
                   </strong>
+
+                  {Item.nhan_xet && (
+                    <span>
+                      {' - '}
+                      {
+                        Item.nhan_xet
+                      }
+                    </span>
+                  )}
                 </div>
               ),
             )}
           </div>
+
+          {KetQua.tong_ket_giao_duc && (
+            <div className="rounded-xl bg-white p-5 shadow-sm">
+              <h2 className="font-semibold">
+                Tổng kết giáo dục
+              </h2>
+
+              <p className="mt-3 text-sm">
+                Mức kết quả giáo dục:{' '}
+                <strong>
+                  {
+                    KetQua.tong_ket_giao_duc
+                      .muc_ket_qua_giao_duc ??
+                    'Chưa có'
+                  }
+                </strong>
+              </p>
+
+              <p className="mt-2 text-sm">
+                Kết quả hoàn thành lớp:{' '}
+                <strong>
+                  {
+                    KetQua.tong_ket_giao_duc
+                      .ket_qua_hoan_thanh_lop ??
+                    'Chưa có'
+                  }
+                </strong>
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>
