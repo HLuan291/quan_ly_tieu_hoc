@@ -3,7 +3,7 @@ import {
 } from '../auth/auth';
 
 export default function DashboardPage() {
-  const nguoiDung =
+  const NguoiDung =
     DocJwt();
 
   return (
@@ -28,7 +28,7 @@ export default function DashboardPage() {
         với vai trò{' '}
 
         <strong>
-          {nguoiDung?.vai_tro}
+          {NguoiDung?.vai_tro}
         </strong>
       </p>
 
@@ -83,7 +83,7 @@ export default function DashboardPage() {
               font-bold
             "
           >
-            {nguoiDung?.sub}
+            {NguoiDung?.sub}
           </p>
         </div>
 
@@ -106,7 +106,7 @@ export default function DashboardPage() {
               font-bold
             "
           >
-            {nguoiDung?.vai_tro}
+            {NguoiDung?.vai_tro}
           </p>
         </div>
       </div>
