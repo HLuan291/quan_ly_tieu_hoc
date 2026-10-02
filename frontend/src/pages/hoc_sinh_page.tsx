@@ -5,17 +5,18 @@ import {
 } from 'react';
 
 import type {
+  ChangeEvent,
   FormEvent,
 } from 'react';
 
 import api from '../api/api';
 
 import {
-  docJwt,
+  docJwt as DocJwt,
 } from '../auth/auth';
 
 import {
-  layThongBaoLoi,
+  layThongBaoLoi as LayThongBaoLoi,
 } from '../utils/loi_api';
 
 interface XepLopTomTat {
@@ -68,7 +69,7 @@ interface HocSinhMoi {
   ghi_chu: string;
 }
 
-const hocSinhRong: HocSinhMoi = {
+const HocSinhRong: HocSinhMoi = {
   ho_ten: '',
   ngay_sinh: '',
   gioi_tinh: '',
@@ -82,7 +83,7 @@ const hocSinhRong: HocSinhMoi = {
   ghi_chu: '',
 };
 
-const phuHuynhRong: PhuHuynhMoi = {
+const PhuHuynhRong: PhuHuynhMoi = {
   ho_ten: '',
   nam_sinh: '',
   so_dien_thoai: '',
@@ -91,56 +92,101 @@ const phuHuynhRong: PhuHuynhMoi = {
   tao_tai_khoan: true,
 };
 
-export default function HocSinhPage() {
-  const nguoiDung =
-    docJwt();
+const DanhSachDanToc = [
+  'Kinh',
+  'Tày',
+  'Thái',
+  'Hoa',
+  'Khmer',
+  'Mường',
+  'Nùng',
+  'H\'Mông',
+  'Dao',
+] as const;
 
-  const laAdmin =
-    nguoiDung?.vai_tro ===
+function LayNgayHomNay() {
+  return new Date()
+    .toISOString()
+    .slice(0, 10);
+}
+
+function LayNamPhuHuynhToiDa() {
+  return (
+    new Date()
+      .getFullYear() - 18
+  );
+}
+
+export default function HocSinhPage() {
+  const NguoiDung =
+    DocJwt();
+
+  const LaAdmin =
+    NguoiDung?.vai_tro ===
     'ADMIN';
 
   const [
-    danhSach,
-    setDanhSach,
+    DanhSach,
+    SetDanhSach,
   ] = useState<HocSinh[]>([]);
 
   const [
-    tuKhoa,
-    setTuKhoa,
+    TuKhoa,
+    SetTuKhoa,
   ] = useState('');
 
   const [
-    loi,
-    setLoi,
+    Loi,
+    SetLoi,
   ] = useState('');
 
   const [
-    dangTai,
-    setDangTai,
+    DangTai,
+    SetDangTai,
   ] = useState(false);
 
   const [
-    hienForm,
-    setHienForm,
+    HienForm,
+    SetHienForm,
   ] = useState(false);
 
   const [
-    hocSinhMoi,
-    setHocSinhMoi,
+    HocSinhMoi,
+    SetHocSinhMoi,
   ] = useState<HocSinhMoi>(
-    hocSinhRong,
+    HocSinhRong,
   );
 
   const [
-    phuHuynhMoi,
-    setPhuHuynhMoi,
+    PhuHuynhMoi,
+    SetPhuHuynhMoi,
   ] = useState<PhuHuynhMoi>(
-    phuHuynhRong,
+    PhuHuynhRong,
   );
 
   const [
-    taiKhoanMoi,
-    setTaiKhoanMoi,
+    DanTocLuaChon,
+    SetDanTocLuaChon,
+  ] = useState('Kinh');
+
+  const [
+    DanTocKhac,
+    SetDanTocKhac,
+  ] = useState('');
+
+  const [
+    QuocTichLuaChon,
+    SetQuocTichLuaChon,
+  ] = useState('Việt Nam');
+
+  const [
+    QuocTichKhac,
+    SetQuocTichKhac,
+  ] = useState('');
+
+  const [
+    TaiKhoanMoi,
+    SetTaiKhoanMoi,
   ] = useState<
     Array<{
       ten_dang_nhap: string;
@@ -149,189 +195,385 @@ export default function HocSinhPage() {
     }>
   >([]);
 
-  const taiDanhSach =
+  const TaiDanhSach =
     useCallback(
       async () => {
         try {
-          setDangTai(true);
-          setLoi('');
+          SetDangTai(true);
+          SetLoi('');
 
-          const response =
+          const Response =
             await api.get<DanhSachResponse>(
               '/ho_so_hoc_sinh/hoc_sinh',
               {
                 params: {
-                  ...(tuKhoa.trim()
+                  ...(TuKhoa.trim()
                     ? {
                         tu_khoa:
-                          tuKhoa.trim(),
+                          TuKhoa.trim(),
                       }
                     : {}),
                 },
               },
             );
 
-          setDanhSach(
-            response.data.danh_sach,
+          SetDanhSach(
+            Response.data.danh_sach,
           );
-        } catch (error: unknown) {
-          setLoi(
-            layThongBaoLoi(
-              error,
+        } catch (Error: unknown) {
+          SetLoi(
+            LayThongBaoLoi(
+              Error,
             ),
           );
         } finally {
-          setDangTai(false);
+          SetDangTai(false);
         }
       },
       [
-        tuKhoa,
+        TuKhoa,
       ],
     );
 
   useEffect(
     () => {
-      void taiDanhSach();
+      void TaiDanhSach();
     },
     [
-      taiDanhSach,
+      TaiDanhSach,
     ],
   );
 
-  async function taoHocSinh(
-    event: FormEvent,
+  function CapNhatHocSinh(
+    Event:
+      ChangeEvent<
+        HTMLInputElement |
+        HTMLSelectElement |
+        HTMLTextAreaElement
+      >,
   ) {
-    event.preventDefault();
+    const {
+      name: TenTruong,
+      value: GiaTri,
+    } = Event.target;
+
+    SetHocSinhMoi(
+      (GiaTriCu) => ({
+        ...GiaTriCu,
+        [TenTruong]:
+          GiaTri,
+      }),
+    );
+  }
+
+  function CapNhatSoDienThoaiHocSinh(
+    Event:
+      ChangeEvent<HTMLInputElement>,
+  ) {
+    const SoDienThoai =
+      Event.target.value
+        .replace(
+          /\D/g,
+          '',
+        )
+        .slice(
+          0,
+          10,
+        );
+
+    SetHocSinhMoi(
+      (GiaTriCu) => ({
+        ...GiaTriCu,
+        so_dien_thoai_lien_he:
+          SoDienThoai,
+      }),
+    );
+  }
+
+  function CapNhatSoDienThoaiPhuHuynh(
+    Event:
+      ChangeEvent<HTMLInputElement>,
+  ) {
+    const SoDienThoai =
+      Event.target.value
+        .replace(
+          /\D/g,
+          '',
+        )
+        .slice(
+          0,
+          10,
+        );
+
+    SetPhuHuynhMoi(
+      (GiaTriCu) => ({
+        ...GiaTriCu,
+        so_dien_thoai:
+          SoDienThoai,
+      }),
+    );
+  }
+
+  function CapNhatDanToc(
+    Event:
+      ChangeEvent<HTMLSelectElement>,
+  ) {
+    const GiaTri =
+      Event.target.value;
+
+    SetDanTocLuaChon(
+      GiaTri,
+    );
+
+    if (
+      GiaTri ===
+      'Khác'
+    ) {
+      SetHocSinhMoi(
+        (GiaTriCu) => ({
+          ...GiaTriCu,
+          dan_toc:
+            DanTocKhac,
+        }),
+      );
+
+      return;
+    }
+
+    SetDanTocKhac('');
+
+    SetHocSinhMoi(
+      (GiaTriCu) => ({
+        ...GiaTriCu,
+        dan_toc:
+          GiaTri,
+      }),
+    );
+  }
+
+  function CapNhatDanTocKhac(
+    Event:
+      ChangeEvent<HTMLInputElement>,
+  ) {
+    const GiaTri =
+      Event.target.value;
+
+    SetDanTocKhac(
+      GiaTri,
+    );
+
+    SetHocSinhMoi(
+      (GiaTriCu) => ({
+        ...GiaTriCu,
+        dan_toc:
+          GiaTri,
+      }),
+    );
+  }
+
+  function CapNhatQuocTich(
+    Event:
+      ChangeEvent<HTMLSelectElement>,
+  ) {
+    const GiaTri =
+      Event.target.value;
+
+    SetQuocTichLuaChon(
+      GiaTri,
+    );
+
+    if (
+      GiaTri ===
+      'Khác'
+    ) {
+      SetHocSinhMoi(
+        (GiaTriCu) => ({
+          ...GiaTriCu,
+          quoc_tich:
+            QuocTichKhac,
+        }),
+      );
+
+      return;
+    }
+
+    SetQuocTichKhac('');
+
+    SetHocSinhMoi(
+      (GiaTriCu) => ({
+        ...GiaTriCu,
+        quoc_tich:
+          GiaTri,
+      }),
+    );
+  }
+
+  function CapNhatQuocTichKhac(
+    Event:
+      ChangeEvent<HTMLInputElement>,
+  ) {
+    const GiaTri =
+      Event.target.value;
+
+    SetQuocTichKhac(
+      GiaTri,
+    );
+
+    SetHocSinhMoi(
+      (GiaTriCu) => ({
+        ...GiaTriCu,
+        quoc_tich:
+          GiaTri,
+      }),
+    );
+  }
+
+  async function TaoHocSinh(
+    Event: FormEvent,
+  ) {
+    Event.preventDefault();
 
     try {
-      setLoi('');
-      setTaiKhoanMoi(
+      SetLoi('');
+      SetTaiKhoanMoi(
         [],
       );
 
-      const response =
+      const Response =
         await api.post(
           '/ho_so_hoc_sinh/hoc_sinh',
           {
             hoc_sinh: {
-              ...hocSinhMoi,
+              ...HocSinhMoi,
             },
 
             phu_huynh: [
               {
                 ho_ten:
-                  phuHuynhMoi.ho_ten,
+                  PhuHuynhMoi.ho_ten,
 
                 nam_sinh:
-                  phuHuynhMoi.nam_sinh
+                  PhuHuynhMoi.nam_sinh
                     ? Number(
-                        phuHuynhMoi.nam_sinh,
+                        PhuHuynhMoi.nam_sinh,
                       )
                     : undefined,
 
                 so_dien_thoai:
-                  phuHuynhMoi.so_dien_thoai,
+                  PhuHuynhMoi.so_dien_thoai,
 
                 nghe_nghiep:
-                  phuHuynhMoi.nghe_nghiep,
+                  PhuHuynhMoi.nghe_nghiep,
 
                 moi_quan_he:
-                  phuHuynhMoi.moi_quan_he,
+                  PhuHuynhMoi.moi_quan_he,
 
                 tao_tai_khoan:
-                  phuHuynhMoi.tao_tai_khoan,
+                  PhuHuynhMoi.tao_tai_khoan,
               },
             ],
           },
         );
 
-      setTaiKhoanMoi(
-        response.data
+      SetTaiKhoanMoi(
+        Response.data
           .tai_khoan_phu_huynh_moi ??
           [],
       );
 
-      setHocSinhMoi(
-        hocSinhRong,
+      SetHocSinhMoi({
+        ...HocSinhRong,
+      });
+
+      SetPhuHuynhMoi({
+        ...PhuHuynhRong,
+      });
+
+      SetDanTocLuaChon(
+        'Kinh',
       );
 
-      setPhuHuynhMoi(
-        phuHuynhRong,
+      SetDanTocKhac('');
+      SetQuocTichLuaChon(
+        'Việt Nam',
       );
+      SetQuocTichKhac('');
 
-      await taiDanhSach();
-    } catch (error: unknown) {
-      setLoi(
-        layThongBaoLoi(
-          error,
+      await TaiDanhSach();
+    } catch (Error: unknown) {
+      SetLoi(
+        LayThongBaoLoi(
+          Error,
         ),
       );
     }
   }
 
-  async function capNhatSucKhoe(
-    hocSinh: HocSinh,
+  async function CapNhatSucKhoe(
+    HocSinhItem: HocSinh,
   ) {
-    const chieuCao =
+    const ChieuCao =
       window.prompt(
         'Chiều cao (cm)',
         String(
-          hocSinh.chieu_cao_cm ??
+          HocSinhItem.chieu_cao_cm ??
           '',
         ),
       );
 
-    if (chieuCao === null) {
+    if (ChieuCao === null) {
       return;
     }
 
-    const canNang =
+    const CanNang =
       window.prompt(
         'Cân nặng (kg)',
         String(
-          hocSinh.can_nang_kg ??
+          HocSinhItem.can_nang_kg ??
           '',
         ),
       );
 
-    if (canNang === null) {
+    if (CanNang === null) {
       return;
     }
 
-    const ngayDo =
+    const NgayDo =
       window.prompt(
         'Ngày đo (YYYY-MM-DD)',
-        new Date()
-          .toISOString()
-          .slice(0, 10),
+        LayNgayHomNay(),
       );
 
-    if (!ngayDo) {
+    if (!NgayDo) {
       return;
     }
 
     try {
-      setLoi('');
+      SetLoi('');
 
       await api.patch(
-        `/ho_so_hoc_sinh/hoc_sinh/${hocSinh.id}/suc_khoe`,
+        `/ho_so_hoc_sinh/hoc_sinh/${HocSinhItem.id}/suc_khoe`,
         {
           chieu_cao_cm:
-            Number(chieuCao),
+            Number(
+              ChieuCao,
+            ),
 
           can_nang_kg:
-            Number(canNang),
+            Number(
+              CanNang,
+            ),
 
           ngay_do:
-            ngayDo,
+            NgayDo,
         },
       );
 
-      await taiDanhSach();
-    } catch (error: unknown) {
-      setLoi(
-        layThongBaoLoi(
-          error,
+      await TaiDanhSach();
+    } catch (Error: unknown) {
+      SetLoi(
+        LayThongBaoLoi(
+          Error,
         ),
       );
     }
@@ -350,52 +592,52 @@ export default function HocSinhPage() {
           </p>
         </div>
 
-        {laAdmin && (
+        {LaAdmin && (
           <button
             type="button"
             onClick={
               () =>
-                setHienForm(
-                  (giaTri) =>
-                    !giaTri,
+                SetHienForm(
+                  (GiaTri) =>
+                    !GiaTri,
                 )
             }
             className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white"
           >
-            {hienForm
+            {HienForm
               ? 'Đóng form'
               : 'Thêm học sinh'}
           </button>
         )}
       </div>
 
-      {loi && (
+      {Loi && (
         <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
-          {loi}
+          {Loi}
         </div>
       )}
 
-      {taiKhoanMoi.length > 0 && (
+      {TaiKhoanMoi.length > 0 && (
         <div className="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm">
           <p className="font-semibold">
             Tài khoản phụ huynh vừa tạo
           </p>
 
-          {taiKhoanMoi.map(
-            (taiKhoan) => (
+          {TaiKhoanMoi.map(
+            (TaiKhoan) => (
               <p
                 key={
-                  taiKhoan.ten_dang_nhap
+                  TaiKhoan.ten_dang_nhap
                 }
                 className="mt-1"
               >
-                {taiKhoan.ho_ten}: {' '}
+                {TaiKhoan.ho_ten}: {' '}
                 <strong>
-                  {taiKhoan.ten_dang_nhap}
+                  {TaiKhoan.ten_dang_nhap}
                 </strong>
                 {' / '}
                 <strong>
-                  {taiKhoan.mat_khau_ban_dau}
+                  {TaiKhoan.mat_khau_ban_dau}
                 </strong>
               </p>
             ),
@@ -403,11 +645,11 @@ export default function HocSinhPage() {
         </div>
       )}
 
-      {laAdmin &&
-        hienForm && (
+      {LaAdmin &&
+        HienForm && (
         <form
           onSubmit={
-            taoHocSinh
+            TaoHocSinh
           }
           className="mt-6 rounded-xl bg-white p-5 shadow-sm"
         >
@@ -415,213 +657,470 @@ export default function HocSinhPage() {
             Thông tin học sinh
           </h2>
 
-          <div className="mt-4 grid gap-3 md:grid-cols-2">
-            {([
-              ['ho_ten', 'Họ tên'],
-              ['ngay_sinh', 'Ngày sinh'],
-              ['noi_sinh', 'Nơi sinh'],
-              ['so_dien_thoai_lien_he', 'SĐT liên hệ'],
-              ['dia_chi_thuong_tru', 'Địa chỉ thường trú'],
-              ['dia_chi_hien_tai', 'Địa chỉ hiện tại'],
-              ['ngay_nhap_hoc', 'Ngày nhập học'],
-              ['dan_toc', 'Dân tộc'],
-              ['quoc_tich', 'Quốc tịch'],
-            ] as const).map(
-              ([
-                ten,
-                nhan,
-              ]) => (
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Họ tên
+              </label>
+
+              <input
+                name="ho_ten"
+                value={
+                  HocSinhMoi.ho_ten
+                }
+                onChange={
+                  CapNhatHocSinh
+                }
+                placeholder="VD: Nguyễn Văn An - viết hoa chữ cái đầu mỗi từ"
+                required
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Ngày sinh
+              </label>
+
+              <input
+                name="ngay_sinh"
+                type="date"
+                value={
+                  HocSinhMoi.ngay_sinh
+                }
+                onChange={
+                  CapNhatHocSinh
+                }
+                max={
+                  LayNgayHomNay()
+                }
+                required
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              />
+
+              <p className="mt-1 text-xs text-slate-500">
+                Ngày sinh không được lớn hơn ngày hiện tại.
+              </p>
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Giới tính
+              </label>
+
+              <select
+                name="gioi_tinh"
+                value={
+                  HocSinhMoi.gioi_tinh
+                }
+                onChange={
+                  CapNhatHocSinh
+                }
+                required
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              >
+                <option value="">
+                  Chọn giới tính
+                </option>
+
+                <option value="NAM">
+                  Nam
+                </option>
+
+                <option value="NU">
+                  Nữ
+                </option>
+              </select>
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Nơi sinh
+              </label>
+
+              <input
+                name="noi_sinh"
+                value={
+                  HocSinhMoi.noi_sinh
+                }
+                onChange={
+                  CapNhatHocSinh
+                }
+                placeholder="VD: TP.Hồ Chí Minh"
+                required
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Số điện thoại liên hệ
+              </label>
+
+              <input
+                name="so_dien_thoai_lien_he"
+                value={
+                  HocSinhMoi.so_dien_thoai_lien_he
+                }
+                onChange={
+                  CapNhatSoDienThoaiHocSinh
+                }
+                inputMode="numeric"
+                minLength={10}
+                maxLength={10}
+                pattern="[0-9]{10}"
+                title="Số điện thoại phải gồm đúng 10 chữ số"
+                placeholder="Gồm đúng 10 số, VD: 0901234567"
+                required
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Ngày nhập học
+              </label>
+
+              <input
+                name="ngay_nhap_hoc"
+                type="date"
+                value={
+                  HocSinhMoi.ngay_nhap_hoc
+                }
+                onChange={
+                  CapNhatHocSinh
+                }
+                min={
+                  HocSinhMoi.ngay_sinh ||
+                  undefined
+                }
+                max={
+                  LayNgayHomNay()
+                }
+                required
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              />
+
+              <p className="mt-1 text-xs text-slate-500">
+                Không được trước ngày sinh và không lớn hơn hôm nay.
+              </p>
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Dân tộc
+              </label>
+
+              <select
+                value={
+                  DanTocLuaChon
+                }
+                onChange={
+                  CapNhatDanToc
+                }
+                required
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              >
+                {DanhSachDanToc.map(
+                  (DanToc) => (
+                    <option
+                      key={
+                        DanToc
+                      }
+                      value={
+                        DanToc
+                      }
+                    >
+                      {DanToc}
+                    </option>
+                  ),
+                )}
+
+                <option value="Khác">
+                  Khác
+                </option>
+              </select>
+
+              {DanTocLuaChon ===
+                'Khác' && (
                 <input
-                  key={
-                    ten
-                  }
-                  type={
-                    ten.includes(
-                      'ngay_',
-                    )
-                      ? 'date'
-                      : 'text'
-                  }
                   value={
-                    hocSinhMoi[ten]
+                    DanTocKhac
                   }
                   onChange={
-                    (event) =>
-                      setHocSinhMoi(
-                        (cu) => ({
-                          ...cu,
-                          [ten]:
-                            event
-                              .target
-                              .value,
-                        }),
-                      )
+                    CapNhatDanTocKhac
                   }
-                  placeholder={
-                    nhan
-                  }
+                  placeholder="Nhập dân tộc khác"
                   required
-                  className="rounded-lg border border-slate-300 px-3 py-2"
+                  className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2"
                 />
-              ),
-            )}
+              )}
+            </div>
 
-            <select
-              value={
-                hocSinhMoi.gioi_tinh
-              }
-              onChange={
-                (event) =>
-                  setHocSinhMoi(
-                    (cu) => ({
-                      ...cu,
-                      gioi_tinh:
-                        event.target.value,
-                    }),
-                  )
-              }
-              required
-              className="rounded-lg border border-slate-300 px-3 py-2"
-            >
-              <option value="">
-                Chọn giới tính
-              </option>
-              <option value="NAM">
-                Nam
-              </option>
-              <option value="NU">
-                Nữ
-              </option>
-            </select>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Quốc tịch
+              </label>
+
+              <select
+                value={
+                  QuocTichLuaChon
+                }
+                onChange={
+                  CapNhatQuocTich
+                }
+                required
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              >
+                <option value="Việt Nam">
+                  Việt Nam
+                </option>
+
+                <option value="Khác">
+                  Khác
+                </option>
+              </select>
+
+              {QuocTichLuaChon ===
+                'Khác' && (
+                <input
+                  value={
+                    QuocTichKhac
+                  }
+                  onChange={
+                    CapNhatQuocTichKhac
+                  }
+                  placeholder="Nhập quốc tịch khác"
+                  required
+                  className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2"
+                />
+              )}
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Địa chỉ thường trú
+              </label>
+
+              <input
+                name="dia_chi_thuong_tru"
+                value={
+                  HocSinhMoi.dia_chi_thuong_tru
+                }
+                onChange={
+                  CapNhatHocSinh
+                }
+                placeholder="VD: 123 Nguyễn Trãi, Quận 5, TP.HCM"
+                required
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Địa chỉ hiện tại
+              </label>
+
+              <input
+                name="dia_chi_hien_tai"
+                value={
+                  HocSinhMoi.dia_chi_hien_tai
+                }
+                onChange={
+                  CapNhatHocSinh
+                }
+                placeholder="Địa chỉ đang sinh sống hiện tại"
+                required
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Ghi chú
+              </label>
+
+              <textarea
+                name="ghi_chu"
+                value={
+                  HocSinhMoi.ghi_chu
+                }
+                onChange={
+                  CapNhatHocSinh
+                }
+                placeholder="Thông tin cần lưu ý về học sinh (nếu có)"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              />
+            </div>
           </div>
 
-          <h2 className="mt-6 text-lg font-semibold">
+          <h2 className="mt-7 text-lg font-semibold">
             Phụ huynh / người giám hộ
           </h2>
 
-          <div className="mt-4 grid gap-3 md:grid-cols-2">
-            <input
-              value={
-                phuHuynhMoi.ho_ten
-              }
-              onChange={
-                (event) =>
-                  setPhuHuynhMoi(
-                    (cu) => ({
-                      ...cu,
-                      ho_ten:
-                        event.target.value,
-                    }),
-                  )
-              }
-              placeholder="Họ tên phụ huynh"
-              required
-              className="rounded-lg border border-slate-300 px-3 py-2"
-            />
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Họ tên phụ huynh
+              </label>
 
-            <input
-              value={
-                phuHuynhMoi.so_dien_thoai
-              }
-              onChange={
-                (event) =>
-                  setPhuHuynhMoi(
-                    (cu) => ({
-                      ...cu,
-                      so_dien_thoai:
-                        event.target.value,
-                    }),
-                  )
-              }
-              placeholder="Số điện thoại"
-              required
-              className="rounded-lg border border-slate-300 px-3 py-2"
-            />
-
-            <input
-              type="number"
-              value={
-                phuHuynhMoi.nam_sinh
-              }
-              onChange={
-                (event) =>
-                  setPhuHuynhMoi(
-                    (cu) => ({
-                      ...cu,
-                      nam_sinh:
-                        event.target.value,
-                    }),
-                  )
-              }
-              placeholder="Năm sinh"
-              className="rounded-lg border border-slate-300 px-3 py-2"
-            />
-
-            <input
-              value={
-                phuHuynhMoi.nghe_nghiep
-              }
-              onChange={
-                (event) =>
-                  setPhuHuynhMoi(
-                    (cu) => ({
-                      ...cu,
-                      nghe_nghiep:
-                        event.target.value,
-                    }),
-                  )
-              }
-              placeholder="Nghề nghiệp"
-              className="rounded-lg border border-slate-300 px-3 py-2"
-            />
-
-            <select
-              value={
-                phuHuynhMoi.moi_quan_he
-              }
-              onChange={
-                (event) =>
-                  setPhuHuynhMoi(
-                    (cu) => ({
-                      ...cu,
-                      moi_quan_he:
-                        event.target.value,
-                    }),
-                  )
-              }
-              className="rounded-lg border border-slate-300 px-3 py-2"
-            >
-              <option value="CHA">
-                Cha
-              </option>
-              <option value="ME">
-                Mẹ
-              </option>
-              <option value="NGUOI_GIAM_HO">
-                Người giám hộ
-              </option>
-            </select>
-
-            <label className="flex items-center gap-2 rounded-lg border border-slate-300 px-3 py-2">
               <input
-                type="checkbox"
-                checked={
-                  phuHuynhMoi.tao_tai_khoan
+                value={
+                  PhuHuynhMoi.ho_ten
                 }
                 onChange={
-                  (event) =>
-                    setPhuHuynhMoi(
-                      (cu) => ({
-                        ...cu,
-                        tao_tai_khoan:
-                          event.target.checked,
+                  (Event) =>
+                    SetPhuHuynhMoi(
+                      (GiaTriCu) => ({
+                        ...GiaTriCu,
+                        ho_ten:
+                          Event.target.value,
                       }),
                     )
                 }
+                placeholder="VD: Nguyễn Văn Bình - viết hoa chữ cái đầu mỗi từ"
+                required
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
               />
+            </div>
 
-              Tạo tài khoản phụ huynh
-            </label>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Số điện thoại phụ huynh
+              </label>
+
+              <input
+                value={
+                  PhuHuynhMoi.so_dien_thoai
+                }
+                onChange={
+                  CapNhatSoDienThoaiPhuHuynh
+                }
+                inputMode="numeric"
+                minLength={10}
+                maxLength={10}
+                pattern="[0-9]{10}"
+                title="Số điện thoại phải gồm đúng 10 chữ số"
+                placeholder="Gồm đúng 10 số, VD: 0912345678"
+                required
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Năm sinh phụ huynh
+              </label>
+
+              <input
+                type="number"
+                min={1900}
+                max={
+                  LayNamPhuHuynhToiDa()
+                }
+                value={
+                  PhuHuynhMoi.nam_sinh
+                }
+                onChange={
+                  (Event) =>
+                    SetPhuHuynhMoi(
+                      (GiaTriCu) => ({
+                        ...GiaTriCu,
+                        nam_sinh:
+                          Event.target.value,
+                      }),
+                    )
+                }
+                placeholder={`Từ 1900 đến ${LayNamPhuHuynhToiDa()}`}
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Nghề nghiệp
+              </label>
+
+              <input
+                value={
+                  PhuHuynhMoi.nghe_nghiep
+                }
+                onChange={
+                  (Event) =>
+                    SetPhuHuynhMoi(
+                      (GiaTriCu) => ({
+                        ...GiaTriCu,
+                        nghe_nghiep:
+                          Event.target.value,
+                      }),
+                    )
+                }
+                placeholder="VD: Nhân viên văn phòng"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Mối quan hệ
+              </label>
+
+              <select
+                value={
+                  PhuHuynhMoi.moi_quan_he
+                }
+                onChange={
+                  (Event) =>
+                    SetPhuHuynhMoi(
+                      (GiaTriCu) => ({
+                        ...GiaTriCu,
+                        moi_quan_he:
+                          Event.target.value,
+                      }),
+                    )
+                }
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              >
+                <option value="CHA">
+                  Cha
+                </option>
+
+                <option value="ME">
+                  Mẹ
+                </option>
+
+                <option value="NGUOI_GIAM_HO">
+                  Người giám hộ
+                </option>
+              </select>
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Tài khoản đăng nhập
+              </label>
+
+              <label className="flex min-h-10 items-center gap-2 rounded-lg border border-slate-300 px-3 py-2">
+                <input
+                  type="checkbox"
+                  checked={
+                    PhuHuynhMoi.tao_tai_khoan
+                  }
+                  onChange={
+                    (Event) =>
+                      SetPhuHuynhMoi(
+                        (GiaTriCu) => ({
+                          ...GiaTriCu,
+                          tao_tai_khoan:
+                            Event.target.checked,
+                        }),
+                      )
+                  }
+                />
+
+                Tạo tài khoản phụ huynh ngay
+              </label>
+            </div>
           </div>
 
           <button
@@ -636,15 +1135,15 @@ export default function HocSinhPage() {
       <div className="mt-6 rounded-xl bg-white p-5 shadow-sm">
         <input
           value={
-            tuKhoa
+            TuKhoa
           }
           onChange={
-            (event) =>
-              setTuKhoa(
-                event.target.value,
+            (Event) =>
+              SetTuKhoa(
+                Event.target.value,
               )
           }
-          placeholder="Tìm mã, họ tên hoặc số điện thoại"
+          placeholder="Tìm theo mã, họ tên hoặc số điện thoại"
           className="w-full rounded-lg border border-slate-300 px-3 py-2 md:max-w-lg"
         />
 
@@ -670,7 +1169,8 @@ export default function HocSinhPage() {
                 <th className="px-3 py-3">
                   Lớp gần nhất
                 </th>
-                {laAdmin && (
+
+                {LaAdmin && (
                   <th className="px-3 py-3">
                     Thao tác
                   </th>
@@ -679,29 +1179,29 @@ export default function HocSinhPage() {
             </thead>
 
             <tbody>
-              {danhSach.map(
-                (hocSinh) => (
+              {DanhSach.map(
+                (HocSinhItem) => (
                   <tr
                     key={
-                      hocSinh.id
+                      HocSinhItem.id
                     }
                     className="border-b"
                   >
                     <td className="px-3 py-3 font-medium">
                       {
-                        hocSinh.ma_hoc_sinh
+                        HocSinhItem.ma_hoc_sinh
                       }
                     </td>
 
                     <td className="px-3 py-3">
                       {
-                        hocSinh.ho_ten
+                        HocSinhItem.ho_ten
                       }
                     </td>
 
                     <td className="px-3 py-3">
                       {
-                        hocSinh.ngay_sinh
+                        HocSinhItem.ngay_sinh
                           .slice(
                             0,
                             10,
@@ -711,32 +1211,32 @@ export default function HocSinhPage() {
 
                     <td className="px-3 py-3">
                       {
-                        hocSinh.so_dien_thoai_lien_he
+                        HocSinhItem.so_dien_thoai_lien_he
                       }
                     </td>
 
                     <td className="px-3 py-3">
                       {
-                        hocSinh.trang_thai
+                        HocSinhItem.trang_thai
                       }
                     </td>
 
                     <td className="px-3 py-3">
                       {
-                        hocSinh.xep_lop[0]
+                        HocSinhItem.xep_lop[0]
                           ?.lop_hoc_id ??
                         'Chưa xếp'
                       }
                     </td>
 
-                    {laAdmin && (
+                    {LaAdmin && (
                       <td className="px-3 py-3">
                         <button
                           type="button"
                           onClick={
                             () =>
-                              void capNhatSucKhoe(
-                                hocSinh,
+                              void CapNhatSucKhoe(
+                                HocSinhItem,
                               )
                           }
                           className="text-blue-600 hover:underline"
@@ -751,14 +1251,14 @@ export default function HocSinhPage() {
             </tbody>
           </table>
 
-          {dangTai && (
+          {DangTai && (
             <p className="py-6 text-center text-slate-500">
               Đang tải...
             </p>
           )}
 
-          {!dangTai &&
-            danhSach.length === 0 && (
+          {!DangTai &&
+            DanhSach.length === 0 && (
             <p className="py-6 text-center text-slate-500">
               Không có học sinh.
             </p>
