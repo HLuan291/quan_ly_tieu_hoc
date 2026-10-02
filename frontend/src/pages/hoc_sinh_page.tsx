@@ -460,10 +460,7 @@ export default function HocSinhPage() {
                   placeholder={
                     nhan
                   }
-                  required={
-                    ten !==
-                    'ghi_chu'
-                  }
+                  required
                   className="rounded-lg border border-slate-300 px-3 py-2"
                 />
               ),
