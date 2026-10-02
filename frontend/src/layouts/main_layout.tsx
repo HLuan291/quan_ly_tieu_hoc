@@ -7,6 +7,7 @@ import {
 import {
   DangXuat,
   DocJwt,
+  LayTenVaiTro,
 } from '../auth/auth';
 
 export default function MainLayout() {
@@ -141,7 +142,11 @@ export default function MainLayout() {
               text-slate-400
             "
           >
-            {NguoiDung?.vai_tro}
+            {
+              LayTenVaiTro(
+                NguoiDung?.vai_tro,
+              )
+            }
           </p>
         </div>
 
