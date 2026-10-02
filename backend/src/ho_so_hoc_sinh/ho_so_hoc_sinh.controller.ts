@@ -51,39 +51,39 @@ interface RequestCoNguoiDung
 export class HoSoHocSinhController {
 
   constructor(
-    private readonly hoSoHocSinhService:
+    private readonly HoSoHocSinhService:
       HoSoHocSinhService,
   ) {}
 
 
-  private layNguoiDung(
-    request: RequestCoNguoiDung,
+  private LayNguoiDung(
+    Request: RequestCoNguoiDung,
   ): NguoiDungJwt {
 
     if (
-      !request.nguoi_dung
+      !Request.nguoi_dung
     ) {
       throw new ForbiddenException(
         'Không xác định được người dùng',
       );
     }
 
-    return request.nguoi_dung;
+    return Request.nguoi_dung;
   }
 
 
-  private kiemTraAdmin(
-    request: RequestCoNguoiDung,
+  private KiemTraAdmin(
+    Request: RequestCoNguoiDung,
   ) {
 
-    const nguoiDung =
-      this.layNguoiDung(
-        request,
+    const NguoiDung =
+      this.LayNguoiDung(
+        Request,
       );
 
 
     if (
-      nguoiDung.vai_tro !==
+      NguoiDung.vai_tro !==
       'ADMIN'
     ) {
       throw new ForbiddenException(
@@ -102,21 +102,21 @@ export class HoSoHocSinhController {
 
   @UseGuards(JwtAuthGuard)
   @Post('hoc_sinh')
-  taoHocSinh(
+  TaoHocSinh(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Body()
-    body: TaoHocSinhKemPhuHuynhDto,
+    Body: TaoHocSinhKemPhuHuynhDto,
   ) {
 
-    this.kiemTraAdmin(
-      request,
+    this.KiemTraAdmin(
+      Request,
     );
 
-    return this.hoSoHocSinhService
+    return this.HoSoHocSinhService
       .taoHocSinhKemPhuHuynh(
-        body,
+        Body,
       );
   }
 
@@ -127,143 +127,143 @@ export class HoSoHocSinhController {
 
   @UseGuards(JwtAuthGuard)
   @Get('hoc_sinh')
-  layDanhSachHocSinh(
+  LayDanhSachHocSinh(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Query('tu_khoa')
-    tuKhoa?: string,
+    TuKhoa?: string,
 
     @Query('trang_thai')
-    trangThai?: string,
+    TrangThai?: string,
   ) {
 
-    return this.hoSoHocSinhService
-      .layDanhSachHocSinh(
-        this.layNguoiDung(
-          request,
+    return this.HoSoHocSinhService
+      .LayDanhSachHocSinh(
+        this.LayNguoiDung(
+          Request,
         ),
-        tuKhoa,
-        trangThai,
+        TuKhoa,
+        TrangThai,
       );
   }
 
 
-  // GET /ho_so_hoc_sinh/hoc_sinh/:id
+  // GET /ho_so_hoc_sinh/hoc_sinh/:Id
 
   @UseGuards(JwtAuthGuard)
-  @Get('hoc_sinh/:id')
-  layChiTietHocSinh(
+  @Get('hoc_sinh/:Id')
+  LayChiTietHocSinh(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Param(
-      'id',
+      'Id',
       ParseIntPipe,
     )
-    id: number,
+    Id: number,
   ) {
 
-    return this.hoSoHocSinhService
-      .layChiTietHocSinh(
-        this.layNguoiDung(
-          request,
+    return this.HoSoHocSinhService
+      .LayChiTietHocSinh(
+        this.LayNguoiDung(
+          Request,
         ),
-        id,
+        Id,
       );
   }
 
 
-  // PATCH /ho_so_hoc_sinh/hoc_sinh/:id
+  // PATCH /ho_so_hoc_sinh/hoc_sinh/:Id
 
   @UseGuards(JwtAuthGuard)
-  @Patch('hoc_sinh/:id')
-  capNhatHocSinh(
+  @Patch('hoc_sinh/:Id')
+  CapNhatHocSinh(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Param(
-      'id',
+      'Id',
       ParseIntPipe,
     )
-    id: number,
+    Id: number,
 
     @Body()
-    body: CapNhatHocSinhDto,
+    Body: CapNhatHocSinhDto,
   ) {
 
-    this.kiemTraAdmin(
-      request,
+    this.KiemTraAdmin(
+      Request,
     );
 
-    return this.hoSoHocSinhService
-      .capNhatHocSinh(
-        id,
-        body,
+    return this.HoSoHocSinhService
+      .CapNhatHocSinh(
+        Id,
+        Body,
       );
   }
 
 
-  // PATCH /ho_so_hoc_sinh/hoc_sinh/:id/trang_thai
+  // PATCH /ho_so_hoc_sinh/hoc_sinh/:Id/trang_thai
 
   @UseGuards(JwtAuthGuard)
   @Patch(
-    'hoc_sinh/:id/trang_thai',
+    'hoc_sinh/:Id/trang_thai',
   )
-  capNhatTrangThaiHocSinh(
+  CapNhatTrangThaiHocSinh(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Param(
-      'id',
+      'Id',
       ParseIntPipe,
     )
-    id: number,
+    Id: number,
 
     @Body()
-    body: CapNhatTrangThaiHocSinhDto,
+    Body: CapNhatTrangThaiHocSinhDto,
   ) {
 
-    this.kiemTraAdmin(
-      request,
+    this.KiemTraAdmin(
+      Request,
     );
 
-    return this.hoSoHocSinhService
-      .capNhatTrangThaiHocSinh(
-        id,
-        body,
+    return this.HoSoHocSinhService
+      .CapNhatTrangThaiHocSinh(
+        Id,
+        Body,
       );
   }
 
 
-  // PATCH /ho_so_hoc_sinh/hoc_sinh/:id/suc_khoe
+  // PATCH /ho_so_hoc_sinh/hoc_sinh/:Id/suc_khoe
 
   @UseGuards(JwtAuthGuard)
   @Patch(
-    'hoc_sinh/:id/suc_khoe',
+    'hoc_sinh/:Id/suc_khoe',
   )
-  capNhatSucKhoeHocSinh(
+  CapNhatSucKhoeHocSinh(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Param(
-      'id',
+      'Id',
       ParseIntPipe,
     )
-    id: number,
+    Id: number,
 
     @Body()
-    body: CapNhatSucKhoeHocSinhDto,
+    Body: CapNhatSucKhoeHocSinhDto,
   ) {
 
-    this.kiemTraAdmin(
-      request,
+    this.KiemTraAdmin(
+      Request,
     );
 
-    return this.hoSoHocSinhService
-      .capNhatSucKhoeHocSinh(
-        id,
-        body,
+    return this.HoSoHocSinhService
+      .CapNhatSucKhoeHocSinh(
+        Id,
+        Body,
       );
   }
 
@@ -278,42 +278,42 @@ export class HoSoHocSinhController {
 
   @UseGuards(JwtAuthGuard)
   @Get('phu_huynh')
-  layDanhSachPhuHuynh(
+  LayDanhSachPhuHuynh(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Query('tu_khoa')
-    tuKhoa?: string,
+    TuKhoa?: string,
   ) {
 
-    this.kiemTraAdmin(
-      request,
+    this.KiemTraAdmin(
+      Request,
     );
 
-    return this.hoSoHocSinhService
-      .layDanhSachPhuHuynh(
-        tuKhoa,
+    return this.HoSoHocSinhService
+      .LayDanhSachPhuHuynh(
+        TuKhoa,
       );
   }
 
 
-  // Lưu ý route "me" đặt trước ":id"
+  // Lưu ý route "me" đặt trước ":Id"
 
   @UseGuards(JwtAuthGuard)
   @Get('phu_huynh/me')
-  layPhuHuynhCuaToi(
+  LayPhuHuynhCuaToi(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
   ) {
 
-    const nguoiDung =
-      this.layNguoiDung(
-        request,
+    const NguoiDung =
+      this.LayNguoiDung(
+        Request,
       );
 
 
     if (
-      nguoiDung.vai_tro !==
+      NguoiDung.vai_tro !==
       'PHU_HUYNH'
     ) {
       throw new ForbiddenException(
@@ -322,121 +322,121 @@ export class HoSoHocSinhController {
     }
 
 
-    return this.hoSoHocSinhService
-      .layPhuHuynhCuaToi(
-        nguoiDung.sub,
+    return this.HoSoHocSinhService
+      .LayPhuHuynhCuaToi(
+        NguoiDung.sub,
       );
   }
 
 
-  // GET /ho_so_hoc_sinh/phu_huynh/:id
+  // GET /ho_so_hoc_sinh/phu_huynh/:Id
 
   @UseGuards(JwtAuthGuard)
-  @Get('phu_huynh/:id')
-  layChiTietPhuHuynh(
+  @Get('phu_huynh/:Id')
+  LayChiTietPhuHuynh(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Param(
-      'id',
+      'Id',
       ParseIntPipe,
     )
-    id: number,
+    Id: number,
   ) {
 
-    this.kiemTraAdmin(
-      request,
+    this.KiemTraAdmin(
+      Request,
     );
 
-    return this.hoSoHocSinhService
-      .layChiTietPhuHuynh(
-        id,
+    return this.HoSoHocSinhService
+      .LayChiTietPhuHuynh(
+        Id,
       );
   }
 
 
-  // PATCH /ho_so_hoc_sinh/phu_huynh/:id
+  // PATCH /ho_so_hoc_sinh/phu_huynh/:Id
 
   @UseGuards(JwtAuthGuard)
-  @Patch('phu_huynh/:id')
-  capNhatPhuHuynh(
+  @Patch('phu_huynh/:Id')
+  CapNhatPhuHuynh(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Param(
-      'id',
+      'Id',
       ParseIntPipe,
     )
-    id: number,
+    Id: number,
 
     @Body()
-    body: CapNhatPhuHuynhDto,
+    Body: CapNhatPhuHuynhDto,
   ) {
 
-    this.kiemTraAdmin(
-      request,
+    this.KiemTraAdmin(
+      Request,
     );
 
-    return this.hoSoHocSinhService
-      .capNhatPhuHuynh(
-        id,
-        body,
+    return this.HoSoHocSinhService
+      .CapNhatPhuHuynh(
+        Id,
+        Body,
       );
   }
 
 
-  // POST /ho_so_hoc_sinh/phu_huynh/:id/tao_tai_khoan
+  // POST /ho_so_hoc_sinh/phu_huynh/:Id/tao_tai_khoan
 
   @UseGuards(JwtAuthGuard)
   @Post(
-    'phu_huynh/:id/tao_tai_khoan',
+    'phu_huynh/:Id/tao_tai_khoan',
   )
-  taoTaiKhoanPhuHuynh(
+  TaoTaiKhoanPhuHuynh(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Param(
-      'id',
+      'Id',
       ParseIntPipe,
     )
-    id: number,
+    Id: number,
   ) {
 
-    this.kiemTraAdmin(
-      request,
+    this.KiemTraAdmin(
+      Request,
     );
 
-    return this.hoSoHocSinhService
-      .taoTaiKhoanPhuHuynh(
-        id,
+    return this.HoSoHocSinhService
+      .TaoTaiKhoanPhuHuynh(
+        Id,
       );
   }
 
 
-  // POST /ho_so_hoc_sinh/phu_huynh/:id/cap_lai_mat_khau
+  // POST /ho_so_hoc_sinh/phu_huynh/:Id/cap_lai_mat_khau
 
   @UseGuards(JwtAuthGuard)
   @Post(
-    'phu_huynh/:id/cap_lai_mat_khau',
+    'phu_huynh/:Id/cap_lai_mat_khau',
   )
-  capLaiMatKhauPhuHuynh(
+  CapLaiMatKhauPhuHuynh(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Param(
-      'id',
+      'Id',
       ParseIntPipe,
     )
-    id: number,
+    Id: number,
   ) {
 
-    this.kiemTraAdmin(
-      request,
+    this.KiemTraAdmin(
+      Request,
     );
 
-    return this.hoSoHocSinhService
-      .capLaiMatKhauPhuHuynh(
-        id,
+    return this.HoSoHocSinhService
+      .CapLaiMatKhauPhuHuynh(
+        Id,
       );
   }
 
@@ -446,34 +446,34 @@ export class HoSoHocSinhController {
   // ==================================================
 
 
-  // POST /ho_so_hoc_sinh/hoc_sinh/:id/phu_huynh
+  // POST /ho_so_hoc_sinh/hoc_sinh/:Id/phu_huynh
 
   @UseGuards(JwtAuthGuard)
   @Post(
-    'hoc_sinh/:id/phu_huynh',
+    'hoc_sinh/:Id/phu_huynh',
   )
-  themPhuHuynhVaoHocSinh(
+  ThemPhuHuynhVaoHocSinh(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Param(
-      'id',
+      'Id',
       ParseIntPipe,
     )
-    hocSinhId: number,
+    HocSinhId: number,
 
     @Body()
-    body: ThongTinPhuHuynhDto,
+    Body: ThongTinPhuHuynhDto,
   ) {
 
-    this.kiemTraAdmin(
-      request,
+    this.KiemTraAdmin(
+      Request,
     );
 
-    return this.hoSoHocSinhService
-      .themPhuHuynhVaoHocSinh(
-        hocSinhId,
-        body,
+    return this.HoSoHocSinhService
+      .ThemPhuHuynhVaoHocSinh(
+        HocSinhId,
+        Body,
       );
   }
 
@@ -484,35 +484,35 @@ export class HoSoHocSinhController {
   @Patch(
     'hoc_sinh/:hoc_sinh_id/phu_huynh/:phu_huynh_id/moi_quan_he',
   )
-  capNhatMoiQuanHe(
+  CapNhatMoiQuanHe(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Param(
       'hoc_sinh_id',
       ParseIntPipe,
     )
-    hocSinhId: number,
+    HocSinhId: number,
 
     @Param(
       'phu_huynh_id',
       ParseIntPipe,
     )
-    phuHuynhId: number,
+    PhuHuynhId: number,
 
     @Body()
-    body: CapNhatMoiQuanHeDto,
+    Body: CapNhatMoiQuanHeDto,
   ) {
 
-    this.kiemTraAdmin(
-      request,
+    this.KiemTraAdmin(
+      Request,
     );
 
-    return this.hoSoHocSinhService
-      .capNhatMoiQuanHe(
-        hocSinhId,
-        phuHuynhId,
-        body,
+    return this.HoSoHocSinhService
+      .CapNhatMoiQuanHe(
+        HocSinhId,
+        PhuHuynhId,
+        Body,
       );
   }
 
@@ -524,31 +524,31 @@ export class HoSoHocSinhController {
   @Delete(
     'hoc_sinh/:hoc_sinh_id/phu_huynh/:phu_huynh_id',
   )
-  huyLienKet(
+  HuyLienKet(
     @Req()
-    request: RequestCoNguoiDung,
+    Request: RequestCoNguoiDung,
 
     @Param(
       'hoc_sinh_id',
       ParseIntPipe,
     )
-    hocSinhId: number,
+    HocSinhId: number,
 
     @Param(
       'phu_huynh_id',
       ParseIntPipe,
     )
-    phuHuynhId: number,
+    PhuHuynhId: number,
   ) {
 
-    this.kiemTraAdmin(
-      request,
+    this.KiemTraAdmin(
+      Request,
     );
 
-    return this.hoSoHocSinhService
+    return this.HoSoHocSinhService
       .huyLienKetPhuHuynhHocSinh(
-        hocSinhId,
-        phuHuynhId,
+        HocSinhId,
+        PhuHuynhId,
       );
   }
 }
