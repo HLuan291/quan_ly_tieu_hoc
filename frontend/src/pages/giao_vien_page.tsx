@@ -67,7 +67,7 @@ interface FormGiaoVien {
   trinh_do_chuyen_mon: string;
 }
 
-const formRong: FormGiaoVien = {
+const FormRong: FormGiaoVien = {
   ho_ten: '',
   ngay_sinh: '',
   gioi_tinh: '',
@@ -78,35 +78,94 @@ const formRong: FormGiaoVien = {
   trinh_do_chuyen_mon: '',
 };
 
-function layNgayInput(
-  giaTri: string,
+const DanhSachTrinhDo = [
+  'Cao đẳng',
+  'Đại học',
+  'Thạc sĩ',
+  'Tiến sĩ',
+] as const;
+
+function LayNgayInput(
+  GiaTri: string,
 ) {
-  return giaTri
-    ? giaTri.slice(0, 10)
+  return GiaTri
+    ? GiaTri.slice(0, 10)
     : '';
 }
 
-function layThongBaoLoi(
-  error: unknown,
+function LayNgayHomNay() {
+  return new Date()
+    .toISOString()
+    .slice(0, 10);
+}
+
+function LayNgaySinhToiDa() {
+  const Ngay =
+    new Date();
+
+  Ngay.setFullYear(
+    Ngay.getFullYear() - 18,
+  );
+
+  return Ngay
+    .toISOString()
+    .slice(0, 10);
+}
+
+function LayNgayDu18Tuoi(
+  NgaySinh: string,
+) {
+  if (!NgaySinh) {
+    return '';
+  }
+
+  const Ngay =
+    new Date(
+      `${NgaySinh}T00:00:00.000Z`,
+    );
+
+  if (
+    Number.isNaN(
+      Ngay.getTime(),
+    )
+  ) {
+    return '';
+  }
+
+  Ngay.setUTCFullYear(
+    Ngay.getUTCFullYear() + 18,
+  );
+
+  return Ngay
+    .toISOString()
+    .slice(0, 10);
+}
+
+function LayThongBaoLoi(
+  Error: unknown,
 ) {
   if (
-    axios.isAxiosError(error)
+    axios.isAxiosError(
+      Error,
+    )
   ) {
-    const message =
-      error.response?.data
+    const Message =
+      Error.response?.data
         ?.message;
 
     if (
-      Array.isArray(message)
+      Array.isArray(
+        Message,
+      )
     ) {
-      return message.join(', ');
+      return Message.join(', ');
     }
 
     if (
-      typeof message ===
+      typeof Message ===
       'string'
     ) {
-      return message;
+      return Message;
     }
   }
 
@@ -115,287 +174,395 @@ function layThongBaoLoi(
 
 export default function GiaoVienPage() {
   const [
-    danhSach,
-    setDanhSach,
+    DanhSach,
+    SetDanhSach,
   ] = useState<GiaoVien[]>([]);
 
   const [
-    tuKhoa,
-    setTuKhoa,
+    TuKhoa,
+    SetTuKhoa,
   ] = useState('');
 
   const [
-    trangThai,
-    setTrangThai,
+    TrangThai,
+    SetTrangThai,
   ] = useState('');
 
   const [
-    dangTai,
-    setDangTai,
+    DangTai,
+    SetDangTai,
   ] = useState(false);
 
   const [
-    loi,
-    setLoi,
+    Loi,
+    SetLoi,
   ] = useState('');
 
   const [
-    hienForm,
-    setHienForm,
+    HienForm,
+    SetHienForm,
   ] = useState(false);
 
   const [
-    dangLuu,
-    setDangLuu,
+    DangLuu,
+    SetDangLuu,
   ] = useState(false);
 
   const [
-    giaoVienDangSua,
-    setGiaoVienDangSua,
+    GiaoVienDangSua,
+    SetGiaoVienDangSua,
   ] = useState<GiaoVien | null>(
     null,
   );
 
   const [
-    form,
-    setForm,
+    Form,
+    SetForm,
   ] = useState<FormGiaoVien>(
-    formRong,
+    FormRong,
   );
 
   const [
-    taiKhoanMoi,
-    setTaiKhoanMoi,
+    TrinhDoLuaChon,
+    SetTrinhDoLuaChon,
+  ] = useState('');
+
+  const [
+    TrinhDoKhac,
+    SetTrinhDoKhac,
+  ] = useState('');
+
+  const [
+    TaiKhoanMoi,
+    SetTaiKhoanMoi,
   ] = useState<TaiKhoanMoi | null>(
     null,
   );
 
-  const taiDanhSach =
+  const TaiDanhSach =
     useCallback(
       async () => {
         try {
-          setDangTai(true);
-          setLoi('');
+          SetDangTai(true);
+          SetLoi('');
 
-          const response =
+          const Response =
             await api.get<DanhSachGiaoVienResponse>(
               '/giao_vien',
               {
                 params: {
-                  ...(tuKhoa.trim()
+                  ...(TuKhoa.trim()
                     ? {
                         tu_khoa:
-                          tuKhoa.trim(),
+                          TuKhoa.trim(),
                       }
                     : {}),
 
-                  ...(trangThai
+                  ...(TrangThai
                     ? {
                         trang_thai:
-                          trangThai,
+                          TrangThai,
                       }
                     : {}),
                 },
               },
             );
 
-          setDanhSach(
-            response.data.danh_sach,
+          SetDanhSach(
+            Response.data.danh_sach,
           );
-        } catch (error: unknown) {
-          setLoi(
-            layThongBaoLoi(
-              error,
+        } catch (Error: unknown) {
+          SetLoi(
+            LayThongBaoLoi(
+              Error,
             ),
           );
         } finally {
-          setDangTai(false);
+          SetDangTai(false);
         }
       },
       [
-        tuKhoa,
-        trangThai,
+        TuKhoa,
+        TrangThai,
       ],
     );
 
   useEffect(
     () => {
-      void taiDanhSach();
+      void TaiDanhSach();
     },
     [
-      taiDanhSach,
+      TaiDanhSach,
     ],
   );
 
-  function moFormThem() {
-    setGiaoVienDangSua(
+  function MoFormThem() {
+    SetGiaoVienDangSua(
       null,
     );
 
-    setForm(
-      formRong,
-    );
+    SetForm({
+      ...FormRong,
+    });
 
-    setTaiKhoanMoi(
-      null,
-    );
-
-    setLoi('');
-    setHienForm(true);
+    SetTrinhDoLuaChon('');
+    SetTrinhDoKhac('');
+    SetTaiKhoanMoi(null);
+    SetLoi('');
+    SetHienForm(true);
   }
 
-  function moFormSua(
-    giaoVien: GiaoVien,
+  function MoFormSua(
+    GiaoVienItem: GiaoVien,
   ) {
-    setGiaoVienDangSua(
-      giaoVien,
+    const LaTrinhDoCoSan =
+      DanhSachTrinhDo.includes(
+        GiaoVienItem.trinh_do_chuyen_mon as
+          (typeof DanhSachTrinhDo)[number],
+      );
+
+    SetGiaoVienDangSua(
+      GiaoVienItem,
     );
 
-    setForm({
+    SetForm({
       ho_ten:
-        giaoVien.ho_ten,
+        GiaoVienItem.ho_ten,
 
       ngay_sinh:
-        layNgayInput(
-          giaoVien.ngay_sinh,
+        LayNgayInput(
+          GiaoVienItem.ngay_sinh,
         ),
 
       gioi_tinh:
-        giaoVien.gioi_tinh,
+        GiaoVienItem.gioi_tinh,
 
       so_dien_thoai:
-        giaoVien.so_dien_thoai,
+        GiaoVienItem.so_dien_thoai,
 
       email:
-        giaoVien.email,
+        GiaoVienItem.email,
 
       dia_chi_lien_he:
-        giaoVien.dia_chi_lien_he,
+        GiaoVienItem.dia_chi_lien_he,
 
       ngay_vao_truong:
-        layNgayInput(
-          giaoVien.ngay_vao_truong,
+        LayNgayInput(
+          GiaoVienItem.ngay_vao_truong,
         ),
 
       trinh_do_chuyen_mon:
-        giaoVien.trinh_do_chuyen_mon,
+        GiaoVienItem.trinh_do_chuyen_mon,
     });
 
-    setTaiKhoanMoi(
-      null,
+    SetTrinhDoLuaChon(
+      LaTrinhDoCoSan
+        ? GiaoVienItem.trinh_do_chuyen_mon
+        : 'Khác',
     );
 
-    setLoi('');
-    setHienForm(true);
+    SetTrinhDoKhac(
+      LaTrinhDoCoSan
+        ? ''
+        : GiaoVienItem.trinh_do_chuyen_mon,
+    );
+
+    SetTaiKhoanMoi(null);
+    SetLoi('');
+    SetHienForm(true);
   }
 
-  function dongForm() {
-    setHienForm(false);
-    setGiaoVienDangSua(
-      null,
-    );
-    setForm(
-      formRong,
-    );
+  function DongForm() {
+    SetHienForm(false);
+    SetGiaoVienDangSua(null);
+    SetForm({
+      ...FormRong,
+    });
+    SetTrinhDoLuaChon('');
+    SetTrinhDoKhac('');
   }
 
-  function capNhatTruong(
-    event:
+  function CapNhatTruong(
+    Event:
       ChangeEvent<
         HTMLInputElement |
         HTMLSelectElement
       >,
   ) {
     const {
-      name,
-      value,
-    } = event.target;
+      name: TenTruong,
+      value: GiaTri,
+    } = Event.target;
 
-    setForm(
-      (giaTriCu) => ({
-        ...giaTriCu,
-        [name]:
-          value,
+    SetForm(
+      (GiaTriCu) => ({
+        ...GiaTriCu,
+        [TenTruong]:
+          GiaTri,
       }),
     );
   }
 
-  async function luuGiaoVien(
-    event: FormEvent,
+  function CapNhatSoDienThoai(
+    Event:
+      ChangeEvent<HTMLInputElement>,
   ) {
-    event.preventDefault();
+    const SoDienThoai =
+      Event.target.value
+        .replace(
+          /\D/g,
+          '',
+        )
+        .slice(
+          0,
+          10,
+        );
 
-    try {
-      setDangLuu(true);
-      setLoi('');
-      setTaiKhoanMoi(
-        null,
+    SetForm(
+      (GiaTriCu) => ({
+        ...GiaTriCu,
+        so_dien_thoai:
+          SoDienThoai,
+      }),
+    );
+  }
+
+  function CapNhatTrinhDo(
+    Event:
+      ChangeEvent<HTMLSelectElement>,
+  ) {
+    const GiaTri =
+      Event.target.value;
+
+    SetTrinhDoLuaChon(
+      GiaTri,
+    );
+
+    if (
+      GiaTri !==
+      'Khác'
+    ) {
+      SetTrinhDoKhac('');
+
+      SetForm(
+        (GiaTriCu) => ({
+          ...GiaTriCu,
+          trinh_do_chuyen_mon:
+            GiaTri,
+        }),
       );
-
-      if (giaoVienDangSua) {
-        await api.patch(
-          `/giao_vien/${giaoVienDangSua.id}`,
-          form,
-        );
-      } else {
-        const response =
-          await api.post<TaoGiaoVienResponse>(
-            '/giao_vien',
-            form,
-          );
-
-        setTaiKhoanMoi(
-          response.data.tai_khoan,
-        );
-      }
-
-      await taiDanhSach();
-
-      if (giaoVienDangSua) {
-        dongForm();
-      } else {
-        setForm(
-          formRong,
-        );
-      }
-    } catch (error: unknown) {
-      setLoi(
-        layThongBaoLoi(
-          error,
-        ),
+    } else {
+      SetForm(
+        (GiaTriCu) => ({
+          ...GiaTriCu,
+          trinh_do_chuyen_mon:
+            '',
+        }),
       );
-    } finally {
-      setDangLuu(false);
     }
   }
 
-  async function capLaiMatKhau(
-    giaoVien: GiaoVien,
+  function CapNhatTrinhDoKhac(
+    Event:
+      ChangeEvent<HTMLInputElement>,
   ) {
-    const dongY =
+    const GiaTri =
+      Event.target.value;
+
+    SetTrinhDoKhac(
+      GiaTri,
+    );
+
+    SetForm(
+      (GiaTriCu) => ({
+        ...GiaTriCu,
+        trinh_do_chuyen_mon:
+          GiaTri,
+      }),
+    );
+  }
+
+  async function LuuGiaoVien(
+    Event: FormEvent,
+  ) {
+    Event.preventDefault();
+
+    try {
+      SetDangLuu(true);
+      SetLoi('');
+      SetTaiKhoanMoi(null);
+
+      if (
+        GiaoVienDangSua
+      ) {
+        await api.patch(
+          `/giao_vien/${GiaoVienDangSua.id}`,
+          Form,
+        );
+      } else {
+        const Response =
+          await api.post<TaoGiaoVienResponse>(
+            '/giao_vien',
+            Form,
+          );
+
+        SetTaiKhoanMoi(
+          Response.data.tai_khoan,
+        );
+      }
+
+      await TaiDanhSach();
+
+      if (
+        GiaoVienDangSua
+      ) {
+        DongForm();
+      } else {
+        SetForm({
+          ...FormRong,
+        });
+
+        SetTrinhDoLuaChon('');
+        SetTrinhDoKhac('');
+      }
+    } catch (Error: unknown) {
+      SetLoi(
+        LayThongBaoLoi(
+          Error,
+        ),
+      );
+    } finally {
+      SetDangLuu(false);
+    }
+  }
+
+  async function CapLaiMatKhau(
+    GiaoVienItem: GiaoVien,
+  ) {
+    const DongY =
       window.confirm(
-        `Cấp lại mật khẩu cho ${giaoVien.ho_ten}?`,
+        `Cấp lại mật khẩu cho ${GiaoVienItem.ho_ten}?`,
       );
 
-    if (!dongY) {
+    if (!DongY) {
       return;
     }
 
     try {
-      setLoi('');
+      SetLoi('');
 
-      const response =
+      const Response =
         await api.post<CapLaiMatKhauResponse>(
-          `/giao_vien/${giaoVien.id}/cap_lai_mat_khau`,
+          `/giao_vien/${GiaoVienItem.id}/cap_lai_mat_khau`,
         );
 
       window.alert(
-        `Mật khẩu mới: ${response.data.mat_khau_moi}\nGiáo viên sẽ phải đổi mật khẩu khi đăng nhập.`,
+        `Mật khẩu mới: ${Response.data.mat_khau_moi}\nGiáo viên sẽ phải đổi mật khẩu khi đăng nhập.`,
       );
-    } catch (error: unknown) {
-      setLoi(
-        layThongBaoLoi(
-          error,
+    } catch (Error: unknown) {
+      SetLoi(
+        LayThongBaoLoi(
+          Error,
         ),
       );
     }
@@ -417,7 +584,7 @@ export default function GiaoVienPage() {
         <button
           type="button"
           onClick={
-            moFormThem
+            MoFormThem
           }
           className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700"
         >
@@ -425,13 +592,13 @@ export default function GiaoVienPage() {
         </button>
       </div>
 
-      {loi && (
+      {Loi && (
         <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
-          {loi}
+          {Loi}
         </div>
       )}
 
-      {taiKhoanMoi && (
+      {TaiKhoanMoi && (
         <div className="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-4">
           <p className="font-semibold text-amber-900">
             Tài khoản giáo viên mới
@@ -440,14 +607,14 @@ export default function GiaoVienPage() {
           <p className="mt-2 text-sm text-amber-900">
             Tên đăng nhập:{' '}
             <strong>
-              {taiKhoanMoi.ten_dang_nhap}
+              {TaiKhoanMoi.ten_dang_nhap}
             </strong>
           </p>
 
           <p className="text-sm text-amber-900">
             Mật khẩu ban đầu:{' '}
             <strong>
-              {taiKhoanMoi.mat_khau_ban_dau}
+              {TaiKhoanMoi.mat_khau_ban_dau}
             </strong>
           </p>
 
@@ -457,16 +624,16 @@ export default function GiaoVienPage() {
         </div>
       )}
 
-      {hienForm && (
+      {HienForm && (
         <form
           onSubmit={
-            luuGiaoVien
+            LuuGiaoVien
           }
           className="mt-6 rounded-xl bg-white p-5 shadow-sm"
         >
           <div className="mb-4 flex items-center justify-between gap-4">
             <h2 className="text-lg font-semibold text-slate-800">
-              {giaoVienDangSua
+              {GiaoVienDangSua
                 ? 'Cập nhật giáo viên'
                 : 'Thêm giáo viên'}
             </h2>
@@ -474,7 +641,7 @@ export default function GiaoVienPage() {
             <button
               type="button"
               onClick={
-                dongForm
+                DongForm
               }
               className="text-sm text-slate-500 hover:text-slate-800"
             >
@@ -483,130 +650,248 @@ export default function GiaoVienPage() {
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
-            <input
-              name="ho_ten"
-              value={
-                form.ho_ten
-              }
-              onChange={
-                capNhatTruong
-              }
-              placeholder="Họ tên"
-              required
-              className="rounded-lg border border-slate-300 px-3 py-2"
-            />
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Họ tên
+              </label>
 
-            <input
-              name="ngay_sinh"
-              type="date"
-              value={
-                form.ngay_sinh
-              }
-              onChange={
-                capNhatTruong
-              }
-              required
-              className="rounded-lg border border-slate-300 px-3 py-2"
-            />
+              <input
+                name="ho_ten"
+                value={
+                  Form.ho_ten
+                }
+                onChange={
+                  CapNhatTruong
+                }
+                placeholder="VD: Trần Thị Bình - viết hoa chữ cái đầu mỗi từ"
+                required
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              />
+            </div>
 
-            <select
-              name="gioi_tinh"
-              value={
-                form.gioi_tinh
-              }
-              onChange={
-                capNhatTruong
-              }
-              required
-              className="rounded-lg border border-slate-300 px-3 py-2"
-            >
-              <option value="">
-                Chọn giới tính
-              </option>
-              <option value="NAM">
-                Nam
-              </option>
-              <option value="NU">
-                Nữ
-              </option>
-            </select>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Ngày sinh
+              </label>
 
-            <input
-              name="so_dien_thoai"
-              value={
-                form.so_dien_thoai
-              }
-              onChange={
-                capNhatTruong
-              }
-              placeholder="Số điện thoại"
-              required
-              className="rounded-lg border border-slate-300 px-3 py-2"
-            />
+              <input
+                name="ngay_sinh"
+                type="date"
+                value={
+                  Form.ngay_sinh
+                }
+                onChange={
+                  CapNhatTruong
+                }
+                min="1950-01-01"
+                max={
+                  LayNgaySinhToiDa()
+                }
+                required
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              />
 
-            <input
-              name="email"
-              type="email"
-              value={
-                form.email
-              }
-              onChange={
-                capNhatTruong
-              }
-              placeholder="Email"
-              required
-              className="rounded-lg border border-slate-300 px-3 py-2"
-            />
+              <p className="mt-1 text-xs text-slate-500">
+                Từ năm 1950 và giáo viên phải đủ 18 tuổi.
+              </p>
+            </div>
 
-            <input
-              name="ngay_vao_truong"
-              type="date"
-              value={
-                form.ngay_vao_truong
-              }
-              onChange={
-                capNhatTruong
-              }
-              required
-              className="rounded-lg border border-slate-300 px-3 py-2"
-            />
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Giới tính
+              </label>
 
-            <input
-              name="dia_chi_lien_he"
-              value={
-                form.dia_chi_lien_he
-              }
-              onChange={
-                capNhatTruong
-              }
-              placeholder="Địa chỉ liên hệ"
-              required
-              className="rounded-lg border border-slate-300 px-3 py-2"
-            />
+              <select
+                name="gioi_tinh"
+                value={
+                  Form.gioi_tinh
+                }
+                onChange={
+                  CapNhatTruong
+                }
+                required
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              >
+                <option value="">
+                  Chọn giới tính
+                </option>
 
-            <input
-              name="trinh_do_chuyen_mon"
-              value={
-                form.trinh_do_chuyen_mon
-              }
-              onChange={
-                capNhatTruong
-              }
-              placeholder="Trình độ chuyên môn"
-              required
-              className="rounded-lg border border-slate-300 px-3 py-2"
-            />
+                <option value="NAM">
+                  Nam
+                </option>
+
+                <option value="NU">
+                  Nữ
+                </option>
+              </select>
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Số điện thoại
+              </label>
+
+              <input
+                name="so_dien_thoai"
+                value={
+                  Form.so_dien_thoai
+                }
+                onChange={
+                  CapNhatSoDienThoai
+                }
+                inputMode="numeric"
+                minLength={10}
+                maxLength={10}
+                pattern="[0-9]{10}"
+                title="Số điện thoại phải gồm đúng 10 chữ số"
+                placeholder="Gồm đúng 10 số, VD: 0901234567"
+                required
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Email
+              </label>
+
+              <input
+                name="email"
+                type="email"
+                value={
+                  Form.email
+                }
+                onChange={
+                  CapNhatTruong
+                }
+                pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+[.][A-Za-z]{2,63}"
+                title="Email phải đúng định dạng, ví dụ: giaovien@truong.edu.vn"
+                placeholder="VD: giaovien@truong.edu.vn"
+                required
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              />
+
+              <p className="mt-1 text-xs text-slate-500">
+                Kiểm tra định dạng email; không xác minh hộp thư có tồn tại.
+              </p>
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Ngày vào trường
+              </label>
+
+              <input
+                name="ngay_vao_truong"
+                type="date"
+                value={
+                  Form.ngay_vao_truong
+                }
+                onChange={
+                  CapNhatTruong
+                }
+                min={
+                  LayNgayDu18Tuoi(
+                    Form.ngay_sinh,
+                  ) ||
+                  undefined
+                }
+                max={
+                  LayNgayHomNay()
+                }
+                required
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              />
+
+              <p className="mt-1 text-xs text-slate-500">
+                Không trước thời điểm đủ 18 tuổi và không lớn hơn hôm nay.
+              </p>
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Địa chỉ liên hệ
+              </label>
+
+              <input
+                name="dia_chi_lien_he"
+                value={
+                  Form.dia_chi_lien_he
+                }
+                onChange={
+                  CapNhatTruong
+                }
+                placeholder="VD: 123 Nguyễn Trãi, Quận 5, TP.HCM"
+                required
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-slate-700">
+                Trình độ chuyên môn
+              </label>
+
+              <select
+                value={
+                  TrinhDoLuaChon
+                }
+                onChange={
+                  CapNhatTrinhDo
+                }
+                required
+                className="w-full rounded-lg border border-slate-300 px-3 py-2"
+              >
+                <option value="">
+                  Chọn trình độ chuyên môn
+                </option>
+
+                {DanhSachTrinhDo.map(
+                  (TrinhDo) => (
+                    <option
+                      key={
+                        TrinhDo
+                      }
+                      value={
+                        TrinhDo
+                      }
+                    >
+                      {TrinhDo}
+                    </option>
+                  ),
+                )}
+
+                <option value="Khác">
+                  Khác
+                </option>
+              </select>
+
+              {TrinhDoLuaChon ===
+                'Khác' && (
+                <input
+                  value={
+                    TrinhDoKhac
+                  }
+                  onChange={
+                    CapNhatTrinhDoKhac
+                  }
+                  placeholder="Nhập trình độ chuyên môn khác"
+                  required
+                  className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2"
+                />
+              )}
+            </div>
           </div>
 
           <div className="mt-5 flex gap-3">
             <button
               type="submit"
               disabled={
-                dangLuu
+                DangLuu
               }
               className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white disabled:opacity-50"
             >
-              {dangLuu
+              {DangLuu
                 ? 'Đang lưu...'
                 : 'Lưu'}
             </button>
@@ -614,7 +899,7 @@ export default function GiaoVienPage() {
             <button
               type="button"
               onClick={
-                dongForm
+                DongForm
               }
               className="rounded-lg border border-slate-300 px-4 py-2"
             >
@@ -628,26 +913,26 @@ export default function GiaoVienPage() {
         <div className="flex flex-wrap gap-3">
           <input
             value={
-              tuKhoa
+              TuKhoa
             }
             onChange={
-              (event) =>
-                setTuKhoa(
-                  event.target.value,
+              (Event) =>
+                SetTuKhoa(
+                  Event.target.value,
                 )
             }
-            placeholder="Tìm mã, họ tên, SĐT, email"
+            placeholder="Tìm theo mã, họ tên, SĐT hoặc email"
             className="min-w-64 flex-1 rounded-lg border border-slate-300 px-3 py-2"
           />
 
           <select
             value={
-              trangThai
+              TrangThai
             }
             onChange={
-              (event) =>
-                setTrangThai(
-                  event.target.value,
+              (Event) =>
+                SetTrangThai(
+                  Event.target.value,
                 )
             }
             className="rounded-lg border border-slate-300 px-3 py-2"
@@ -655,6 +940,7 @@ export default function GiaoVienPage() {
             <option value="">
               Tất cả trạng thái
             </option>
+
             <option value="HOAT_DONG">
               Hoạt động
             </option>
@@ -690,48 +976,48 @@ export default function GiaoVienPage() {
             </thead>
 
             <tbody>
-              {danhSach.map(
-                (giaoVien) => (
+              {DanhSach.map(
+                (GiaoVienItem) => (
                   <tr
                     key={
-                      giaoVien.id
+                      GiaoVienItem.id
                     }
                     className="border-b"
                   >
                     <td className="px-3 py-3 font-medium">
                       {
-                        giaoVien.ma_giao_vien
+                        GiaoVienItem.ma_giao_vien
                       }
                     </td>
 
                     <td className="px-3 py-3">
                       {
-                        giaoVien.ho_ten
+                        GiaoVienItem.ho_ten
                       }
                     </td>
 
                     <td className="px-3 py-3">
                       {
-                        giaoVien.so_dien_thoai
+                        GiaoVienItem.so_dien_thoai
                       }
                     </td>
 
                     <td className="px-3 py-3">
                       {
-                        giaoVien.email
+                        GiaoVienItem.email
                       }
                     </td>
 
                     <td className="px-3 py-3">
                       {
-                        giaoVien.tai_khoan
+                        GiaoVienItem.tai_khoan
                           .ten_dang_nhap
                       }
                     </td>
 
                     <td className="px-3 py-3">
                       {
-                        giaoVien.trang_thai
+                        GiaoVienItem.trang_thai
                       }
                     </td>
 
@@ -740,8 +1026,8 @@ export default function GiaoVienPage() {
                         type="button"
                         onClick={
                           () =>
-                            moFormSua(
-                              giaoVien,
+                            MoFormSua(
+                              GiaoVienItem,
                             )
                         }
                         className="mr-3 text-blue-600 hover:underline"
@@ -753,8 +1039,8 @@ export default function GiaoVienPage() {
                         type="button"
                         onClick={
                           () =>
-                            void capLaiMatKhau(
-                              giaoVien,
+                            void CapLaiMatKhau(
+                              GiaoVienItem,
                             )
                         }
                         className="text-amber-700 hover:underline"
@@ -768,14 +1054,14 @@ export default function GiaoVienPage() {
             </tbody>
           </table>
 
-          {!dangTai &&
-            danhSach.length === 0 && (
+          {!DangTai &&
+            DanhSach.length === 0 && (
             <p className="py-8 text-center text-slate-500">
               Không có giáo viên phù hợp.
             </p>
           )}
 
-          {dangTai && (
+          {DangTai && (
             <p className="py-8 text-center text-slate-500">
               Đang tải danh sách...
             </p>
