@@ -11,7 +11,7 @@ import type {
 import api from '../api/api';
 
 import {
-  layThongBaoLoi,
+  layThongBaoLoi as LayThongBaoLoi,
 } from '../utils/loi_api';
 
 interface NamHoc {
@@ -46,82 +46,86 @@ interface HocSinhChuaXep {
   ho_ten: string;
 }
 
+function LayNgayHomNay() {
+  return new Date()
+    .toISOString()
+    .slice(0, 10);
+}
+
 export default function LopHocPage() {
   const [
-    namHoc,
-    setNamHoc,
+    NamHoc,
+    SetNamHoc,
   ] = useState<NamHoc[]>([]);
 
   const [
-    khoi,
-    setKhoi,
+    Khoi,
+    SetKhoi,
   ] = useState<Khoi[]>([]);
 
   const [
-    lopHoc,
-    setLopHoc,
+    LopHoc,
+    SetLopHoc,
   ] = useState<LopHoc[]>([]);
 
   const [
-    hocSinhChuaXep,
-    setHocSinhChuaXep,
+    HocSinhChuaXep,
+    SetHocSinhChuaXep,
   ] = useState<HocSinhChuaXep[]>([]);
 
   const [
-    loi,
-    setLoi,
+    Loi,
+    SetLoi,
   ] = useState('');
 
   const [
-    tenNamHoc,
-    setTenNamHoc,
+    TenNamHoc,
+    SetTenNamHoc,
   ] = useState('');
 
   const [
-    tenLop,
-    setTenLop,
+    TenLop,
+    SetTenLop,
   ] = useState('');
 
   const [
-    namHocId,
-    setNamHocId,
+    NamHocId,
+    SetNamHocId,
   ] = useState('');
 
   const [
-    khoiId,
-    setKhoiId,
+    KhoiId,
+    SetKhoiId,
   ] = useState('');
 
   const [
-    hocSinhId,
-    setHocSinhId,
+    HocSinhId,
+    SetHocSinhId,
   ] = useState('');
 
   const [
-    lopHocId,
-    setLopHocId,
+    LopHocId,
+    SetLopHocId,
   ] = useState('');
 
   const [
-    ngayBatDau,
-    setNgayBatDau,
+    NgayBatDau,
+    SetNgayBatDau,
   ] = useState(
-    new Date()
-      .toISOString()
-      .slice(0, 10),
+    LayNgayHomNay(),
   );
 
-  const taiDuLieu =
+  const TaiDuLieu =
     useCallback(
       async () => {
         try {
-          setLoi('');
+          SetLoi('');
 
           const [
-            namHocResponse,
-            khoiResponse,
-            lopResponse,
-            hocSinhResponse,
+            NamHocResponse,
+            KhoiResponse,
+            LopResponse,
+            HocSinhResponse,
           ] =
             await Promise.all([
               api.get<NamHoc[]>(
@@ -141,25 +145,25 @@ export default function LopHocPage() {
               ),
             ]);
 
-          setNamHoc(
-            namHocResponse.data,
+          SetNamHoc(
+            NamHocResponse.data,
           );
 
-          setKhoi(
-            khoiResponse.data,
+          SetKhoi(
+            KhoiResponse.data,
           );
 
-          setLopHoc(
-            lopResponse.data,
+          SetLopHoc(
+            LopResponse.data,
           );
 
-          setHocSinhChuaXep(
-            hocSinhResponse.data,
+          SetHocSinhChuaXep(
+            HocSinhResponse.data,
           );
-        } catch (error: unknown) {
-          setLoi(
-            layThongBaoLoi(
-              error,
+        } catch (Error: unknown) {
+          SetLoi(
+            LayThongBaoLoi(
+              Error,
             ),
           );
         }
@@ -169,109 +173,109 @@ export default function LopHocPage() {
 
   useEffect(
     () => {
-      void taiDuLieu();
+      void TaiDuLieu();
     },
     [
-      taiDuLieu,
+      TaiDuLieu,
     ],
   );
 
-  async function taoNamHoc(
-    event: FormEvent,
+  async function TaoNamHoc(
+    Event: FormEvent,
   ) {
-    event.preventDefault();
+    Event.preventDefault();
 
     try {
-      setLoi('');
+      SetLoi('');
 
       await api.post(
         '/to_chuc_lop_hoc/nam_hoc',
         {
           ten_nam_hoc:
-            tenNamHoc,
+            TenNamHoc.trim(),
         },
       );
 
-      setTenNamHoc('');
-      await taiDuLieu();
-    } catch (error: unknown) {
-      setLoi(
-        layThongBaoLoi(
-          error,
+      SetTenNamHoc('');
+      await TaiDuLieu();
+    } catch (Error: unknown) {
+      SetLoi(
+        LayThongBaoLoi(
+          Error,
         ),
       );
     }
   }
 
-  async function taoLop(
-    event: FormEvent,
+  async function TaoLop(
+    Event: FormEvent,
   ) {
-    event.preventDefault();
+    Event.preventDefault();
 
     try {
-      setLoi('');
+      SetLoi('');
 
       await api.post(
         '/to_chuc_lop_hoc/lop_hoc',
         {
           nam_hoc_id:
             Number(
-              namHocId,
+              NamHocId,
             ),
 
           khoi_id:
             Number(
-              khoiId,
+              KhoiId,
             ),
 
           ten_lop:
-            tenLop,
+            TenLop.trim(),
         },
       );
 
-      setTenLop('');
-      await taiDuLieu();
-    } catch (error: unknown) {
-      setLoi(
-        layThongBaoLoi(
-          error,
+      SetTenLop('');
+      await TaiDuLieu();
+    } catch (Error: unknown) {
+      SetLoi(
+        LayThongBaoLoi(
+          Error,
         ),
       );
     }
   }
 
-  async function xepLop(
-    event: FormEvent,
+  async function XepLop(
+    Event: FormEvent,
   ) {
-    event.preventDefault();
+    Event.preventDefault();
 
     try {
-      setLoi('');
+      SetLoi('');
 
       await api.post(
         '/to_chuc_lop_hoc/xep_lop',
         {
           hoc_sinh_id:
             Number(
-              hocSinhId,
+              HocSinhId,
             ),
 
           lop_hoc_id:
             Number(
-              lopHocId,
+              LopHocId,
             ),
 
           ngay_bat_dau:
-            ngayBatDau,
+            NgayBatDau,
         },
       );
 
-      setHocSinhId('');
-      await taiDuLieu();
-    } catch (error: unknown) {
-      setLoi(
-        layThongBaoLoi(
-          error,
+      SetHocSinhId('');
+      await TaiDuLieu();
+    } catch (Error: unknown) {
+      SetLoi(
+        LayThongBaoLoi(
+          Error,
         ),
       );
     }
@@ -287,16 +291,16 @@ export default function LopHocPage() {
         Quản lý năm học, lớp học và xếp học sinh vào lớp.
       </p>
 
-      {loi && (
+      {Loi && (
         <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
-          {loi}
+          {Loi}
         </div>
       )}
 
       <div className="mt-6 grid gap-5 lg:grid-cols-3">
         <form
           onSubmit={
-            taoNamHoc
+            TaoNamHoc
           }
           className="rounded-xl bg-white p-5 shadow-sm"
         >
@@ -304,20 +308,30 @@ export default function LopHocPage() {
             Tạo năm học
           </h2>
 
+          <label className="mt-4 block text-sm font-medium text-slate-700">
+            Tên năm học
+          </label>
+
           <input
             value={
-              tenNamHoc
+              TenNamHoc
             }
             onChange={
-              (event) =>
-                setTenNamHoc(
-                  event.target.value,
+              (Event) =>
+                SetTenNamHoc(
+                  Event.target.value,
                 )
             }
-            placeholder="Ví dụ: 2026-2027"
+            pattern="\d{4}-\d{4}"
+            title="Năm học phải có dạng YYYY-YYYY, ví dụ 2026-2027"
+            placeholder="VD: 2026-2027"
             required
-            className="mt-4 w-full rounded-lg border border-slate-300 px-3 py-2"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
           />
+
+          <p className="mt-1 text-xs text-slate-500">
+            Năm sau phải lớn hơn năm trước đúng 1 năm.
+          </p>
 
           <button
             type="submit"
@@ -329,7 +343,7 @@ export default function LopHocPage() {
 
         <form
           onSubmit={
-            taoLop
+            TaoLop
           }
           className="rounded-xl bg-white p-5 shadow-sm"
         >
@@ -337,89 +351,101 @@ export default function LopHocPage() {
             Tạo lớp
           </h2>
 
+          <label className="mt-4 block text-sm font-medium text-slate-700">
+            Năm học
+          </label>
+
           <select
             value={
-              namHocId
+              NamHocId
             }
             onChange={
-              (event) =>
-                setNamHocId(
-                  event.target.value,
+              (Event) =>
+                SetNamHocId(
+                  Event.target.value,
                 )
             }
             required
-            className="mt-4 w-full rounded-lg border border-slate-300 px-3 py-2"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
           >
             <option value="">
               Chọn năm học
             </option>
 
-            {namHoc.map(
-              (item) => (
+            {NamHoc.map(
+              (Item) => (
                 <option
                   key={
-                    item.id
+                    Item.id
                   }
                   value={
-                    item.id
+                    Item.id
                   }
                 >
                   {
-                    item.ten_nam_hoc
+                    Item.ten_nam_hoc
                   }
                 </option>
               ),
             )}
           </select>
 
+          <label className="mt-3 block text-sm font-medium text-slate-700">
+            Khối
+          </label>
+
           <select
             value={
-              khoiId
+              KhoiId
             }
             onChange={
-              (event) =>
-                setKhoiId(
-                  event.target.value,
+              (Event) =>
+                SetKhoiId(
+                  Event.target.value,
                 )
             }
             required
-            className="mt-3 w-full rounded-lg border border-slate-300 px-3 py-2"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
           >
             <option value="">
               Chọn khối
             </option>
 
-            {khoi.map(
-              (item) => (
+            {Khoi.map(
+              (Item) => (
                 <option
                   key={
-                    item.id
+                    Item.id
                   }
                   value={
-                    item.id
+                    Item.id
                   }
                 >
                   {
-                    item.ten_khoi
+                    Item.ten_khoi
                   }
                 </option>
               ),
             )}
           </select>
 
+          <label className="mt-3 block text-sm font-medium text-slate-700">
+            Tên lớp
+          </label>
+
           <input
             value={
-              tenLop
+              TenLop
             }
             onChange={
-              (event) =>
-                setTenLop(
-                  event.target.value,
+              (Event) =>
+                SetTenLop(
+                  Event.target.value,
                 )
             }
-            placeholder="Tên lớp"
+            placeholder="VD: 1A, 2B, 5A"
             required
-            className="mt-3 w-full rounded-lg border border-slate-300 px-3 py-2"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
           />
 
           <button
@@ -432,7 +458,7 @@ export default function LopHocPage() {
 
         <form
           onSubmit={
-            xepLop
+            XepLop
           }
           className="rounded-xl bg-white p-5 shadow-sm"
         >
@@ -440,95 +466,117 @@ export default function LopHocPage() {
             Xếp học sinh vào lớp
           </h2>
 
+          <label className="mt-4 block text-sm font-medium text-slate-700">
+            Học sinh
+          </label>
+
           <select
             value={
-              hocSinhId
+              HocSinhId
             }
             onChange={
-              (event) =>
-                setHocSinhId(
-                  event.target.value,
+              (Event) =>
+                SetHocSinhId(
+                  Event.target.value,
                 )
             }
             required
-            className="mt-4 w-full rounded-lg border border-slate-300 px-3 py-2"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
           >
             <option value="">
-              Chọn học sinh
+              Chọn học sinh chưa có lớp
             </option>
 
-            {hocSinhChuaXep.map(
-              (item) => (
+            {HocSinhChuaXep.map(
+              (Item) => (
                 <option
                   key={
-                    item.id
+                    Item.id
                   }
                   value={
-                    item.id
+                    Item.id
                   }
                 >
                   {
-                    item.ma_hoc_sinh
+                    Item.ma_hoc_sinh
                   } - {
-                    item.ho_ten
+                    Item.ho_ten
                   }
                 </option>
               ),
             )}
           </select>
 
+          <label className="mt-3 block text-sm font-medium text-slate-700">
+            Lớp học
+          </label>
+
           <select
             value={
-              lopHocId
+              LopHocId
             }
             onChange={
-              (event) =>
-                setLopHocId(
-                  event.target.value,
+              (Event) =>
+                SetLopHocId(
+                  Event.target.value,
                 )
             }
             required
-            className="mt-3 w-full rounded-lg border border-slate-300 px-3 py-2"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
           >
             <option value="">
               Chọn lớp
             </option>
 
-            {lopHoc.map(
-              (item) => (
+            {LopHoc.map(
+              (Item) => (
                 <option
                   key={
-                    item.id
+                    Item.id
                   }
                   value={
-                    item.id
+                    Item.id
                   }
                 >
                   {
-                    item.nam_hoc
+                    Item.nam_hoc
                       .ten_nam_hoc
                   } - {
-                    item.ten_lop
+                    Item.khoi
+                      .ten_khoi
+                  } - {
+                    Item.ten_lop
                   }
                 </option>
               ),
             )}
           </select>
 
+          <label className="mt-3 block text-sm font-medium text-slate-700">
+            Ngày bắt đầu học tại lớp
+          </label>
+
           <input
             type="date"
             value={
-              ngayBatDau
+              NgayBatDau
             }
             onChange={
-              (event) =>
-                setNgayBatDau(
-                  event.target.value,
+              (Event) =>
+                SetNgayBatDau(
+                  Event.target.value,
                 )
             }
+            max={
+              LayNgayHomNay()
+            }
             required
-            className="mt-3 w-full rounded-lg border border-slate-300 px-3 py-2"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
           />
+
+          <p className="mt-1 text-xs text-slate-500">
+            Chọn ngày học sinh bắt đầu thuộc lớp này.
+          </p>
 
           <button
             type="submit"
@@ -567,44 +615,44 @@ export default function LopHocPage() {
             </thead>
 
             <tbody>
-              {lopHoc.map(
-                (item) => (
+              {LopHoc.map(
+                (Item) => (
                   <tr
                     key={
-                      item.id
+                      Item.id
                     }
                     className="border-b"
                   >
                     <td className="px-3 py-3">
                       {
-                        item.nam_hoc
+                        Item.nam_hoc
                           .ten_nam_hoc
                       }
                     </td>
 
                     <td className="px-3 py-3">
                       {
-                        item.khoi
+                        Item.khoi
                           .ten_khoi
                       }
                     </td>
 
                     <td className="px-3 py-3 font-medium">
                       {
-                        item.ten_lop
+                        Item.ten_lop
                       }
                     </td>
 
                     <td className="px-3 py-3">
                       {
-                        item._count
+                        Item._count
                           .xep_lop
                       }
                     </td>
 
                     <td className="px-3 py-3">
                       {
-                        item._count
+                        Item._count
                           .phan_cong_giao_vien
                       }
                     </td>
