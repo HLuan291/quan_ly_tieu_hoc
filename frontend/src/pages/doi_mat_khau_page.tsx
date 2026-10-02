@@ -17,6 +17,10 @@ import {
   LuuToken,
 } from '../auth/auth';
 
+import {
+  LayThongBaoLoi,
+} from '../utils/loi_api';
+
 interface DoiMatKhauResponse {
   access_token: string;
 }
@@ -51,9 +55,9 @@ export default function DoiMatKhauPage() {
   ] = useState(false);
 
   async function XuLyDoiMatKhau(
-    event: FormEvent,
+    Event: FormEvent,
   ) {
-    event.preventDefault();
+    Event.preventDefault();
     SetLoi('');
 
     if (
@@ -78,7 +82,7 @@ export default function DoiMatKhauPage() {
     try {
       SetDangGui(true);
 
-      const response =
+      const Response =
         await Api.post<DoiMatKhauResponse>(
           '/auth/doi-mat-khau',
           {
@@ -91,7 +95,7 @@ export default function DoiMatKhauPage() {
         );
 
       LuuToken(
-        response.data.access_token,
+        Response.data.access_token,
       );
 
       Navigate(
@@ -100,9 +104,11 @@ export default function DoiMatKhauPage() {
           replace: true,
         },
       );
-    } catch {
+    } catch (Error: unknown) {
       SetLoi(
-        'Đổi mật khẩu thất bại',
+        LayThongBaoLoi(
+          Error,
+        ),
       );
     } finally {
       SetDangGui(false);
@@ -147,9 +153,9 @@ export default function DoiMatKhauPage() {
               MatKhauCu
             }
             onChange={
-              (event) =>
+              (Event) =>
                 SetMatKhauCu(
-                  event.target.value,
+                  Event.target.value,
                 )
             }
             placeholder="Nhập mật khẩu hiện tại"
@@ -168,9 +174,9 @@ export default function DoiMatKhauPage() {
               MatKhauMoi
             }
             onChange={
-              (event) =>
+              (Event) =>
                 SetMatKhauMoi(
-                  event.target.value,
+                  Event.target.value,
                 )
             }
             minLength={8}
@@ -190,9 +196,9 @@ export default function DoiMatKhauPage() {
               XacNhan
             }
             onChange={
-              (event) =>
+              (Event) =>
                 SetXacNhan(
-                  event.target.value,
+                  Event.target.value,
                 )
             }
             minLength={8}
