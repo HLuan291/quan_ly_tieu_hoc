@@ -19,6 +19,9 @@ import DoiMatKhauPage
 import DashboardPage
   from './pages/dashboard_page';
 
+import GiaoVienPage
+  from './pages/giao_vien_page';
+
 import KhongCoQuyenPage
   from './pages/khong_co_quyen_page';
 
@@ -84,7 +87,7 @@ export default function App() {
           <Route
             path="/giao_vien"
             element={
-              <TrangTam ten="Quản lý giáo viên" />
+              <GiaoVienPage />
             }
           />
 
