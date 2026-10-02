@@ -9,7 +9,7 @@ import type {
   FormEvent,
 } from 'react';
 
-import Api from '../Api/Api';
+import Api from '../api/api';
 
 import {
   DocJwt,
