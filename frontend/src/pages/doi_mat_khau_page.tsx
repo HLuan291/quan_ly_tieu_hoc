@@ -10,7 +10,7 @@ import {
   useNavigate,
 } from 'react-router';
 
-import api from '../api/api';
+import Api from '../api/api';
 
 import {
   DangXuat,
@@ -79,7 +79,7 @@ export default function DoiMatKhauPage() {
       SetDangGui(true);
 
       const response =
-        await api.post<DoiMatKhauResponse>(
+        await Api.post<DoiMatKhauResponse>(
           '/auth/doi-mat-khau',
           {
             mat_khau_cu:
