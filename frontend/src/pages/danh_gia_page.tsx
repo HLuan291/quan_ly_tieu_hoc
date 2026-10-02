@@ -309,9 +309,9 @@ export default function DanhGiaPage() {
 
           if (LaAdmin) {
             const [
-              namResponse,
-              khoiResponse,
-              monResponse,
+              NamResponse,
+              KhoiResponse,
+              MonResponse,
             ] =
               await Promise.all([
                 Api.get<NamHoc[]>(
@@ -319,7 +319,7 @@ export default function DanhGiaPage() {
                 ),
 
                 Api.get<Khoi[]>(
-                  '/to_chuc_lop_hoc/Khoi',
+                  '/to_chuc_lop_hoc/khoi',
                 ),
 
                 Api.get<MonHoc[]>(
@@ -328,15 +328,15 @@ export default function DanhGiaPage() {
               ]);
 
             SetNamHoc(
-              namResponse.data,
+              NamResponse.data,
             );
 
             SetKhoi(
-              khoiResponse.data,
+              KhoiResponse.data,
             );
 
             SetMonHoc(
-              monResponse.data,
+              MonResponse.data,
             );
           }
 
@@ -435,10 +435,10 @@ export default function DanhGiaPage() {
     );
 
   async function TaiHocSinhLop(
-    id: string,
+    Id: string,
   ) {
     SetLopHocId(
-      id,
+      Id,
     );
 
     SetHocSinh(
@@ -447,14 +447,14 @@ export default function DanhGiaPage() {
 
     SetHocSinhId('');
 
-    if (!id) {
+    if (!Id) {
       return;
     }
 
     try {
       const Response =
         await Api.get<HocSinhLopResponse>(
-          `/danh_gia_hoc_tap/Lop/${id}/hoc_sinh`,
+          `/danh_gia_hoc_tap/lop/${Id}/hoc_sinh`,
         );
 
       SetHocSinh(
