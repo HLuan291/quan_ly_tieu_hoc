@@ -23,7 +23,7 @@ import {
 
 import {
   ToChucLopHocService,
-} from './to_chuc_lop_hoc.Service';
+} from './to_chuc_lop_hoc.service';
 
 import {
   CapNhatLopHocDto,
