@@ -239,6 +239,15 @@ export default function GiaoVienPage() {
     null,
   );
 
+  const [MatKhauBanDau, SetMatKhauBanDau] = useState('');
+  const [HienMatKhauBanDau, SetHienMatKhauBanDau] = useState(false);
+  const [GiaoVienCapMatKhau, SetGiaoVienCapMatKhau] = useState<GiaoVien | null>(null);
+  const [MatKhauCapLai, SetMatKhauCapLai] = useState('');
+  const [HienMatKhauCapLai, SetHienMatKhauCapLai] = useState(false);
+  const [DangCapMatKhau, SetDangCapMatKhau] = useState(false);
+  const [LoiCapMatKhau, SetLoiCapMatKhau] = useState('');
+  const [DaSaoChep, SetDaSaoChep] = useState(false);
+
   const TaiDanhSach =
     useCallback(
       async () => {
@@ -302,6 +311,10 @@ export default function GiaoVienPage() {
   );
 
   function MoFormThem() {
+    DongFormCapMatKhau();
+    SetMatKhauBanDau('');
+    SetHienMatKhauBanDau(false);
+    SetDaSaoChep(false);
     SetGiaoVienDangSua(
       null,
     );
@@ -320,6 +333,9 @@ export default function GiaoVienPage() {
   function MoFormSua(
     GiaoVienItem: GiaoVien,
   ) {
+    DongFormCapMatKhau();
+    SetMatKhauBanDau('');
+    SetHienMatKhauBanDau(false);
     const LaTrinhDoCoSan =
       DanhSachTrinhDo.includes(
         GiaoVienItem.trinh_do_chuyen_mon as
@@ -378,6 +394,8 @@ export default function GiaoVienPage() {
   }
 
   function DongForm() {
+    SetMatKhauBanDau('');
+    SetHienMatKhauBanDau(false);
     SetHienForm(false);
     SetGiaoVienDangSua(null);
     SetForm({
@@ -508,12 +526,18 @@ export default function GiaoVienPage() {
         const Response =
           await Api.post<TaoGiaoVienResponse>(
             '/giao_vien',
-            Form,
+            {
+              ...Form,
+              ...(MatKhauBanDau ? { mat_khau_ban_dau: MatKhauBanDau } : {}),
+            },
           );
 
         SetTaiKhoanMoi(
           Response.data.tai_khoan,
         );
+        SetDaSaoChep(false);
+        SetMatKhauBanDau('');
+        SetHienMatKhauBanDau(false);
       }
 
       await TaiDanhSach();
@@ -541,35 +565,63 @@ export default function GiaoVienPage() {
     }
   }
 
-  async function CapLaiMatKhau(
-    GiaoVienItem: GiaoVien,
-  ) {
-    const DongY =
-      window.confirm(
-        `Cấp lại mật khẩu cho ${GiaoVienItem.ho_ten}?`,
-      );
+  function MoFormCapMatKhau(GiaoVienItem: GiaoVien) {
+    DongForm();
+    SetGiaoVienCapMatKhau(GiaoVienItem);
+    SetMatKhauCapLai('');
+    SetHienMatKhauCapLai(false);
+    SetLoiCapMatKhau('');
+    SetTaiKhoanMoi(null);
+  }
 
-    if (!DongY) {
-      return;
-    }
+  function DongFormCapMatKhau() {
+    SetGiaoVienCapMatKhau(null);
+    SetMatKhauCapLai('');
+    SetHienMatKhauCapLai(false);
+    SetLoiCapMatKhau('');
+  }
+
+  async function CapLaiMatKhau(Event: FormEvent) {
+    Event.preventDefault();
+    if (!GiaoVienCapMatKhau) return;
 
     try {
-      SetLoi('');
+      SetDangCapMatKhau(true);
+      SetLoiCapMatKhau('');
 
       const Response =
         await Api.post<CapLaiMatKhauResponse>(
-          `/giao_vien/${GiaoVienItem.id}/cap_lai_mat_khau`,
+          `/giao_vien/${GiaoVienCapMatKhau.id}/cap_lai_mat_khau`,
+          MatKhauCapLai ? { mat_khau_moi: MatKhauCapLai } : {},
         );
 
-      window.alert(
-        `Mật khẩu mới: ${Response.data.mat_khau_moi}\nGiáo viên sẽ phải đổi mật khẩu khi đăng nhập.`,
-      );
+      SetTaiKhoanMoi({
+        ten_dang_nhap: GiaoVienCapMatKhau.tai_khoan.ten_dang_nhap,
+        mat_khau_ban_dau: Response.data.mat_khau_moi,
+        phai_doi_mat_khau: Response.data.phai_doi_mat_khau,
+      });
+      SetDaSaoChep(false);
+      DongFormCapMatKhau();
     } catch (Error: unknown) {
-      SetLoi(
+      SetLoiCapMatKhau(
         LayThongBaoLoi(
           Error,
         ),
       );
+    } finally {
+      SetDangCapMatKhau(false);
+    }
+  }
+
+  async function SaoChepTaiKhoan() {
+    if (!TaiKhoanMoi) return;
+    try {
+      await navigator.clipboard.writeText(
+        `Tên đăng nhập: ${TaiKhoanMoi.ten_dang_nhap}\nMật khẩu: ${TaiKhoanMoi.mat_khau_ban_dau}`,
+      );
+      SetDaSaoChep(true);
+    } catch {
+      SetLoi('Không thể sao chép. Bạn có thể chọn và sao chép thông tin đăng nhập bên dưới.');
     }
   }
 
@@ -588,6 +640,7 @@ export default function GiaoVienPage() {
 
         <button
           type="button"
+          disabled={DangCapMatKhau}
           onClick={
             MoFormThem
           }
@@ -606,26 +659,34 @@ export default function GiaoVienPage() {
       {TaiKhoanMoi && (
         <div className="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-4">
           <p className="font-semibold text-amber-900">
-            Tài khoản giáo viên mới
+            Thông tin đăng nhập giáo viên
           </p>
 
           <p className="mt-2 text-sm text-amber-900">
             Tên đăng nhập:{' '}
-            <strong>
+            <strong className="break-all">
               {TaiKhoanMoi.ten_dang_nhap}
             </strong>
           </p>
 
           <p className="text-sm text-amber-900">
-            Mật khẩu ban đầu:{' '}
-            <strong>
+            Mật khẩu tạm thời:{' '}
+            <strong className="break-all">
               {TaiKhoanMoi.mat_khau_ban_dau}
             </strong>
           </p>
 
           <p className="mt-1 text-xs text-amber-700">
-            Chỉ hiển thị mật khẩu này để Admin bàn giao cho giáo viên.
+            Sao chép để bàn giao hoặc thử đăng nhập. Giáo viên phải đổi mật khẩu khi đăng nhập lần đầu.
           </p>
+          <div className="mt-3 flex flex-wrap gap-3">
+            <button type="button" onClick={() => void SaoChepTaiKhoan()} className="rounded-lg bg-amber-700 px-3 py-2 text-sm font-medium text-white">
+              {DaSaoChep ? 'Đã sao chép' : 'Sao chép tài khoản'}
+            </button>
+            <button type="button" onClick={() => SetTaiKhoanMoi(null)} className="rounded-lg border border-amber-500 px-3 py-2 text-sm text-amber-900">
+              Ẩn thông tin
+            </button>
+          </div>
         </div>
       )}
 
@@ -888,6 +949,31 @@ export default function GiaoVienPage() {
             </div>
           </div>
 
+          {!GiaoVienDangSua && (
+            <div className="mt-4">
+              <label htmlFor="mat-khau-ban-dau" className="mb-1 block text-sm font-medium text-slate-700">
+                Mật khẩu ban đầu (tùy chọn)
+              </label>
+              <div className="flex gap-2">
+                <input
+                  id="mat-khau-ban-dau"
+                  type={HienMatKhauBanDau ? 'text' : 'password'}
+                  value={MatKhauBanDau}
+                  onChange={(Event) => SetMatKhauBanDau(Event.target.value)}
+                  minLength={8}
+                  maxLength={128}
+                  autoComplete="new-password"
+                  placeholder="Để trống để hệ thống tự sinh"
+                  className="min-w-0 flex-1 rounded-lg border border-slate-300 px-3 py-2"
+                />
+                <button type="button" aria-pressed={HienMatKhauBanDau} onClick={() => SetHienMatKhauBanDau(!HienMatKhauBanDau)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm">
+                  {HienMatKhauBanDau ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                </button>
+              </div>
+              <p className="mt-1 text-xs text-slate-500">Nếu tự đặt, mật khẩu cần có từ 8 đến 128 ký tự.</p>
+            </div>
+          )}
+
           <div className="mt-5 flex gap-3">
             <button
               type="submit"
@@ -910,6 +996,46 @@ export default function GiaoVienPage() {
             >
               Hủy
             </button>
+          </div>
+        </form>
+      )}
+
+      {GiaoVienCapMatKhau && (
+        <form onSubmit={CapLaiMatKhau} aria-labelledby="tieu-de-cap-mat-khau" className="mt-6 rounded-xl border border-amber-200 bg-white p-5 shadow-sm">
+          <h2 id="tieu-de-cap-mat-khau" className="text-lg font-semibold text-slate-800">
+            Cấp lại mật khẩu cho {GiaoVienCapMatKhau.ho_ten}
+          </h2>
+          <p className="mt-1 text-sm text-slate-600">
+            Tài khoản: {GiaoVienCapMatKhau.tai_khoan.ten_dang_nhap}. Mật khẩu hiện tại sẽ được thay thế; giáo viên cần đổi mật khẩu khi đăng nhập.
+          </p>
+          {LoiCapMatKhau && <p role="alert" className="mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-600">{LoiCapMatKhau}</p>}
+          <label htmlFor="mat-khau-cap-lai" className="mb-1 mt-4 block text-sm font-medium text-slate-700">
+            Mật khẩu mới (tùy chọn)
+          </label>
+          <div className="flex gap-2">
+            <input
+              id="mat-khau-cap-lai"
+              type={HienMatKhauCapLai ? 'text' : 'password'}
+              value={MatKhauCapLai}
+              onChange={(Event) => SetMatKhauCapLai(Event.target.value)}
+              minLength={8}
+              maxLength={128}
+              autoComplete="new-password"
+              autoFocus
+              disabled={DangCapMatKhau}
+              placeholder="Để trống để hệ thống tự sinh"
+              className="min-w-0 flex-1 rounded-lg border border-slate-300 px-3 py-2"
+            />
+            <button type="button" aria-pressed={HienMatKhauCapLai} onClick={() => SetHienMatKhauCapLai(!HienMatKhauCapLai)} className="rounded-lg border border-slate-300 px-3 py-2 text-sm">
+              {HienMatKhauCapLai ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+            </button>
+          </div>
+          <p className="mt-1 text-xs text-slate-500">Nhập từ 8 đến 128 ký tự hoặc để trống để tự sinh mật khẩu mới.</p>
+          <div className="mt-4 flex gap-3">
+            <button type="submit" disabled={DangCapMatKhau} className="rounded-lg bg-amber-700 px-4 py-2 font-medium text-white disabled:opacity-50">
+              {DangCapMatKhau ? 'Đang cấp mật khẩu...' : 'Cấp mật khẩu mới'}
+            </button>
+            <button type="button" disabled={DangCapMatKhau} onClick={DongFormCapMatKhau} className="rounded-lg border border-slate-300 px-4 py-2 disabled:opacity-50">Hủy</button>
           </div>
         </form>
       )}
@@ -1029,6 +1155,7 @@ export default function GiaoVienPage() {
                     <td className="whitespace-nowrap px-3 py-3">
                       <button
                         type="button"
+                        disabled={DangCapMatKhau}
                         onClick={
                           () =>
                             MoFormSua(
@@ -1042,9 +1169,10 @@ export default function GiaoVienPage() {
 
                       <button
                         type="button"
+                        disabled={DangCapMatKhau || DangLuu}
                         onClick={
                           () =>
-                            void CapLaiMatKhau(
+                            MoFormCapMatKhau(
                               GiaoVienItem,
                             )
                         }

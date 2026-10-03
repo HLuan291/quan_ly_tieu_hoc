@@ -208,6 +208,50 @@ async function Main() {
   Login = await Goi('Đổi mật khẩu sau reset', 'POST', '/auth/doi-mat-khau', 'GIAO_VIEN', { mat_khau_cu: Reset.mat_khau_moi, mat_khau_moi: MatKhau + 'New' }, 201);
   Tokens.TOKEN_CU = TokenCu;
   await Goi('SESSION: token cũ sau reset không dùng lại', 'GET', '/phan_cong_giang_day/phan_cong/cua_toi', 'TOKEN_CU', undefined, 401);
+
+  const MatKhauAdminDat = ' GvDemo@Manual123 ';
+  const GvMatKhau = await Goi('MẬT KHẨU: tạo giáo viên bằng mật khẩu Admin đặt', 'POST', '/giao_vien', 'ADMIN', { ...FormGv, so_dien_thoai: '0990000031', mat_khau_ban_dau: MatKhauAdminDat }, 201);
+  assert(GvMatKhau.giao_vien && GvMatKhau.tai_khoan);
+  Ghi('MẬT KHẨU: trả đúng mật khẩu đã chọn, giữ khoảng trắng', GvMatKhau.tai_khoan.mat_khau_ban_dau === MatKhauAdminDat);
+  const TaiKhoanMatKhau = await Prisma.tai_khoan.findUnique({ where: { ten_dang_nhap: GvMatKhau.tai_khoan.ten_dang_nhap } });
+  Ghi('MẬT KHẨU: chỉ lưu Argon2 hash của mật khẩu đã chọn', TaiKhoanMatKhau.mat_khau_bam !== MatKhauAdminDat && await argon2.verify(TaiKhoanMatKhau.mat_khau_bam, MatKhauAdminDat));
+  const DanhSachGv = await Goi('MẬT KHẨU: đọc danh sách giáo viên', 'GET', '/giao_vien', 'ADMIN');
+  const DanhSachJson = JSON.stringify(DanhSachGv);
+  Ghi('MẬT KHẨU: danh sách không trả mật khẩu rõ hoặc hash', !DanhSachJson.includes(MatKhauAdminDat) && !DanhSachJson.includes('mat_khau_bam') && !DanhSachJson.includes('mat_khau_ban_dau'));
+  let LoginMatKhau = await Goi('MẬT KHẨU: đăng nhập bằng username và mật khẩu Admin đặt', 'POST', '/auth/login', '', { ten_dang_nhap_hoac_so_dien_thoai: GvMatKhau.tai_khoan.ten_dang_nhap, mat_khau: MatKhauAdminDat }, 201);
+  assert(LoginMatKhau.access_token);
+  Ghi('MẬT KHẨU: tạo mới buộc đổi mật khẩu lần đầu', LoginMatKhau.tai_khoan.phai_doi_mat_khau === true);
+  Tokens.GV_MAT_KHAU = LoginMatKhau.access_token;
+  await Goi('MẬT KHẨU: chặn nghiệp vụ trước khi đổi lần đầu', 'GET', '/phan_cong_giang_day/phan_cong/cua_toi', 'GV_MAT_KHAU', undefined, 403);
+  LoginMatKhau = await Goi('MẬT KHẨU: giáo viên tự đổi mật khẩu lần đầu', 'POST', '/auth/doi-mat-khau', 'GV_MAT_KHAU', { mat_khau_cu: MatKhauAdminDat, mat_khau_moi: 'GvDemo@Changed123' }, 201);
+  Tokens.GV_MAT_KHAU = LoginMatKhau.access_token;
+  await Goi('MẬT KHẨU: dùng nghiệp vụ sau khi đổi', 'GET', '/phan_cong_giang_day/phan_cong/cua_toi', 'GV_MAT_KHAU');
+  await Goi('MẬT KHẨU: giáo viên không được cấp lại mật khẩu', 'POST', `/giao_vien/${GvMatKhau.giao_vien.id}/cap_lai_mat_khau`, 'GV_MAT_KHAU', { mat_khau_moi: 'GvDemo@Forbidden123' }, 403);
+  await Goi('MẬT KHẨU: phụ huynh không được cấp lại mật khẩu', 'POST', `/giao_vien/${GvMatKhau.giao_vien.id}/cap_lai_mat_khau`, 'PHU_HUYNH', {}, 403);
+  const MatKhauSai = [
+    ['ngắn hơn 8 ký tự', '1234567'], ['sai kiểu số', 123], ['null', null],
+    ['chỉ có khoảng trắng', ' '.repeat(8)], ['dài hơn 128 ký tự', 'A'.repeat(129)],
+  ];
+  for (const [Ten, GiaTri] of MatKhauSai) {
+    await Goi('MẬT KHẨU: từ chối tạo mới với mật khẩu ' + Ten, 'POST', '/giao_vien', 'ADMIN', { ...FormGv, so_dien_thoai: '0990000032', mat_khau_ban_dau: GiaTri }, 400);
+    await Goi('MẬT KHẨU: từ chối cấp lại với mật khẩu ' + Ten, 'POST', `/giao_vien/${GvMatKhau.giao_vien.id}/cap_lai_mat_khau`, 'ADMIN', { mat_khau_moi: GiaTri }, 400);
+  }
+  Ghi('MẬT KHẨU: không tạo giáo viên khi mật khẩu sai', await Prisma.giao_vien.count({ where: { so_dien_thoai: '0990000032' } }) === 0);
+  await Goi('MẬT KHẨU: dữ liệu cấp lại sai không làm mất phiên hiện tại', 'GET', '/phan_cong_giang_day/phan_cong/cua_toi', 'GV_MAT_KHAU');
+  const TokenTruocCapLai = Tokens.GV_MAT_KHAU;
+  const MatKhauCapLai = 'GvDemo@Reset456';
+  const ResetMatKhau = await Goi('MẬT KHẨU: cấp lại bằng mật khẩu Admin đặt', 'POST', `/giao_vien/${GvMatKhau.giao_vien.id}/cap_lai_mat_khau`, 'ADMIN', { mat_khau_moi: MatKhauCapLai }, 201);
+  Ghi('MẬT KHẨU: trả đúng mật khẩu cấp lại', ResetMatKhau.mat_khau_moi === MatKhauCapLai && ResetMatKhau.phai_doi_mat_khau === true);
+  Tokens.GV_TRUOC_CAP_LAI = TokenTruocCapLai;
+  await Goi('MẬT KHẨU: token cũ bị thu hồi sau cấp lại', 'GET', '/phan_cong_giang_day/phan_cong/cua_toi', 'GV_TRUOC_CAP_LAI', undefined, 401);
+  await Goi('MẬT KHẨU: mật khẩu cũ không đăng nhập được sau cấp lại', 'POST', '/auth/login', '', { ten_dang_nhap_hoac_so_dien_thoai: GvMatKhau.tai_khoan.ten_dang_nhap, mat_khau: 'GvDemo@Changed123' }, 401);
+  LoginMatKhau = await Goi('MẬT KHẨU: dùng SĐT giả và mật khẩu cấp lại để đăng nhập', 'POST', '/auth/login', '', { ten_dang_nhap_hoac_so_dien_thoai: '0990000031', mat_khau: MatKhauCapLai }, 201);
+  Ghi('MẬT KHẨU: cấp lại buộc đổi mật khẩu lần đầu', LoginMatKhau.tai_khoan.phai_doi_mat_khau === true);
+  Tokens.GV_MAT_KHAU = LoginMatKhau.access_token;
+  await Goi('MẬT KHẨU: chặn nghiệp vụ sau cấp lại trước khi đổi', 'GET', '/phan_cong_giang_day/phan_cong/cua_toi', 'GV_MAT_KHAU', undefined, 403);
+  const ResetTuSinh = await Goi('MẬT KHẨU: cấp lại với body rỗng tự sinh mật khẩu', 'POST', `/giao_vien/${GvMatKhau.giao_vien.id}/cap_lai_mat_khau`, 'ADMIN', {}, 201);
+  await Goi('MẬT KHẨU: mật khẩu tự sinh đăng nhập được', 'POST', '/auth/login', '', { ten_dang_nhap_hoac_so_dien_thoai: GvMatKhau.tai_khoan.ten_dang_nhap, mat_khau: ResetTuSinh.mat_khau_moi }, 201);
+
   await Prisma.tai_khoan.update({ where: { id: Admin.id }, data: { trang_thai: 'KHOA' } });
   await Goi('Tài khoản khóa bị chặn với token đang có', 'GET', '/giao_vien', 'ADMIN', undefined, 403);
 }
@@ -216,7 +260,7 @@ Main().catch((Error) => { KetQua.push({ ten: 'Runtime bị gián đoạn', dat: 
   Server?.kill();
   await Prisma.$disconnect();
   const Report = { thoi_diem: new Date().toISOString(), database: Database.pathname.slice(1), loai_du_lieu: 'Dữ liệu giả; DB được tạo từ Prisma schema, không phải DB của người dùng', tong: KetQua.length, dat: KetQua.filter((X) => X.dat).length, khong_dat: KetQua.filter((X) => !X.dat).length, ket_qua: KetQua };
-  fs.writeFileSync(path.resolve('../docs/runtime-audit-results.json'), JSON.stringify(Report, null, 2));
+  fs.writeFileSync(path.resolve(process.env.AUDIT_REPORT_FILE || '../docs/runtime-audit-results.json'), JSON.stringify(Report, null, 2));
   console.log(JSON.stringify({ tong: Report.tong, dat: Report.dat, khong_dat: Report.khong_dat }));
   if (Report.khong_dat) process.exitCode = 1;
 });

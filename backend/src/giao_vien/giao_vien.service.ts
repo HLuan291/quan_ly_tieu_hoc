@@ -17,6 +17,7 @@ export interface DuLieuTaoGiaoVien {
   dia_chi_lien_he: string;
   ngay_vao_truong: string;
   trinh_do_chuyen_mon: string;
+  mat_khau_ban_dau?: string;
 }
 
 export interface DuLieuCapNhatGiaoVien {
@@ -35,6 +36,25 @@ export class GiaoVienService {
   constructor(
     private readonly Prisma: PrismaService,
   ) {}
+
+  private TaoMatKhauTamThoi(GiaTri: unknown): string {
+    if (GiaTri === undefined || GiaTri === '') {
+      return `Gv@${randomBytes(16).toString('base64url')}`;
+    }
+
+    if (
+      typeof GiaTri !== 'string' ||
+      GiaTri.length < 8 ||
+      GiaTri.length > 128 ||
+      !GiaTri.trim()
+    ) {
+      throw new BadRequestException(
+        'Mật khẩu phải có từ 8 đến 128 ký tự và không được chỉ chứa khoảng trắng',
+      );
+    }
+
+    return GiaTri;
+  }
 
   private ChuyenNgay(
     GiaTri: string,
@@ -268,6 +288,8 @@ export class GiaoVienService {
       );
     }
 
+    const MatKhauBanDau = this.TaoMatKhauTamThoi(DuLieu.mat_khau_ban_dau);
+
     const HoTen =
       DuLieu.ho_ten.trim();
 
@@ -331,13 +353,6 @@ export class GiaoVienService {
 
     const TenDangNhap =
       MaGiaoVien.toLowerCase();
-
-    const MatKhauBanDau =
-      `Gv@${randomBytes(
-        4,
-      ).toString(
-        'hex',
-      )}`;
 
     const MatKhauBam =
       await argon2.hash(
@@ -826,7 +841,10 @@ export class GiaoVienService {
 
   async CapLaiMatKhauGiaoVien(
     Id: number,
+    MatKhauNhap?: string,
   ) {
+    const MatKhauMoi = this.TaoMatKhauTamThoi(MatKhauNhap);
+
     const GiaoVien =
       await this.Prisma.giao_vien.findUnique({
         where: {
@@ -840,13 +858,6 @@ export class GiaoVienService {
         'Không tìm thấy giáo viên',
       );
     }
-
-    const MatKhauMoi =
-      `Gv@${randomBytes(
-        4,
-      ).toString(
-        'hex',
-      )}`;
 
     const MatKhauBam =
       await argon2.hash(

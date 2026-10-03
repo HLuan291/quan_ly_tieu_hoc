@@ -30,7 +30,7 @@ const TruongBatBuoc: Record<string, string[]> = {
   CapNhatTongKetGiaoDucDto: ['hoc_sinh_id', 'dot_danh_gia_id'],
 };
 const TruongChuoi = new Set([
-  'ten_dang_nhap_hoac_so_dien_thoai', 'mat_khau', 'mat_khau_cu', 'mat_khau_moi', 'ho_ten', 'gioi_tinh',
+  'ten_dang_nhap_hoac_so_dien_thoai', 'mat_khau', 'mat_khau_cu', 'mat_khau_moi', 'mat_khau_ban_dau', 'ho_ten', 'gioi_tinh',
   'so_dien_thoai', 'so_dien_thoai_lien_he', 'email', 'dia_chi_lien_he', 'trinh_do_chuyen_mon', 'dan_toc',
   'quoc_tich', 'noi_sinh', 'dia_chi_thuong_tru', 'dia_chi_hien_tai', 'ghi_chu', 'nghe_nghiep', 'moi_quan_he',
   'trang_thai', 'ten_nam_hoc', 'ten_lop', 'ma_mon_hoc', 'ten_mon_hoc', 'loai_phan_cong', 'buoi_hoc', 'buoi_nghi',
@@ -46,6 +46,8 @@ const TruongSo = new Set(['nam_sinh', 'thu_tu', 'thu_tu_hien_thi', 'diem', 'chie
 export class KiemTraBodyPipe implements PipeTransform {
   transform(GiaTri: unknown, Metadata: ArgumentMetadata) {
     if (Metadata.type !== 'body') return GiaTri;
+    // API cấp lại mật khẩu cũ không gửi body: vẫn tự sinh mật khẩu như trước.
+    if (GiaTri === undefined && Metadata.metatype?.name === 'CapLaiMatKhauGiaoVienDto') return {};
     this.KiemTraDoiTuong(GiaTri, 'Dữ liệu');
     const Body = GiaTri as Record<string, unknown>;
     for (const Ten of TruongBatBuoc[Metadata.metatype?.name ?? ''] ?? []) {

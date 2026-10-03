@@ -2,6 +2,7 @@ import { BadRequestException } from '@nestjs/common';
 import { KiemTraBodyPipe } from './kiem_tra_body.pipe';
 import { TaoLopHocDto } from './to_chuc_lop_hoc/to_chuc_lop_hoc.dto';
 import { TaoHocSinhKemPhuHuynhDto } from './ho_so_hoc_sinh/ho_so_hoc_sinh.dto';
+import { CapLaiMatKhauGiaoVienDto } from './giao_vien/giao_vien.dto';
 
 describe('Kiểm tra JSON trước Service', () => {
   const Pipe = new KiemTraBodyPipe();
@@ -21,5 +22,12 @@ describe('Kiểm tra JSON trước Service', () => {
   });
   it('không kiểm tra lại tham số query thành chuỗi', () => {
     expect(Pipe.transform('1', { type: 'query' })).toBe('1');
+  });
+  it('chấp nhận request cấp lại mật khẩu cũ không có body', () => {
+    expect(Pipe.transform(undefined, { type: 'body', metatype: CapLaiMatKhauGiaoVienDto })).toEqual({});
+    expect(() => Pipe.transform(undefined, Metadata)).toThrow(BadRequestException);
+  });
+  it.each(['mat_khau_ban_dau', 'mat_khau_moi'])('trả 400 khi %s sai kiểu', (Ten) => {
+    expect(() => Pipe.transform({ [Ten]: 123 }, { type: 'body', metatype: Object })).toThrow(BadRequestException);
   });
 });

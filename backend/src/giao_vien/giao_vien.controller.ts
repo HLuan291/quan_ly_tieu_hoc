@@ -24,6 +24,8 @@ import {
   GiaoVienService,
 } from './giao_vien.service';
 
+import { CapLaiMatKhauGiaoVienDto } from './giao_vien.dto';
+
 import type {
   DuLieuCapNhatGiaoVien,
   DuLieuTaoGiaoVien,
@@ -134,6 +136,9 @@ export class GiaoVienController {
       ParseIntPipe,
     )
     Id: number,
+
+    @Body()
+    Body: CapLaiMatKhauGiaoVienDto,
   ) {
     this.KiemTraAdmin(
       Request,
@@ -142,6 +147,7 @@ export class GiaoVienController {
     return this.GiaoVienService
       .CapLaiMatKhauGiaoVien(
         Id,
+        Body.mat_khau_moi,
       );
   }
 }
