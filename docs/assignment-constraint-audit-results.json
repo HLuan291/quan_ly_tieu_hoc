@@ -1,0 +1,75 @@
+{
+  "thoi_diem": "2026-10-03T18:53:51.041Z",
+  "mysql": "8.0.46-0ubuntu0.24.04.3",
+  "database": "DB riêng từ Prisma schema với chk_pc_loai được thực thi",
+  "du_lieu": "Giả; không kết nối DB người dùng",
+  "tong": 15,
+  "dat": 15,
+  "ket_qua": [
+    {
+      "ten": "Mặc định chỉ kiểm tra, giữ nguyên dữ liệu và CHECK",
+      "dat": true
+    },
+    {
+      "ten": "Tái hiện HTTP 500 với chk_pc_loai cũ",
+      "dat": true
+    },
+    {
+      "ten": "Chuyển đủ 3 mã cũ và giữ nguyên toàn bộ trường khác",
+      "dat": true
+    },
+    {
+      "ten": "CHECK mới được cài đặt",
+      "dat": true
+    },
+    {
+      "ten": "Bản sao chứa DDL thật, CHECK cũ và đủ dữ liệu trước chuyển",
+      "dat": true
+    },
+    {
+      "ten": "Chạy lại không thay đổi DB hoặc tạo thêm bản sao",
+      "dat": true
+    },
+    {
+      "ten": "CHECK mới vẫn chặn dòng sai: SAI/null/null",
+      "dat": true
+    },
+    {
+      "ten": "CHECK mới vẫn chặn dòng sai: GVBM/null/BO_SUNG",
+      "dat": true
+    },
+    {
+      "ten": "CHECK mới vẫn chặn dòng sai: GVCN/2/null",
+      "dat": true
+    },
+    {
+      "ten": "CHECK mới vẫn chặn dòng sai: CHU_NHIEM/null/null",
+      "dat": true
+    },
+    {
+      "ten": "Tiếp tục được sau gián đoạn ở CHECK chuyển tiếp",
+      "dat": true
+    },
+    {
+      "ten": "Không sửa ràng buộc khác mẫu",
+      "dat": true
+    },
+    {
+      "ten": "Cùng yêu cầu phân công chuyển từ HTTP 500 sang 201 sau sửa",
+      "dat": true
+    },
+    {
+      "ten": "Phân công mới lưu đủ dòng chủ nhiệm và môn tự động",
+      "dat": true
+    },
+    {
+      "ten": "231 ca API đạt khi chk_pc_loai mới được thực thi",
+      "dat": true
+    }
+  ],
+  "hoi_quy_api": {
+    "tong": 231,
+    "dat": 231,
+    "khong_dat": 0
+  }
+}
