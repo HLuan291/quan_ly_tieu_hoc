@@ -1,11 +1,11 @@
 {
-  "thoi_diem": "2026-10-04T15:10:32.936Z",
+  "thoi_diem": "2026-10-04T16:21:13.286Z",
   "database": "audit_school_ci",
   "loai_du_lieu": "Giả trên MySQL CI riêng",
-  "tong": 126,
-  "dat": 126,
+  "tong": 173,
+  "dat": 173,
   "khong_dat": 0,
-  "http": 86,
+  "http": 125,
   "ket_qua": [
     {
       "ten": "Đăng nhập ADMIN",
@@ -232,10 +232,19 @@
       "dat": true
     },
     {
-      "ten": "GV sửa trạng thái trong phạm vi",
+      "ten": "GV chỉ xem trạng thái trong phạm vi",
       "method": "PATCH",
       "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/trang_thai",
       "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "ADMIN sửa trạng thái học sinh",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/trang_thai",
+      "vai_tro": "ADMIN",
       "mong_doi": 200,
       "thuc_te": 200,
       "dat": true
@@ -244,7 +253,7 @@
       "ten": "Không dùng sửa trạng thái để xóa",
       "method": "PATCH",
       "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/trang_thai",
-      "vai_tro": "GIAO_VIEN",
+      "vai_tro": "ADMIN",
       "mong_doi": 400,
       "thuc_te": 400,
       "dat": true
@@ -475,6 +484,380 @@
       "vai_tro": "GIAO_VIEN",
       "mong_doi": 403,
       "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "GV đọc đúng hồ sơ cá nhân",
+      "method": "GET",
+      "endpoint": "/giao_vien/me",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Hồ sơ me đúng tài khoản và không có mật khẩu",
+      "dat": true
+    },
+    {
+      "ten": "GV lưu hồ sơ cá nhân",
+      "method": "PATCH",
+      "endpoint": "/giao_vien/me",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Hồ sơ và điện thoại tài khoản cùng được lưu",
+      "dat": true
+    },
+    {
+      "ten": "Đăng nhập GV bằng điện thoại đã cập nhật",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "vai_tro": "KHACH",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "ADMIN không dùng hồ sơ GV me",
+      "method": "GET",
+      "endpoint": "/giao_vien/me",
+      "vai_tro": "ADMIN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "ADMIN không sửa hồ sơ GV me",
+      "method": "PATCH",
+      "endpoint": "/giao_vien/me",
+      "vai_tro": "ADMIN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "PHU_HUYNH không dùng hồ sơ GV me",
+      "method": "GET",
+      "endpoint": "/giao_vien/me",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "PHU_HUYNH không sửa hồ sơ GV me",
+      "method": "PATCH",
+      "endpoint": "/giao_vien/me",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Chặn tự đổi trường hệ thống GV id",
+      "method": "PATCH",
+      "endpoint": "/giao_vien/me",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Chặn tự đổi trường hệ thống GV tai_khoan_id",
+      "method": "PATCH",
+      "endpoint": "/giao_vien/me",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Chặn tự đổi trường hệ thống GV trang_thai",
+      "method": "PATCH",
+      "endpoint": "/giao_vien/me",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Chặn tự đổi trường hệ thống GV vai_tro",
+      "method": "PATCH",
+      "endpoint": "/giao_vien/me",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Chặn tự đổi trường hệ thống GV mat_khau_bam",
+      "method": "PATCH",
+      "endpoint": "/giao_vien/me",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Chặn hồ sơ cá nhân sai ngay_sinh",
+      "method": "PATCH",
+      "endpoint": "/giao_vien/me",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Chặn hồ sơ cá nhân sai so_dien_thoai",
+      "method": "PATCH",
+      "endpoint": "/giao_vien/me",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Chặn hồ sơ cá nhân sai email",
+      "method": "PATCH",
+      "endpoint": "/giao_vien/me",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Chặn hồ sơ cá nhân sai ngay_vao_truong",
+      "method": "PATCH",
+      "endpoint": "/giao_vien/me",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Trùng điện thoại khi tự sửa",
+      "method": "PATCH",
+      "endpoint": "/giao_vien/me",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 409,
+      "thuc_te": 409,
+      "dat": true
+    },
+    {
+      "ten": "Lỗi hồ sơ GV không ghi một phần",
+      "dat": true
+    },
+    {
+      "ten": "GV vẫn không sửa giáo viên khác",
+      "method": "PATCH",
+      "endpoint": "/giao_vien/6",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Một lần lưu HS, sức khỏe, PH, quan hệ, người giám hộ",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/ho_so",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Các phần hồ sơ được lưu cùng một lần",
+      "dat": true
+    },
+    {
+      "ten": "ADMIN đổi trạng thái trong lần lưu chung",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/ho_so",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Trạng thái HS đổi bởi ADMIN",
+      "dat": true
+    },
+    {
+      "ten": "ADMIN đưa HS lại đang học",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/ho_so",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "GV không đổi trạng thái trong lần lưu chung",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/ho_so",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "PH không sử dụng API lưu chung",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/ho_so",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "GV không lưu chung HS ngoài lớp",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/4/ho_so",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Không gắn PH khác qua API lưu chung",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/ho_so",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Lưu chung chặn Sức khỏe sai",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/ho_so",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Lưu chung chặn Quan hệ sai",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/ho_so",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Lưu chung chặn Lặp ID phụ huynh",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/ho_so",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Lưu chung chặn Trạng thái trong dữ liệu HS",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/ho_so",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Lưu chung chặn Hồ sơ rỗng",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/ho_so",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Lưu chung chặn Người giám hộ thiếu điện thoại",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/ho_so",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Lưu chung chặn Không cấp tài khoản giám hộ",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/ho_so",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Lưu chung chặn Định dạng sức khỏe sai",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/ho_so",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Lưu chung chặn Định dạng người giám hộ sai",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/ho_so",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Lỗi điện thoại PH hoàn tác toàn bộ",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/ho_so",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 409,
+      "thuc_te": 409,
+      "dat": true
+    },
+    {
+      "ten": "Giám hộ trùng điện thoại hoàn tác toàn bộ",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/ho_so",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 409,
+      "thuc_te": 409,
+      "dat": true
+    },
+    {
+      "ten": "HS và sức khỏe giữ nguyên sau tất cả lỗi",
+      "dat": true
+    },
+    {
+      "ten": "PH và tài khoản giữ nguyên sau tất cả lỗi",
+      "dat": true
+    },
+    {
+      "ten": "Lưu chung xóa dữ liệu sức khỏe tùy chọn",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/ho_so",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Xóa sức khỏe không tạo số đo 0 hoặc để lại ngày đo cũ",
+      "dat": true
+    },
+    {
+      "ten": "Nhập lại sức khỏe qua lần lưu chung",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/ho_so",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
       "dat": true
     },
     {

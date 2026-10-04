@@ -1,5 +1,5 @@
 {
-  "thoi_diem": "2026-10-04T15:10:35.275Z",
+  "thoi_diem": "2026-10-04T16:21:16.205Z",
   "database": "audit_school_ci",
   "loai_du_lieu": "Giả trên MySQL CI riêng",
   "tong": 71,
@@ -131,7 +131,7 @@
       "dat": true
     },
     {
-      "ten": "GVCN đồng thời lớp 8",
+      "ten": "GVCN đồng thời lớp 7",
       "method": "POST",
       "endpoint": "/phan_cong_giang_day/phan_cong/gvcn",
       "vai_tro": "ADMIN",
@@ -140,7 +140,7 @@
       "dat": true
     },
     {
-      "ten": "GVCN đồng thời lớp 7",
+      "ten": "GVCN đồng thời lớp 8",
       "method": "POST",
       "endpoint": "/phan_cong_giang_day/phan_cong/gvcn",
       "vai_tro": "ADMIN",

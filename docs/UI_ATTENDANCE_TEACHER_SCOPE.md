@@ -5,8 +5,8 @@ Phạm vi: nhánh `backend_audit_fix`. Giao diện tham khảo thanh đầu tran
 ## Giao diện và thao tác
 
 - Thanh menu ngang cho đúng vai trò; bảng có tiêu đề xanh, cuộn trong vùng bảng và phân trang.
-- Thêm học sinh kèm phụ huynh, hồ sơ học sinh, bổ sung phụ huynh, thêm/sửa giáo viên và cấp lại mật khẩu mở hộp thoại nổi.
-- Hộp thoại giữ focus bên trong, khóa cuộn nền, có nút Đóng và phím Escape. Khi mở hộp thoại bổ sung phụ huynh, Escape chỉ đóng hộp thoại con.
+- Thêm học sinh kèm phụ huynh, hồ sơ học sinh, thêm/sửa giáo viên và cấp lại mật khẩu mở hộp thoại nổi.
+- Hộp thoại giữ focus bên trong, khóa cuộn nền, có một nút Đóng trên đầu và phím Escape. Hồ sơ đang sửa chưa lưu yêu cầu xác nhận trước khi đóng.
 - Thông tin đăng nhập vừa tạo/cấp được hiển thị để bàn giao một lần; mật khẩu đã lưu không được đọc lại.
 
 ## Phạm vi giáo viên
@@ -33,7 +33,7 @@ Một giáo viên không được chủ nhiệm hai lớp trong các khoảng ng
 
 Các mã lưu: `CO_MAT`, `VANG_CO_PHEP`, `VANG_KHONG_PHEP`, `DI_TRE`. Đi trễ không cộng vào ngày/buổi vắng; phụ huynh thấy nhãn Đi trễ khi xem điểm danh của con.
 
-Chỉ ADMIN tạo/xóa học sinh và giáo viên. Giáo viên xem/sửa hồ sơ trong phạm vi của mình và bổ sung phụ huynh mới vào học sinh hiện có.
+Chỉ ADMIN tạo/xóa học sinh và giáo viên. Giáo viên xem/sửa hồ sơ trong phạm vi của mình và ghi thêm người giám hộ vào học sinh hiện có. Hồ sơ dùng một nút Lưu thay đổi; trạng thái chỉ ADMIN sửa. Giáo viên có menu Hồ sơ của tôi để sửa thông tin cá nhân. Xem [UNIFIED_PROFILE_SAVING.md](UNIFIED_PROFILE_SAVING.md).
 
 ## Cập nhật Windows
 

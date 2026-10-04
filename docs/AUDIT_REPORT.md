@@ -1,3 +1,5 @@
+> Lưu hồ sơ bằng một nút, trạng thái chỉ ADMIN sửa và giáo viên tự sửa thông tin: [UNIFIED_PROFILE_SAVING.md](UNIFIED_PROFILE_SAVING.md).
+>
 > Kết quả kiểm thử chức năng ngày 04/10/2026: [FUNCTIONAL_TEST_REPORT.md](FUNCTIONAL_TEST_REPORT.md). Hộp thoại, điểm danh nhanh và lớp gắn với giáo viên: [UI_ATTENDANCE_TEACHER_SCOPE.md](UI_ATTENDANCE_TEACHER_SCOPE.md). Báo cáo bên dưới là kết quả lịch sử ngày 02/10/2026.
 
 # Báo cáo kiểm tra quan_ly_tieu_hoc

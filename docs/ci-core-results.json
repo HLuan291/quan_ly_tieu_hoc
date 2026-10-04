@@ -1,9 +1,9 @@
 {
-  "thoi_diem": "2026-10-04T15:10:27.559Z",
+  "thoi_diem": "2026-10-04T16:21:06.105Z",
   "database": "audit_school_ci",
   "loai_du_lieu": "Dữ liệu giả; DB được tạo từ Prisma schema, không phải DB của người dùng",
-  "tong": 236,
-  "dat": 236,
+  "tong": 239,
+  "dat": 239,
   "khong_dat": 0,
   "ket_qua": [
     {
@@ -1094,6 +1094,24 @@
       "dat": true
     },
     {
+      "ten": "Không token: GET /giao_vien/me",
+      "method": "GET",
+      "endpoint": "/giao_vien/me",
+      "vai_tro": "KHACH",
+      "mong_doi": 401,
+      "thuc_te": 401,
+      "dat": true
+    },
+    {
+      "ten": "Không token: PATCH /giao_vien/me",
+      "method": "PATCH",
+      "endpoint": "/giao_vien/me",
+      "vai_tro": "KHACH",
+      "mong_doi": 401,
+      "thuc_te": 401,
+      "dat": true
+    },
+    {
       "ten": "Không token: PATCH /giao_vien/:id",
       "method": "PATCH",
       "endpoint": "/giao_vien/1",
@@ -1169,6 +1187,15 @@
       "ten": "Không token: PATCH /ho_so_hoc_sinh/hoc_sinh/:Id",
       "method": "PATCH",
       "endpoint": "/ho_so_hoc_sinh/hoc_sinh/1",
+      "vai_tro": "KHACH",
+      "mong_doi": 401,
+      "thuc_te": 401,
+      "dat": true
+    },
+    {
+      "ten": "Không token: PATCH /ho_so_hoc_sinh/hoc_sinh/:Id/ho_so",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/1/ho_so",
       "vai_tro": "KHACH",
       "mong_doi": 401,
       "thuc_te": 401,

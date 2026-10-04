@@ -1,6 +1,6 @@
 # Ma trận endpoint và giao diện
 
-Vai trò theo kiểm tra trong controller/service. Lượt CI 37211940169 đã chạy luồng thành công cho 75/75 route; con số này không đại diện cho mọi nhánh nghiệp vụ. Phạm vi lớp GVCN/GVBM được kiểm tra tại service.
+Vai trò theo kiểm tra trong controller/service; đây là đối chiếu mã nguồn, không phải bằng chứng mọi nhánh phân quyền đã được chạy. Endpoint chưa có frontend vẫn có thể gọi qua API.
 
 | Method | Endpoint | Vai trò | Frontend |
 |---|---|---|---|
@@ -36,7 +36,9 @@ Vai trò theo kiểm tra trong controller/service. Lượt CI 37211940169 đã c
 | PATCH | `/diem_danh_nghi_hoc/don_xin_nghi/:id/xu_ly` | GIAO_VIEN | don_xin_nghi_page.tsx |
 | POST | `/giao_vien` | ADMIN | giao_vien_page.tsx |
 | GET | `/giao_vien` | ADMIN | giao_vien_page.tsx, phan_cong_page.tsx |
-| PATCH | `/giao_vien/:id` | ADMIN | giao_vien_page.tsx |
+| GET | `/giao_vien/me` | GIAO_VIEN | ho_so_giao_vien_page.tsx |
+| PATCH | `/giao_vien/me` | GIAO_VIEN | ho_so_giao_vien_page.tsx |
+| PATCH | `/giao_vien/:id` | ADMIN | giao_vien_page.tsx, ho_so_giao_vien_page.tsx |
 | POST | `/giao_vien/:id/cap_lai_mat_khau` | ADMIN | giao_vien_page.tsx |
 | DELETE | `/giao_vien/:id` | ADMIN | giao_vien_page.tsx |
 | GET | `/ho_so_hoc_sinh/danh_muc` | ADMIN, GIAO_VIEN (phạm vi phân công) | bang_danh_gia_giao_vien.tsx, danh_sach_hoc_sinh.tsx, diem_danh_page.tsx, thong_ke_danh_gia.tsx |
@@ -44,17 +46,18 @@ Vai trò theo kiểm tra trong controller/service. Lượt CI 37211940169 đã c
 | POST | `/ho_so_hoc_sinh/hoc_sinh` | ADMIN | hoc_sinh_page.tsx |
 | GET | `/ho_so_hoc_sinh/hoc_sinh` | ADMIN, GIAO_VIEN, PHU_HUYNH (có thể giới hạn dữ liệu theo vai trò) | danh_sach_hoc_sinh.tsx |
 | GET | `/ho_so_hoc_sinh/hoc_sinh/:Id` | ADMIN, GIAO_VIEN, PHU_HUYNH (có thể giới hạn dữ liệu theo vai trò) | ho_so_hoc_sinh_chi_tiet.tsx |
-| PATCH | `/ho_so_hoc_sinh/hoc_sinh/:Id` | ADMIN, GIAO_VIEN (phạm vi phân công) | ho_so_hoc_sinh_chi_tiet.tsx |
-| PATCH | `/ho_so_hoc_sinh/hoc_sinh/:Id/trang_thai` | ADMIN, GIAO_VIEN (phạm vi phân công) | ho_so_hoc_sinh_chi_tiet.tsx |
-| PATCH | `/ho_so_hoc_sinh/hoc_sinh/:Id/suc_khoe` | ADMIN, GIAO_VIEN (phạm vi phân công) | ho_so_hoc_sinh_chi_tiet.tsx |
+| PATCH | `/ho_so_hoc_sinh/hoc_sinh/:Id` | ADMIN, GIAO_VIEN (phạm vi phân công) | Chưa thấy lời gọi |
+| PATCH | `/ho_so_hoc_sinh/hoc_sinh/:Id/ho_so` | ADMIN, GIAO_VIEN (phạm vi phân công; chỉ ADMIN sửa trạng thái) | ho_so_hoc_sinh_chi_tiet.tsx |
+| PATCH | `/ho_so_hoc_sinh/hoc_sinh/:Id/trang_thai` | ADMIN | Chưa thấy lời gọi |
+| PATCH | `/ho_so_hoc_sinh/hoc_sinh/:Id/suc_khoe` | ADMIN, GIAO_VIEN (phạm vi phân công) | Chưa thấy lời gọi |
 | GET | `/ho_so_hoc_sinh/phu_huynh` | ADMIN | Chưa thấy lời gọi |
 | GET | `/ho_so_hoc_sinh/phu_huynh/me` | PHU_HUYNH | con_cua_toi_page.tsx, don_xin_nghi_page.tsx |
 | GET | `/ho_so_hoc_sinh/phu_huynh/:Id` | ADMIN | con_cua_toi_page.tsx, don_xin_nghi_page.tsx |
-| PATCH | `/ho_so_hoc_sinh/phu_huynh/:Id` | ADMIN, GIAO_VIEN (phạm vi phân công) | ho_so_hoc_sinh_chi_tiet.tsx |
+| PATCH | `/ho_so_hoc_sinh/phu_huynh/:Id` | ADMIN, GIAO_VIEN (phạm vi phân công) | Chưa thấy lời gọi |
 | POST | `/ho_so_hoc_sinh/phu_huynh/:Id/tao_tai_khoan` | ADMIN | Chưa thấy lời gọi |
 | POST | `/ho_so_hoc_sinh/phu_huynh/:Id/cap_lai_mat_khau` | ADMIN | Chưa thấy lời gọi |
-| POST | `/ho_so_hoc_sinh/hoc_sinh/:Id/phu_huynh` | ADMIN, GIAO_VIEN (phạm vi phân công) | ho_so_hoc_sinh_chi_tiet.tsx |
-| PATCH | `/ho_so_hoc_sinh/hoc_sinh/:hoc_sinh_id/phu_huynh/:phu_huynh_id/moi_quan_he` | ADMIN, GIAO_VIEN (phạm vi phân công) | ho_so_hoc_sinh_chi_tiet.tsx |
+| POST | `/ho_so_hoc_sinh/hoc_sinh/:Id/phu_huynh` | ADMIN, GIAO_VIEN (phạm vi phân công) | Chưa thấy lời gọi |
+| PATCH | `/ho_so_hoc_sinh/hoc_sinh/:hoc_sinh_id/phu_huynh/:phu_huynh_id/moi_quan_he` | ADMIN, GIAO_VIEN (phạm vi phân công) | Chưa thấy lời gọi |
 | DELETE | `/ho_so_hoc_sinh/hoc_sinh/:hoc_sinh_id/phu_huynh/:phu_huynh_id` | ADMIN | Chưa thấy lời gọi |
 | POST | `/phan_cong_giang_day/mon_hoc` | ADMIN | phan_cong_page.tsx |
 | GET | `/phan_cong_giang_day/mon_hoc` | ADMIN, GIAO_VIEN, PHU_HUYNH (có thể giới hạn dữ liệu theo vai trò) | danh_gia_page.tsx, phan_cong_page.tsx |

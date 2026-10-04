@@ -1,7 +1,7 @@
 {
-  "source_commit": "9e925695677472a07cef76cd6baf82c8ed2fc9d8",
-  "workflow_run": 37211940169,
-  "workflow_url": "https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37211940169",
+  "source_commit": "c967dafc3377fc705f2d0c185a70d426dc924b62",
+  "workflow_run": 37216358087,
+  "workflow_url": "https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37216358087",
   "conclusion": "success",
   "data": "Dữ liệu giả trên MySQL CI riêng; không kết nối database Windows",
   "backend_unit": {
@@ -15,21 +15,21 @@
     "scope": "GET /"
   },
   "api": {
-    "passed": 549,
-    "total": 549,
-    "http": 435,
-    "assertions": 114,
-    "core": 236,
+    "passed": 599,
+    "total": 599,
+    "http": 477,
+    "assertions": 122,
+    "core": 239,
     "extra": 116,
-    "profiles": 126,
+    "profiles": 173,
     "attendance_teacher_scope": 71
   },
   "route_coverage": {
-    "total": 75,
-    "covered": 75,
+    "total": 78,
+    "covered": 78,
     "missing": []
   },
-  "protected_routes_without_token": 73,
+  "protected_routes_without_token": 76,
   "mysql_constraints": {
     "passed": 15,
     "total": 15
@@ -39,14 +39,16 @@
     "total": 16
   },
   "browser": {
-    "passed": 65,
-    "total": 65,
-    "http": 218,
+    "passed": 68,
+    "total": 68,
+    "http": 234,
     "http_5xx": 0,
     "javascript_errors": 0,
     "screenshots": [
       "admin-student-directory.png",
+      "teacher-self-profile.png",
       "teacher-student-profile.png",
+      "student-unified-save.png",
       "attendance-quick.png",
       "teacher-assessment-table.png",
       "teacher-assessment-statistics.png",
@@ -129,9 +131,9 @@
     }
   ],
   "artifact": {
-    "id": 11307405006,
-    "url": "https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37211940169/artifacts/11307405006",
-    "expires_at": "2026-10-18T15:11:33Z"
+    "id": 11308572379,
+    "url": "https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37216358087/artifacts/11308572379",
+    "expires_at": "2026-10-18T16:22:39Z"
   },
   "features": {
     "modals": true,
@@ -140,7 +142,13 @@
     "late_status": "DI_TRE",
     "sunday_attendance_blocked": true,
     "homeroom_auto_class": true,
-    "subject_teacher_assigned_choices": true
+    "subject_teacher_assigned_choices": true,
+    "single_student_profile_save": true,
+    "atomic_profile_update": true,
+    "single_close_per_dialog": true,
+    "admin_only_student_status": true,
+    "inline_optional_guardian": true,
+    "teacher_self_profile": true
   },
   "limits": [
     "Không kiểm thử DB Windows hiện có",

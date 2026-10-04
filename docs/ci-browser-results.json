@@ -1,11 +1,11 @@
 {
-  "thoi_diem": "2026-10-04T15:11:32.863Z",
+  "thoi_diem": "2026-10-04T16:22:39.226Z",
   "browser": "Chromium thật, headless",
   "du_lieu": "Giả trên MySQL CI riêng",
-  "tong": 65,
-  "dat": 65,
+  "tong": 68,
+  "dat": 68,
   "khong_dat": 0,
-  "http": 218,
+  "http": 234,
   "http_5xx": 0,
   "loi_javascript": [],
   "viewport": [
@@ -19,7 +19,9 @@
   ],
   "screenshots": [
     "admin-student-directory.png",
+    "teacher-self-profile.png",
     "teacher-student-profile.png",
+    "student-unified-save.png",
     "attendance-quick.png",
     "teacher-assessment-table.png",
     "teacher-assessment-statistics.png",
@@ -92,6 +94,10 @@
       "dat": true
     },
     {
+      "ten": "Một nút lưu có thể xóa và nhập lại sức khỏe tùy chọn",
+      "dat": true
+    },
+    {
       "ten": "ADMIN tạo năm học qua form",
       "dat": true
     },
@@ -144,6 +150,10 @@
       "dat": true
     },
     {
+      "ten": "GV có trang hồ sơ cá nhân và tự sửa thông tin",
+      "dat": true
+    },
+    {
       "ten": "Chặn GV vào trang quản trị",
       "dat": true
     },
@@ -156,7 +166,11 @@
       "dat": true
     },
     {
-      "ten": "GV sửa phụ huynh và bổ sung người giám hộ qua hồ sơ",
+      "ten": "GV lưu chung phụ huynh và người giám hộ bằng một nút",
+      "dat": true
+    },
+    {
+      "ten": "Lưu lỗi giữ bản nhập và không ghi một phần vào MySQL",
       "dat": true
     },
     {
@@ -351,14 +365,14 @@
     },
     {
       "method": "GET",
-      "endpoint": "/giao_vien",
+      "endpoint": "/to_chuc_lop_hoc/khoi",
       "status": 200,
       "vai_tro": "ADMIN",
       "phase": "normal"
     },
     {
       "method": "GET",
-      "endpoint": "/to_chuc_lop_hoc/khoi",
+      "endpoint": "/giao_vien",
       "status": 200,
       "vai_tro": "ADMIN",
       "phase": "normal"
@@ -372,14 +386,14 @@
     },
     {
       "method": "GET",
-      "endpoint": "/phan_cong_giang_day/mon_hoc_khoi",
+      "endpoint": "/to_chuc_lop_hoc/lop_hoc",
       "status": 200,
       "vai_tro": "ADMIN",
       "phase": "normal"
     },
     {
       "method": "GET",
-      "endpoint": "/to_chuc_lop_hoc/lop_hoc",
+      "endpoint": "/phan_cong_giang_day/mon_hoc_khoi",
       "status": 200,
       "vai_tro": "ADMIN",
       "phase": "normal"
@@ -400,6 +414,55 @@
     },
     {
       "method": "GET",
+      "endpoint": "/to_chuc_lop_hoc/khoi",
+      "status": 200,
+      "vai_tro": "ADMIN",
+      "phase": "normal"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/phan_cong_giang_day/mon_hoc",
+      "status": 200,
+      "vai_tro": "ADMIN",
+      "phase": "normal"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/giao_vien",
+      "status": 200,
+      "vai_tro": "ADMIN",
+      "phase": "normal"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/to_chuc_lop_hoc/lop_hoc",
+      "status": 200,
+      "vai_tro": "ADMIN",
+      "phase": "normal"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/phan_cong_giang_day/mon_hoc_khoi",
+      "status": 200,
+      "vai_tro": "ADMIN",
+      "phase": "normal"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/phan_cong_giang_day/phan_cong",
+      "status": 200,
+      "vai_tro": "ADMIN",
+      "phase": "normal"
+    },
+    {
+      "method": "POST",
+      "endpoint": "/phan_cong_giang_day/mon_hoc",
+      "status": 201,
+      "vai_tro": "ADMIN",
+      "phase": "normal"
+    },
+    {
+      "method": "GET",
       "endpoint": "/phan_cong_giang_day/mon_hoc",
       "status": 200,
       "vai_tro": "ADMIN",
@@ -442,55 +505,6 @@
     },
     {
       "method": "POST",
-      "endpoint": "/phan_cong_giang_day/mon_hoc",
-      "status": 201,
-      "vai_tro": "ADMIN",
-      "phase": "normal"
-    },
-    {
-      "method": "GET",
-      "endpoint": "/to_chuc_lop_hoc/khoi",
-      "status": 200,
-      "vai_tro": "ADMIN",
-      "phase": "normal"
-    },
-    {
-      "method": "GET",
-      "endpoint": "/giao_vien",
-      "status": 200,
-      "vai_tro": "ADMIN",
-      "phase": "normal"
-    },
-    {
-      "method": "GET",
-      "endpoint": "/phan_cong_giang_day/mon_hoc",
-      "status": 200,
-      "vai_tro": "ADMIN",
-      "phase": "normal"
-    },
-    {
-      "method": "GET",
-      "endpoint": "/phan_cong_giang_day/mon_hoc_khoi",
-      "status": 200,
-      "vai_tro": "ADMIN",
-      "phase": "normal"
-    },
-    {
-      "method": "GET",
-      "endpoint": "/to_chuc_lop_hoc/lop_hoc",
-      "status": 200,
-      "vai_tro": "ADMIN",
-      "phase": "normal"
-    },
-    {
-      "method": "GET",
-      "endpoint": "/phan_cong_giang_day/phan_cong",
-      "status": 200,
-      "vai_tro": "ADMIN",
-      "phase": "normal"
-    },
-    {
-      "method": "POST",
       "endpoint": "/phan_cong_giang_day/mon_hoc_khoi",
       "status": 201,
       "vai_tro": "ADMIN",
@@ -526,14 +540,14 @@
     },
     {
       "method": "GET",
-      "endpoint": "/phan_cong_giang_day/mon_hoc_khoi",
+      "endpoint": "/phan_cong_giang_day/phan_cong",
       "status": 200,
       "vai_tro": "ADMIN",
       "phase": "normal"
     },
     {
       "method": "GET",
-      "endpoint": "/phan_cong_giang_day/phan_cong",
+      "endpoint": "/phan_cong_giang_day/mon_hoc_khoi",
       "status": 200,
       "vai_tro": "ADMIN",
       "phase": "normal"
@@ -554,14 +568,14 @@
     },
     {
       "method": "GET",
-      "endpoint": "/phan_cong_giang_day/mon_hoc",
+      "endpoint": "/giao_vien",
       "status": 200,
       "vai_tro": "ADMIN",
       "phase": "normal"
     },
     {
       "method": "GET",
-      "endpoint": "/giao_vien",
+      "endpoint": "/phan_cong_giang_day/mon_hoc",
       "status": 200,
       "vai_tro": "ADMIN",
       "phase": "normal"
@@ -575,14 +589,14 @@
     },
     {
       "method": "GET",
-      "endpoint": "/phan_cong_giang_day/phan_cong",
+      "endpoint": "/phan_cong_giang_day/mon_hoc_khoi",
       "status": 200,
       "vai_tro": "ADMIN",
       "phase": "normal"
     },
     {
       "method": "GET",
-      "endpoint": "/phan_cong_giang_day/mon_hoc_khoi",
+      "endpoint": "/phan_cong_giang_day/phan_cong",
       "status": 200,
       "vai_tro": "ADMIN",
       "phase": "normal"
@@ -638,7 +652,28 @@
     },
     {
       "method": "PATCH",
-      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/7/suc_khoe",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/7/ho_so",
+      "status": 200,
+      "vai_tro": "ADMIN",
+      "phase": "normal"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/7",
+      "status": 200,
+      "vai_tro": "ADMIN",
+      "phase": "normal"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh",
+      "status": 200,
+      "vai_tro": "ADMIN",
+      "phase": "normal"
+    },
+    {
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/7/ho_so",
       "status": 200,
       "vai_tro": "ADMIN",
       "phase": "normal"
@@ -659,14 +694,49 @@
     },
     {
       "method": "GET",
-      "endpoint": "/to_chuc_lop_hoc/nam_hoc",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/7",
+      "status": 200,
+      "vai_tro": "ADMIN",
+      "phase": "normal"
+    },
+    {
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/7/ho_so",
       "status": 200,
       "vai_tro": "ADMIN",
       "phase": "normal"
     },
     {
       "method": "GET",
-      "endpoint": "/to_chuc_lop_hoc/hoc_sinh_chua_xep_lop",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/7",
+      "status": 200,
+      "vai_tro": "ADMIN",
+      "phase": "normal"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh",
+      "status": 200,
+      "vai_tro": "ADMIN",
+      "phase": "normal"
+    },
+    {
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/7/ho_so",
+      "status": 200,
+      "vai_tro": "ADMIN",
+      "phase": "normal"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/7",
+      "status": 200,
+      "vai_tro": "ADMIN",
+      "phase": "normal"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh",
       "status": 200,
       "vai_tro": "ADMIN",
       "phase": "normal"
@@ -686,8 +756,57 @@
       "phase": "normal"
     },
     {
+      "method": "GET",
+      "endpoint": "/to_chuc_lop_hoc/nam_hoc",
+      "status": 200,
+      "vai_tro": "ADMIN",
+      "phase": "normal"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/to_chuc_lop_hoc/hoc_sinh_chua_xep_lop",
+      "status": 200,
+      "vai_tro": "ADMIN",
+      "phase": "normal"
+    },
+    {
       "method": "POST",
       "endpoint": "/to_chuc_lop_hoc/nam_hoc",
+      "status": 201,
+      "vai_tro": "ADMIN",
+      "phase": "normal"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/to_chuc_lop_hoc/khoi",
+      "status": 200,
+      "vai_tro": "ADMIN",
+      "phase": "normal"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/to_chuc_lop_hoc/hoc_sinh_chua_xep_lop",
+      "status": 200,
+      "vai_tro": "ADMIN",
+      "phase": "normal"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/to_chuc_lop_hoc/nam_hoc",
+      "status": 200,
+      "vai_tro": "ADMIN",
+      "phase": "normal"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/to_chuc_lop_hoc/lop_hoc",
+      "status": 200,
+      "vai_tro": "ADMIN",
+      "phase": "normal"
+    },
+    {
+      "method": "POST",
+      "endpoint": "/to_chuc_lop_hoc/lop_hoc",
       "status": 201,
       "vai_tro": "ADMIN",
       "phase": "normal"
@@ -708,28 +827,7 @@
     },
     {
       "method": "GET",
-      "endpoint": "/to_chuc_lop_hoc/hoc_sinh_chua_xep_lop",
-      "status": 200,
-      "vai_tro": "ADMIN",
-      "phase": "normal"
-    },
-    {
-      "method": "GET",
       "endpoint": "/to_chuc_lop_hoc/lop_hoc",
-      "status": 200,
-      "vai_tro": "ADMIN",
-      "phase": "normal"
-    },
-    {
-      "method": "POST",
-      "endpoint": "/to_chuc_lop_hoc/lop_hoc",
-      "status": 201,
-      "vai_tro": "ADMIN",
-      "phase": "normal"
-    },
-    {
-      "method": "GET",
-      "endpoint": "/to_chuc_lop_hoc/nam_hoc",
       "status": 200,
       "vai_tro": "ADMIN",
       "phase": "normal"
@@ -737,20 +835,6 @@
     {
       "method": "GET",
       "endpoint": "/to_chuc_lop_hoc/hoc_sinh_chua_xep_lop",
-      "status": 200,
-      "vai_tro": "ADMIN",
-      "phase": "normal"
-    },
-    {
-      "method": "GET",
-      "endpoint": "/to_chuc_lop_hoc/khoi",
-      "status": 200,
-      "vai_tro": "ADMIN",
-      "phase": "normal"
-    },
-    {
-      "method": "GET",
-      "endpoint": "/to_chuc_lop_hoc/lop_hoc",
       "status": 200,
       "vai_tro": "ADMIN",
       "phase": "normal"
@@ -771,13 +855,6 @@
     },
     {
       "method": "GET",
-      "endpoint": "/to_chuc_lop_hoc/khoi",
-      "status": 200,
-      "vai_tro": "ADMIN",
-      "phase": "normal"
-    },
-    {
-      "method": "GET",
       "endpoint": "/to_chuc_lop_hoc/hoc_sinh_chua_xep_lop",
       "status": 200,
       "vai_tro": "ADMIN",
@@ -786,6 +863,13 @@
     {
       "method": "GET",
       "endpoint": "/to_chuc_lop_hoc/lop_hoc",
+      "status": 200,
+      "vai_tro": "ADMIN",
+      "phase": "normal"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/to_chuc_lop_hoc/khoi",
       "status": 200,
       "vai_tro": "ADMIN",
       "phase": "normal"
@@ -841,14 +925,14 @@
     },
     {
       "method": "GET",
-      "endpoint": "/to_chuc_lop_hoc/khoi",
+      "endpoint": "/phan_cong_giang_day/mon_hoc",
       "status": 200,
       "vai_tro": "ADMIN",
       "phase": "normal"
     },
     {
       "method": "GET",
-      "endpoint": "/phan_cong_giang_day/mon_hoc",
+      "endpoint": "/to_chuc_lop_hoc/khoi",
       "status": 200,
       "vai_tro": "ADMIN",
       "phase": "normal"
@@ -876,6 +960,13 @@
     },
     {
       "method": "GET",
+      "endpoint": "/to_chuc_lop_hoc/nam_hoc",
+      "status": 200,
+      "vai_tro": "ADMIN",
+      "phase": "normal"
+    },
+    {
+      "method": "GET",
       "endpoint": "/to_chuc_lop_hoc/khoi",
       "status": 200,
       "vai_tro": "ADMIN",
@@ -884,13 +975,6 @@
     {
       "method": "GET",
       "endpoint": "/phan_cong_giang_day/mon_hoc",
-      "status": 200,
-      "vai_tro": "ADMIN",
-      "phase": "normal"
-    },
-    {
-      "method": "GET",
-      "endpoint": "/to_chuc_lop_hoc/nam_hoc",
       "status": 200,
       "vai_tro": "ADMIN",
       "phase": "normal"
@@ -1023,6 +1107,41 @@
     },
     {
       "method": "GET",
+      "endpoint": "/giao_vien/me",
+      "status": 200,
+      "vai_tro": "GIAO_VIEN",
+      "phase": "normal"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/giao_vien/me",
+      "status": 200,
+      "vai_tro": "GIAO_VIEN",
+      "phase": "normal"
+    },
+    {
+      "method": "PATCH",
+      "endpoint": "/giao_vien/me",
+      "status": 200,
+      "vai_tro": "GIAO_VIEN",
+      "phase": "normal"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/giao_vien/me",
+      "status": 200,
+      "vai_tro": "GIAO_VIEN",
+      "phase": "normal"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/giao_vien/me",
+      "status": 200,
+      "vai_tro": "GIAO_VIEN",
+      "phase": "normal"
+    },
+    {
+      "method": "GET",
       "endpoint": "/ho_so_hoc_sinh/danh_muc",
       "status": 200,
       "vai_tro": "GIAO_VIEN",
@@ -1072,7 +1191,7 @@
     },
     {
       "method": "PATCH",
-      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/6",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/6/ho_so",
       "status": 200,
       "vai_tro": "GIAO_VIEN",
       "phase": "normal"
@@ -1093,7 +1212,7 @@
     },
     {
       "method": "PATCH",
-      "endpoint": "/ho_so_hoc_sinh/phu_huynh/3",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/6/ho_so",
       "status": 200,
       "vai_tro": "GIAO_VIEN",
       "phase": "normal"
@@ -1106,9 +1225,23 @@
       "phase": "normal"
     },
     {
-      "method": "POST",
-      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/6/phu_huynh",
-      "status": 201,
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh",
+      "status": 200,
+      "vai_tro": "GIAO_VIEN",
+      "phase": "normal"
+    },
+    {
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/6/ho_so",
+      "status": 409,
+      "vai_tro": "GIAO_VIEN",
+      "phase": "normal"
+    },
+    {
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/6/ho_so",
+      "status": 200,
       "vai_tro": "GIAO_VIEN",
       "phase": "normal"
     },
@@ -1583,14 +1716,14 @@
     },
     {
       "method": "GET",
-      "endpoint": "/danh_gia_hoc_tap/dot_danh_gia",
+      "endpoint": "/ho_so_hoc_sinh/phu_huynh/me",
       "status": 200,
       "vai_tro": "PHU_HUYNH",
       "phase": "normal"
     },
     {
       "method": "GET",
-      "endpoint": "/ho_so_hoc_sinh/phu_huynh/me",
+      "endpoint": "/danh_gia_hoc_tap/dot_danh_gia",
       "status": 200,
       "vai_tro": "PHU_HUYNH",
       "phase": "normal"
@@ -1632,6 +1765,27 @@
     },
     {
       "method": "GET",
+      "endpoint": "/diem_danh_nghi_hoc/don_xin_nghi/cua_toi",
+      "status": 200,
+      "vai_tro": "PHU_HUYNH",
+      "phase": "normal"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/phu_huynh/me",
+      "status": 200,
+      "vai_tro": "PHU_HUYNH",
+      "phase": "normal"
+    },
+    {
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/phu_huynh/me",
+      "status": 200,
+      "vai_tro": "PHU_HUYNH",
+      "phase": "normal"
+    },
+    {
+      "method": "GET",
       "endpoint": "/ho_so_hoc_sinh/phu_huynh/me",
       "status": 200,
       "vai_tro": "PHU_HUYNH",
@@ -1654,27 +1808,6 @@
     {
       "method": "GET",
       "endpoint": "/diem_danh_nghi_hoc/don_xin_nghi/cua_toi",
-      "status": 200,
-      "vai_tro": "PHU_HUYNH",
-      "phase": "normal"
-    },
-    {
-      "method": "GET",
-      "endpoint": "/ho_so_hoc_sinh/phu_huynh/me",
-      "status": 200,
-      "vai_tro": "PHU_HUYNH",
-      "phase": "normal"
-    },
-    {
-      "method": "GET",
-      "endpoint": "/diem_danh_nghi_hoc/don_xin_nghi/cua_toi",
-      "status": 200,
-      "vai_tro": "PHU_HUYNH",
-      "phase": "normal"
-    },
-    {
-      "method": "GET",
-      "endpoint": "/ho_so_hoc_sinh/phu_huynh/me",
       "status": 200,
       "vai_tro": "PHU_HUYNH",
       "phase": "normal"
@@ -1731,13 +1864,6 @@
     {
       "method": "PATCH",
       "endpoint": "/diem_danh_nghi_hoc/don_xin_nghi/3/xu_ly",
-      "status": 200,
-      "vai_tro": "GIAO_VIEN",
-      "phase": "normal"
-    },
-    {
-      "method": "GET",
-      "endpoint": "/diem_danh_nghi_hoc/don_xin_nghi/lop/9",
       "status": 200,
       "vai_tro": "GIAO_VIEN",
       "phase": "normal"
