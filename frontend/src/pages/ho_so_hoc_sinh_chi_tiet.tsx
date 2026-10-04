@@ -44,6 +44,7 @@ function PhuHuynhForm({ PH, MoiQuanHe, HocSinhId, Luu }: { PH: PhuHuynh; MoiQuan
     <h4 className="font-semibold">{PH.ho_ten} · #{PH.id}</h4>
     <p className="mb-3 text-xs text-slate-500">{PH.tai_khoan_id ? 'Đã có tài khoản phụ huynh #' + PH.tai_khoan_id : 'Chưa có tài khoản đăng nhập'} · Tạo: {PH.ngay_tao} · Cập nhật: {PH.ngay_cap_nhat}</p>
     {Loi && <p role="alert" className="mb-3 text-red-700">{Loi}</p>}{Tin && <p role="status" className="mb-3 text-green-700">{Tin}</p>}
+    <p className="mb-3 text-xs text-slate-500">Thông tin liên hệ dùng chung cho các học sinh liên kết cùng phụ huynh này.</p>
     <form aria-label={'Thông tin phụ huynh ' + PH.id} onSubmit={Sua}>
       <div className="grid gap-3 sm:grid-cols-2">
         <label>Họ tên phụ huynh<input name="ho_ten" defaultValue={PH.ho_ten} required maxLength={100} className={O} /></label>

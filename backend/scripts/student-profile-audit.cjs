@@ -193,7 +193,13 @@ async function Main() {
   const EmptyCatalog = await Call('GV chưa phân công có danh mục rỗng', 'GET', '/ho_so_hoc_sinh/danh_muc', 'GV_KHONG_PHAN_CONG');
   Check('Không tự thấy toàn trường khi chưa phân công', EmptyCatalog.lop_hoc.length === 0);
   await Call('GV chưa phân công không sửa HS', 'PATCH', Own, 'GV_KHONG_PHAN_CONG', { ghi_chu: 'Không được phép' }, 403);
-  const Expired = await Prisma.phan_cong_giao_vien.create({ data: { giao_vien_id: NoAssignment.giao_vien.id, lop_hoc_id: F.class_id, loai_phan_cong: 'GVCN', mon_hoc_id: F.subject_id, ngay_bat_dau: new Date('2026-09-01'), ngay_ket_thuc: new Date('2026-09-02'), nguon_phan_cong: 'THU_CONG' } });
+  const Expired = await Prisma.phan_cong_giao_vien.create({ data: { giao_vien_id: NoAssignment.giao_vien.id, lop_hoc_id: F.class_id, loai_phan_cong: 'GVBM', mon_hoc_id: F.subject_id, ngay_bat_dau: new Date('2026-09-01'), ngay_ket_thuc: null, nguon_phan_cong: 'BO_SUNG' } });
+  const BangBM = await Call('GVBM đọc bảng trong lớp được phân công', 'GET', BangUrl, 'GV_KHONG_PHAN_CONG');
+  Check('GVBM nhập môn của mình và chỉ xem năng lực/phẩm chất', BangBM.mon_hoc.find(M => M.id === F.subject_id).duoc_nhap && !BangBM.duoc_nhap_nang_luc);
+  await Call('GVBM không nhập năng lực/phẩm chất', 'PUT', '/danh_gia_hoc_tap/nang_luc_pham_chat', 'GV_KHONG_PHAN_CONG', {
+    hoc_sinh_id: F.student_id, dot_danh_gia_id: F.dot_id, tieu_chi_danh_gia_id: BangBM.tieu_chi[0].id, muc_danh_gia: 'TOT',
+  }, 403);
+  await Prisma.phan_cong_giao_vien.update({ where: { id: Expired.id }, data: { ngay_ket_thuc: new Date('2026-09-02') } });
   await Call('Phân công hết hạn không cho sửa PH', 'PATCH', '/ho_so_hoc_sinh/phu_huynh/' + Parent.id, 'GV_KHONG_PHAN_CONG', { nghe_nghiep: 'Không được phép' }, 403);
   await Call('Phân công hết hạn không xem bảng', 'GET', BangUrl, 'GV_KHONG_PHAN_CONG', undefined, 403);
   await Call('Phân công hết hạn không xem kết quả qua endpoint cũ', 'GET', '/danh_gia_hoc_tap/hoc_sinh/' + F.student_id + '/dot/' + F.dot_id, 'GV_KHONG_PHAN_CONG', undefined, 403);
