@@ -40,6 +40,7 @@ jobs:
       JWT_SECRET: test-only-ci-secret-with-enough-characters-2026
       AUDIT_ALLOW_TEST_DATA: '1'
       AUDIT_FIXTURE_FILE: /tmp/school-functional-fixture.json
+      AUDIT_COMPLETE_FIXTURE_FILE: /tmp/school-complete-fixture.json
       AUDIT_REPORT_FILE: ${{ github.workspace }}/docs/ci-core-results.json
       FRONTEND_ORIGIN: http://localhost:5173
       TZ: Asia/Ho_Chi_Minh
@@ -71,6 +72,9 @@ jobs:
       - name: MySQL constraint and API regression
         working-directory: backend
         run: node scripts/assignment-constraint-audit.cjs
+      - name: Complete authenticated API coverage
+        working-directory: backend
+        run: node scripts/functional-complete-audit.cjs
       - name: Install frontend
         run: npm ci --include=dev
         working-directory: frontend
@@ -89,5 +93,6 @@ jobs:
             docs/ci-*.json
             docs/assignment-constraint-audit-results.json
             docs/runtime-server.log
+            docs/ci-extra-server.log
           if-no-files-found: warn
           retention-days: 14
