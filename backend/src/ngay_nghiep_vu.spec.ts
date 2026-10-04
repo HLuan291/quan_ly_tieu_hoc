@@ -39,6 +39,9 @@ describe('Ngày nghiệp vụ của trường', () => {
 
 describe('Nghiệp vụ lúc 00:30 tại Việt Nam', () => {
   const HomNay = new Date('2026-10-04T00:00:00.000Z');
+  const Lop = { id: 2, ten_lop: '1 A', nam_hoc_id: 1, khoi_id: 1,
+    nam_hoc: { id: 1, ten_nam_hoc: '2026-2027' }, khoi: { id: 1, so_khoi: 1, ten_khoi: 'Khối 1' } };
+  const PC = { lop_hoc_id: 2, loai_phan_cong: 'GVCN', mon_hoc_id: null, lop_hoc: Lop };
   beforeEach(() => {
     jest.useFakeTimers().setSystemTime(new Date('2026-10-03T17:30:00.000Z'));
   });
@@ -109,8 +112,8 @@ describe('Nghiệp vụ lúc 00:30 tại Việt Nam', () => {
 
   it('phạm vi học sinh giáo viên bắt đầu từ ngày Việt Nam', async () => {
     const Prisma = {
-      giao_vien: { findUnique: jest.fn().mockResolvedValue({ id: 1 }) },
-      phan_cong_giao_vien: { findMany: jest.fn().mockResolvedValue([{ lop_hoc_id: 2 }]) },
+      giao_vien: { findUnique: jest.fn().mockResolvedValue({ id: 1, trang_thai: 'HOAT_DONG' }) },
+      phan_cong_giao_vien: { findMany: jest.fn().mockResolvedValue([PC]) },
       hoc_sinh: { findMany: jest.fn().mockResolvedValue([]) },
     };
     await new HoSoHocSinhService(Prisma as unknown as PrismaService).LayDanhSachHocSinh({
@@ -123,7 +126,7 @@ describe('Nghiệp vụ lúc 00:30 tại Việt Nam', () => {
 
   it('lớp chủ nhiệm để điểm danh dùng ngày Việt Nam', async () => {
     const Prisma = {
-      giao_vien: { findUnique: jest.fn().mockResolvedValue({ id: 1 }) },
+      giao_vien: { findUnique: jest.fn().mockResolvedValue({ id: 1, trang_thai: 'HOAT_DONG' }) },
       phan_cong_giao_vien: { findMany: jest.fn().mockResolvedValue([]) },
     };
     await new DiemDanhNghiHocService(Prisma as unknown as PrismaService).LayLopChuNhiemCuaToi(1);
@@ -134,8 +137,8 @@ describe('Nghiệp vụ lúc 00:30 tại Việt Nam', () => {
 
   it('đánh giá học sinh nhận phân công bắt đầu hôm nay', async () => {
     const Prisma = {
-      giao_vien: { findUnique: jest.fn().mockResolvedValue({ id: 1 }) },
-      phan_cong_giao_vien: { findFirst: jest.fn().mockResolvedValue({ id: 1 }) },
+      giao_vien: { findUnique: jest.fn().mockResolvedValue({ id: 1, trang_thai: 'HOAT_DONG' }) },
+      phan_cong_giao_vien: { findFirst: jest.fn().mockResolvedValue({ id: 1, trang_thai: 'HOAT_DONG' }) },
       lop_hoc: { findUnique: jest.fn().mockResolvedValue({ id: 2 }) },
       xep_lop: { findMany: jest.fn().mockResolvedValue([]) },
     };
