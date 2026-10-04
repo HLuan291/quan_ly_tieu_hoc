@@ -89,7 +89,7 @@ async function Go(Route, Heading) {
 async function Shot(Name) {
   const Bytes = await Page.screenshot({ path: Path.join(Output, Name + '.png'), fullPage: true });
   Screens.push(Name + '.png');
-  if (['parent-mobile', 'attendance-quick', 'student-modal-mobile', 'teacher-self-profile', 'student-unified-save'].includes(Name)) console.log('CI_SCREENSHOT_' + Name.replaceAll('-', '_').toUpperCase() + ' ' + Bytes.toString('base64'));
+  if (['parent-mobile', 'attendance-quick', 'student-modal-mobile', 'teacher-self-profile', 'student-unified-save', 'assignment-compact', 'assignment-configuration', 'assignment-mobile'].includes(Name)) console.log('CI_SCREENSHOT_' + Name.replaceAll('-', '_').toUpperCase() + ' ' + Bytes.toString('base64'));
 }
 
 function WithDeadline(PromiseValue) {
@@ -237,8 +237,34 @@ async function Main() {
     Assert.equal((await Prisma.giao_vien.findUniqueOrThrow({ where: { id: Teacher.giao_vien.id } })).email, 'browser-edit@example.test');
   });
 
+
+  await Case('Phân công chỉ hiện danh sách và nút mở chức năng', async () => {
+    await Go('/phan_cong', 'Phân công giảng dạy');
+    const Table = Page.getByRole('table', { name: 'Bảng phân công giáo viên', exact: true }); await Table.waitFor();
+    for (const Name of ['Tạo môn học', 'Gắn môn cho khối', 'Tạo phân công', 'Cấu hình môn theo khối']) {
+      const Button = Page.getByRole('button', { name: Name, exact: true }); await Button.waitFor();
+      Assert.equal(await Button.getAttribute('aria-haspopup'), 'dialog');
+    }
+    await Page.getByRole('button', { name: 'Tạo phân công', exact: true }).waitFor({ state: 'visible' });
+    Assert.equal(await Page.locator('form').count(), 0);
+    Assert.equal(await Page.locator('dialog[open]').count(), 0);
+    Assert.equal(await Page.getByRole('heading', { name: 'Cấu hình môn theo khối', exact: true }).count(), 0);
+    await Page.getByRole('button', { name: 'Tạo môn học', exact: true }).click();
+    const Dialog = Page.getByRole('dialog', { name: 'Tạo môn học', exact: true }); await Dialog.waitFor();
+    Assert(await Dialog.evaluate(E => E.open && E.matches(':modal')));
+    Assert.equal(await Page.locator('form').count(), 1);
+    Assert.equal(await Dialog.getByRole('button', { name: /Đóng|Hủy/ }).count(), 1);
+    await Dialog.getByPlaceholder('VD: TOAN, TV, TA', { exact: true }).fill('BAN_NHAP_MON');
+    await Dialog.getByRole('button', { name: /^Đóng hộp thoại/ }).click();
+    await Page.getByRole('button', { name: 'Tạo môn học', exact: true }).click();
+    Assert.equal(await Dialog.getByPlaceholder('VD: TOAN, TV, TA', { exact: true }).inputValue(), 'BAN_NHAP_MON');
+    await Page.keyboard.press('Escape'); await Dialog.waitFor({ state: 'hidden' });
+    Assert.equal(await Page.evaluate(() => document.body.style.overflow), '');
+  });
+
   await Case('Phân công GVCN qua form và môn tự động', async () => {
-    await Go('/phan_cong', 'Phân công giảng dạy'); await SelectValue('Chọn giáo viên', Teacher.giao_vien.id);
+    await Page.getByRole('button', { name: 'Tạo phân công', exact: true }).click();
+    await SelectValue('Chọn giáo viên', Teacher.giao_vien.id);
     await SelectValue('Chọn lớp học', BrowserClass.id);
     await Page.locator('select').filter({ has: Page.locator('option[value="GVCN_CHINH"]') }).selectOption('GVCN_CHINH');
     const Form = Page.locator('form').filter({ has: Page.getByRole('button', { name: 'Phân công', exact: true }) });
@@ -247,11 +273,17 @@ async function Main() {
     await HttpAction('POST', '/phan_cong_giang_day/phan_cong/gvcn', () => Form.getByRole('button', { name: 'Phân công', exact: true }).click(), 201);
     const Records = await Prisma.phan_cong_giao_vien.findMany({ where: { lop_hoc_id: BrowserClass.id, giao_vien_id: Teacher.giao_vien.id } });
     Assert(Records.length === 2 && Records.some(Row => Row.mon_hoc_id === Fixture.subject_id && Row.nguon_phan_cong === 'TU_DONG_GVCN'));
+    const Root = Records.find(R => R.mon_hoc_id === null);
+    await Page.getByTestId('phan-cong-' + Root.id).waitFor();
+    Assert.equal(await Page.getByRole('table', { name: 'Bảng phân công giáo viên', exact: true }).locator('tbody tr').filter({ hasText: 'Trần Thị Trình Duyệt' }).count(), 1);
+    for (const Course of Records.filter(R => R.mon_hoc_id !== null)) Assert.equal(await Page.getByTestId('phan-cong-' + Course.id).count(), 0);
+    Assert.equal(await Page.locator('dialog[open]').count(), 0);
   });
 
 
   await Case('ADMIN tạo môn học qua form', async () => {
-    const Form = FormWithHeading('Tạo môn học');
+    await Page.getByRole('button', { name: 'Tạo môn học', exact: true }).click();
+    const Form = Page.getByRole('form', { name: 'Tạo môn học', exact: true });
     await Form.getByPlaceholder('VD: TOAN, TV, TA', { exact: true }).fill('CI_BROWSER_M');
     await Form.getByPlaceholder('VD: Toán, Tiếng Việt, Tiếng Anh', { exact: true }).fill('Môn Chromium');
     const Data = await HttpAction('POST', '/phan_cong_giang_day/mon_hoc', () => Form.getByRole('button', { name: 'Tạo môn', exact: true }).click(), 201);
@@ -259,7 +291,8 @@ async function Main() {
     Assert.equal((await Prisma.mon_hoc.findUniqueOrThrow({ where: { id: FormSubject.id } })).ma_mon_hoc, 'CI_BROWSER_M');
   });
   await Case('ADMIN gắn môn cho khối qua form', async () => {
-    const Form = FormWithHeading('Gắn môn cho khối');
+    await Page.getByRole('button', { name: 'Gắn môn cho khối', exact: true }).click();
+    const Form = Page.getByRole('form', { name: 'Gắn môn cho khối', exact: true });
     await Form.locator('select').nth(0).selectOption(String(FormSubject.id));
     await Form.locator('select').nth(1).selectOption(String(Fixture.grade_id));
     await Form.locator('input[type="checkbox"]').uncheck();
@@ -267,7 +300,8 @@ async function Main() {
     Assert(await Prisma.mon_hoc_khoi.findFirst({ where: { mon_hoc_id: FormSubject.id, khoi_id: Fixture.grade_id, mac_dinh_gvcn: false } }));
   });
   await Case('ADMIN phân công giáo viên bộ môn qua form', async () => {
-    const Form = FormWithHeading('Tạo phân công');
+    await Page.getByRole('button', { name: 'Tạo phân công', exact: true }).click();
+    const Form = Page.getByRole('form', { name: 'Tạo phân công', exact: true });
     await Form.locator('select').nth(0).selectOption(String(Teacher.giao_vien.id));
     await Form.locator('select').nth(1).selectOption(String(BrowserClass.id));
     await Form.locator('select').nth(2).selectOption('GVBM');
@@ -276,12 +310,65 @@ async function Main() {
     SubjectAssignment = await Prisma.phan_cong_giao_vien.findFirstOrThrow({ where: { giao_vien_id: Teacher.giao_vien.id, lop_hoc_id: BrowserClass.id, mon_hoc_id: FormSubject.id } });
     Assert.equal(SubjectAssignment.loai_phan_cong, 'GVBM');
   });
+
+  await Case('Cấu hình chỉ mở khi bấm và mỗi khối có một nhãn GVCN', async () => {
+    await Page.getByRole('button', { name: 'Cấu hình môn theo khối', exact: true }).click();
+    const Dialog = Page.getByRole('dialog', { name: 'Cấu hình môn theo khối', exact: true }); await Dialog.waitFor();
+    Assert(await Dialog.evaluate(E => E.open && E.matches(':modal')));
+    Assert.equal(await Page.locator('form').count(), 0);
+    await Dialog.getByRole('combobox', { name: 'Khối cấu hình', exact: true }).selectOption(String(Fixture.grade_id));
+    const Grade = await Prisma.khoi.findUniqueOrThrow({ where: { id: Fixture.grade_id } });
+    const Config = Dialog.getByRole('region', { name: 'Cấu hình ' + Grade.ten_khoi, exact: true });
+    await Config.waitFor();
+    Assert.equal(await Config.getByText('GVCN', { exact: true }).count(), 1);
+    const Default = await Prisma.mon_hoc.findUniqueOrThrow({ where: { id: Fixture.subject_id } });
+    Assert.equal(await Config.getByText(Default.ten_mon_hoc, { exact: true }).count(), 0);
+    await Config.getByText('Môn Chromium', { exact: true }).waitFor();
+    await Shot('assignment-configuration');
+    await Page.setViewportSize({ width: 390, height: 844 });
+    Assert(await Dialog.evaluate(E => E.getBoundingClientRect().width <= innerWidth));
+    Assert(await Page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+    await Page.keyboard.press('Escape'); await Dialog.waitFor({ state: 'hidden' });
+    Assert.equal(await Page.evaluate(() => document.body.style.overflow), '');
+    await Shot('assignment-mobile');
+    await Page.setViewportSize({ width: 1440, height: 1000 });
+  });
+
+  await Case('Bảng gọn giữ giáo viên bộ môn và không xóa các môn GVCN', async () => {
+    const Table = Page.getByRole('table', { name: 'Bảng phân công giáo viên', exact: true });
+    const Rows = Table.locator('tbody tr').filter({ hasText: 'Trần Thị Trình Duyệt' });
+    Assert.equal(await Rows.count(), 2);
+    Assert.equal(await Rows.filter({ hasText: 'GVCN' }).count(), 1);
+    Assert.equal(await Rows.filter({ hasText: 'GVBM' }).count(), 1);
+    await Table.getByText('Môn Chromium', { exact: true }).waitFor();
+    const Auto = await Prisma.phan_cong_giao_vien.findFirstOrThrow({ where: { lop_hoc_id: BrowserClass.id, giao_vien_id: Teacher.giao_vien.id, nguon_phan_cong: 'TU_DONG_GVCN' } });
+    Assert.equal(await Page.getByTestId('phan-cong-' + Auto.id).count(), 0);
+    Assert.equal(Auto.mon_hoc_id, Fixture.subject_id);
+    await Shot('assignment-compact');
+  });
+
   await Case('ADMIN kết thúc phân công qua prompt native', async () => {
     const Row = Page.locator('tbody tr').filter({ hasText: 'Trần Thị Trình Duyệt' }).filter({ hasText: 'Môn Chromium' });
     PromptValues = [Fixture.today];
     await HttpAction('PATCH', '/phan_cong_giang_day/phan_cong/' + SubjectAssignment.id + '/ket_thuc',
       () => Row.getByRole('button', { name: 'Kết thúc', exact: true }).click());
     Assert.equal((await Prisma.phan_cong_giao_vien.findUniqueOrThrow({ where: { id: SubjectAssignment.id } })).ngay_ket_thuc.toISOString().slice(0, 10), Fixture.today);
+    Assert.equal(PromptValues.length, 0);
+  });
+
+
+  await Case('Kết thúc dòng chủ nhiệm kết thúc cả các môn GVCN', async () => {
+    const Records = await Prisma.phan_cong_giao_vien.findMany({ where: { giao_vien_id: Teacher.giao_vien.id, lop_hoc_id: BrowserClass.id, loai_phan_cong: 'GVCN' } });
+    const Root = Records.find(R => R.mon_hoc_id === null);
+    Assert(Root && Records.some(R => R.nguon_phan_cong === 'TU_DONG_GVCN'));
+    PromptValues = [Fixture.today];
+    await HttpAction('PATCH', '/phan_cong_giang_day/phan_cong/' + Root.id + '/ket_thuc',
+      () => Page.getByTestId('phan-cong-' + Root.id).getByRole('button', { name: 'Kết thúc', exact: true }).click());
+    const Saved = await Prisma.phan_cong_giao_vien.findMany({ where: { id: { in: Records.map(R => R.id) } } });
+    Assert.equal(Saved.length, Records.length);
+    Assert(Saved.every(R => R.ngay_ket_thuc?.toISOString().slice(0, 10) === Fixture.today));
+    await Page.getByTestId('phan-cong-' + Root.id).getByText(Fixture.today, { exact: true }).waitFor();
+    Assert.equal(await Page.getByTestId('phan-cong-' + Root.id).getByRole('button', { name: 'Kết thúc', exact: true }).count(), 0);
     Assert.equal(PromptValues.length, 0);
   });
 
