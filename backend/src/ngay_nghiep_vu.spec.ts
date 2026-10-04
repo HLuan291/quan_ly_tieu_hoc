@@ -51,6 +51,22 @@ describe('Nghiệp vụ lúc 00:30 tại Việt Nam', () => {
     expect(() => Service.KiemTraNgaySinhGiaoVien(new Date('2008-10-04T00:00:00.000Z'))).not.toThrow();
   });
 
+  it('không nhận giáo viên sinh 01/03 sớm một ngày vào 29/02', () => {
+    jest.setSystemTime(new Date('2024-02-28T17:30:00.000Z'));
+    const Service = new GiaoVienService({} as PrismaService) as unknown as {
+      KiemTraNgaySinhGiaoVien: (NgaySinh: Date) => void;
+    };
+    expect(() => Service.KiemTraNgaySinhGiaoVien(new Date('2006-03-01T00:00:00.000Z'))).toThrow();
+  });
+
+  it('nhận giáo viên đã tròn 18 tuổi từ 28/02 khi hôm nay là 29/02', () => {
+    jest.setSystemTime(new Date('2024-02-28T17:30:00.000Z'));
+    const Service = new GiaoVienService({} as PrismaService) as unknown as {
+      KiemTraNgaySinhGiaoVien: (NgaySinh: Date) => void;
+    };
+    expect(() => Service.KiemTraNgaySinhGiaoVien(new Date('2006-02-28T00:00:00.000Z'))).not.toThrow();
+  });
+
   it('chấp nhận ngày vào trường là hôm nay', () => {
     const Service = new GiaoVienService({} as PrismaService) as unknown as {
       KiemTraNgayVaoTruong: (NgaySinh: Date, NgayVaoTruong: Date) => void;

@@ -149,9 +149,15 @@ export class GiaoVienService {
     const NgayLonNhat =
       LayNgayNghiepVu();
 
+    const ThangSinhToiDa = NgayLonNhat.getUTCMonth();
+
     NgayLonNhat.setUTCFullYear(
       NgayLonNhat.getUTCFullYear() - 18,
     );
+
+    if (NgayLonNhat.getUTCMonth() !== ThangSinhToiDa) {
+      NgayLonNhat.setUTCDate(0);
+    }
 
     if (
       NgaySinh < NgayNhoNhat ||

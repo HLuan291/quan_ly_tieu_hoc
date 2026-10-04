@@ -30,9 +30,9 @@ if (process.argv[2] === 'case') {
   const Exports = {};
   Vm.runInNewContext(Output, { exports: Exports, Date: FrozenDate, String });
   Assert.equal(Exports.LayNgayHomNay(), Expected);
-  const BirthMax = new FrozenDate();
-  BirthMax.setFullYear(BirthMax.getFullYear() - 18);
-  Assert.equal(Exports.DinhDangNgayLocal(BirthMax), String(Number(Expected.slice(0, 4)) - 18) + Expected.slice(4));
+  const BirthYear = String(Number(Expected.slice(0, 4)) - 18);
+  const BirthMonthDay = Expected.slice(4) === '-02-29' ? '-02-28' : Expected.slice(4);
+  Assert.equal(Exports.LayNgaySinhToiDa(), BirthYear + BirthMonthDay);
   process.stdout.write('PASS ' + Cases[Index][0] + ' ' + Time + '\n');
 } else {
   Cases.forEach(([Zone], Index) => {

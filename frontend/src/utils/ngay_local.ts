@@ -8,3 +8,11 @@ export function DinhDangNgayLocal(Ngay: Date): string {
 export function LayNgayHomNay(): string {
   return DinhDangNgayLocal(new Date());
 }
+
+export function LayNgaySinhToiDa(): string {
+  const Ngay = new Date();
+  const Thang = Ngay.getMonth();
+  Ngay.setFullYear(Ngay.getFullYear() - 18);
+  if (Ngay.getMonth() !== Thang) Ngay.setDate(0);
+  return DinhDangNgayLocal(Ngay);
+}
