@@ -69,12 +69,18 @@ jobs:
           npm run build
           npm run test -- --runInBand
           npm run test:e2e -- --runInBand
+      - name: Regenerate endpoint matrix
+        working-directory: backend
+        run: node scripts/audit-route-map.cjs
       - name: MySQL constraint and API regression
         working-directory: backend
         run: node scripts/assignment-constraint-audit.cjs
       - name: Complete authenticated API coverage
         working-directory: backend
         run: node scripts/functional-complete-audit.cjs
+      - name: Student profiles and assessment permissions
+        working-directory: backend
+        run: node scripts/student-profile-audit.cjs
       - name: Install frontend
         run: npm ci --include=dev
         working-directory: frontend
@@ -107,6 +113,7 @@ jobs:
             docs/assignment-constraint-audit-results.json
             docs/runtime-server.log
             docs/ci-extra-server.log
+            docs/ci-profile-server.log
             docs/ci-browser/
           if-no-files-found: warn
           retention-days: 14

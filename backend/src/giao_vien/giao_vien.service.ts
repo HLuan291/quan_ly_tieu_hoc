@@ -506,7 +506,7 @@ export class GiaoVienService {
                 trang_thai:
                   TrangThaiTimKiem,
               }
-            : {}),
+            : { trang_thai: { not: 'DA_XOA' } }),
         },
 
         orderBy: {
@@ -562,6 +562,8 @@ export class GiaoVienService {
         'Không tìm thấy giáo viên',
       );
     }
+    if (GiaoVien.trang_thai === 'DA_XOA') throw new ConflictException('Hồ sơ giáo viên đã được xóa khỏi danh sách sử dụng');
+
 
     if (
       Object.values(
@@ -851,6 +853,8 @@ export class GiaoVienService {
         'Không tìm thấy giáo viên',
       );
     }
+    if (GiaoVien.trang_thai === 'DA_XOA') throw new ConflictException('Hồ sơ giáo viên đã được xóa khỏi danh sách sử dụng');
+
 
     const MatKhauBam =
       await argon2.hash(
@@ -885,5 +889,14 @@ export class GiaoVienService {
       phai_doi_mat_khau:
         true,
     };
+  }
+  async XoaGiaoVien(Id: number) {
+    const GiaoVien = await this.Prisma.giao_vien.findUnique({ where: { id: Id } });
+    if (!GiaoVien) throw new NotFoundException('Không tìm thấy giáo viên');
+    await this.Prisma.$transaction([
+      this.Prisma.giao_vien.update({ where: { id: Id }, data: { trang_thai: 'DA_XOA' } }),
+      this.Prisma.tai_khoan.update({ where: { id: GiaoVien.tai_khoan_id }, data: { trang_thai: 'DA_KHOA' } }),
+    ]);
+    return { thong_bao: 'Đã xóa giáo viên khỏi danh sách sử dụng và khóa tài khoản; lịch sử được giữ lại' };
   }
 }

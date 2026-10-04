@@ -11,6 +11,7 @@ import * as argon2 from 'argon2';
 
 import { PrismaService } from '../prisma.service';
 import { LayNgayNghiepVu } from '../ngay_nghiep_vu';
+import { TinhThongKeNghi } from './thong_ke_nghi';
 
 import {
   CapNhatHocSinhDto,
@@ -312,6 +313,7 @@ export class HoSoHocSinhService {
 
 
       return {
+        trang_thai: { not: 'DA_XOA' },
         xep_lop: {
           some: {
             lop_hoc_id: {
@@ -843,148 +845,98 @@ export class HoSoHocSinhService {
   // PH: con được liên kết
   // ==================================================
 
-  async LayDanhSachHocSinh(
-    NguoiDung: NguoiDungJwt,
-    TuKhoa?: string,
-    TrangThai?: string,
-  ) {
-
-    const PhamVi =
-      await this.TaoDieuKienPhamViHocSinh(
-        NguoiDung,
-      );
-
-
-    const TuKhoaTimKiem =
-      TuKhoa?.trim();
-
-
-    const TrangThaiTimKiem =
-      TrangThai?.trim();
-
-
-    const DanhSach =
-      await this.Prisma.hoc_sinh.findMany({
-        where: {
-          ...PhamVi,
-
-
-          ...(TuKhoaTimKiem
-            ? {
-                OR: [
-                  {
-                    ma_hoc_sinh: {
-                      contains:
-                        TuKhoaTimKiem,
-                    },
-                  },
-
-                  {
-                    ho_ten: {
-                      contains:
-                        TuKhoaTimKiem,
-                    },
-                  },
-
-                  {
-                    so_dien_thoai_lien_he: {
-                      contains:
-                        TuKhoaTimKiem,
-                    },
-                  },
-                ],
-              }
-            : {}),
-
-
-          ...(TrangThaiTimKiem
-            ? {
-                trang_thai:
-                  TrangThaiTimKiem,
-              }
-            : {}),
-        },
-
-
-        orderBy: {
-          ho_ten:
-            'asc',
-        },
-
-
-        select: {
-          id: true,
-
-          ma_hoc_sinh:
-            true,
-
-          ho_ten:
-            true,
-
-          ngay_sinh:
-            true,
-
-          gioi_tinh:
-            true,
-
-          so_dien_thoai_lien_he:
-            true,
-
-          trang_thai:
-            true,
-
-          chieu_cao_cm:
-            true,
-
-          can_nang_kg:
-            true,
-
-          ngay_do:
-            true,
-
-          xep_lop: {
-            orderBy: {
-              ngay_bat_dau:
-                'desc',
-            },
-
-            take:
-              1,
-
-            select: {
-              id:
-                true,
-
-              lop_hoc_id:
-                true,
-
-              ngay_bat_dau:
-                true,
-
-              ngay_ket_thuc:
-                true,
-
-              trang_thai:
-                true,
-            },
-          },
-        },
-      });
-
-
-    return {
-      tong_so:
-        DanhSach.length,
-
-      danh_sach:
-        DanhSach,
-    };
+  async LayDanhMuc(NguoiDung: NguoiDungJwt) {
+    if (!['ADMIN', 'GIAO_VIEN'].includes(NguoiDung.vai_tro)) {
+      throw new ForbiddenException('Chỉ Admin và giáo viên được xem danh mục lớp');
+    }
+    const HomNay = this.HomNay();
+    const Lop = await this.Prisma.lop_hoc.findMany({
+      where: NguoiDung.vai_tro === 'ADMIN' ? {} : {
+        phan_cong_giao_vien: { some: {
+          giao_vien: { tai_khoan_id: NguoiDung.sub },
+          ngay_bat_dau: { lte: HomNay },
+          OR: [{ ngay_ket_thuc: null }, { ngay_ket_thuc: { gte: HomNay } }],
+        } },
+      },
+      include: { khoi: true, nam_hoc: true },
+      orderBy: [{ nam_hoc_id: 'desc' }, { ten_lop: 'asc' }],
+    });
+    return { lop_hoc: Lop };
   }
 
+  async KiemTraQuyenSuaHocSinh(NguoiDung: NguoiDungJwt, Id: number) {
+    if (!['ADMIN', 'GIAO_VIEN'].includes(NguoiDung.vai_tro)) {
+      throw new ForbiddenException('Chỉ Admin và giáo viên được cập nhật hồ sơ');
+    }
+    if (NguoiDung.vai_tro !== 'ADMIN') await this.KiemTraQuyenXemHocSinh(NguoiDung, Id);
+    const HocSinh = await this.Prisma.hoc_sinh.findUnique({ where: { id: Id } });
+    if (!HocSinh) throw new NotFoundException('Không tìm thấy học sinh');
+    if (HocSinh.trang_thai === 'DA_XOA') throw new ConflictException('Hồ sơ đã được xóa khỏi danh sách sử dụng');
+  }
 
-  // ==================================================
-  // 3. CHI TIẾT HỌC SINH
-  // ==================================================
+  async KiemTraQuyenSuaPhuHuynh(NguoiDung: NguoiDungJwt, Id: number) {
+    if (NguoiDung.vai_tro === 'ADMIN') return;
+    if (NguoiDung.vai_tro !== 'GIAO_VIEN') throw new ForbiddenException('Không có quyền cập nhật phụ huynh');
+    const PhamVi = await this.TaoDieuKienPhamViHocSinh(NguoiDung);
+    const HocSinh = await this.Prisma.hoc_sinh.findFirst({
+      where: { AND: [PhamVi, { phu_huynh_hoc_sinh: { some: { phu_huynh_id: Id } } }] },
+      select: { id: true },
+    });
+    if (!HocSinh) throw new ForbiddenException('Phụ huynh không thuộc học sinh trong lớp được phân công');
+  }
+
+  async XoaHocSinh(Id: number) {
+    const HocSinh = await this.Prisma.hoc_sinh.findUnique({ where: { id: Id } });
+    if (!HocSinh) throw new NotFoundException('Không tìm thấy học sinh');
+    await this.Prisma.$transaction([
+      this.Prisma.hoc_sinh.update({ where: { id: Id }, data: { trang_thai: 'DA_XOA' } }),
+      this.Prisma.xep_lop.updateMany({
+        where: { hoc_sinh_id: Id, trang_thai: 'DANG_HOC' },
+        data: { trang_thai: 'DA_KET_THUC' },
+      }),
+    ]);
+    return { thong_bao: 'Đã xóa học sinh khỏi danh sách sử dụng; lịch sử hồ sơ được lưu giữ' };
+  }
+
+  async LayDanhSachHocSinh(
+    NguoiDung: NguoiDungJwt, TuKhoa?: string, TrangThai?: string,
+    NamHocId?: number, KhoiId?: number, LopHocId?: number,
+  ) {
+    const PhamVi = await this.TaoDieuKienPhamViHocSinh(NguoiDung);
+    const TuKhoaTimKiem = TuKhoa?.trim();
+    const LocLop = {
+      ...(NamHocId ? { nam_hoc_id: NamHocId } : {}),
+      ...(KhoiId ? { khoi_id: KhoiId } : {}),
+      ...(LopHocId ? { id: LopHocId } : {}),
+    };
+    const CoLocLop = Object.keys(LocLop).length > 0;
+    const DanhSach = await this.Prisma.hoc_sinh.findMany({
+      where: {
+        AND: [
+          PhamVi,
+          { trang_thai: TrangThai?.trim() || { not: 'DA_XOA' } },
+          ...(CoLocLop ? [{ xep_lop: { some: { lop_hoc: LocLop, trang_thai: 'DANG_HOC' } } }] : []),
+          ...(TuKhoaTimKiem ? [{ OR: [
+            { ma_hoc_sinh: { contains: TuKhoaTimKiem } },
+            { ho_ten: { contains: TuKhoaTimKiem } },
+            { so_dien_thoai_lien_he: { contains: TuKhoaTimKiem } },
+          ] }] : []),
+        ],
+      },
+      orderBy: [{ ho_ten: 'asc' }, { id: 'asc' }],
+      select: {
+        id: true, ma_hoc_sinh: true, ho_ten: true, ngay_sinh: true, gioi_tinh: true,
+        dan_toc: true, so_dien_thoai_lien_he: true, trang_thai: true,
+        chieu_cao_cm: true, can_nang_kg: true, ngay_do: true,
+        xep_lop: {
+          where: CoLocLop ? { lop_hoc: LocLop, trang_thai: 'DANG_HOC' } : {},
+          orderBy: [{ ngay_bat_dau: 'desc' }, { id: 'desc' }], take: 1,
+          include: { lop_hoc: { include: { khoi: true, nam_hoc: true } } },
+        },
+      },
+    });
+    return { tong_so: DanhSach.length, danh_sach: DanhSach };
+  }
 
   async LayChiTietHocSinh(
     NguoiDung: NguoiDungJwt,
@@ -1074,6 +1026,7 @@ export class HoSoHocSinhService {
 
               lop_hoc_id:
                 true,
+              lop_hoc: { include: { khoi: true, nam_hoc: true } },
 
               ngay_xep_lop:
                 true,
@@ -1120,6 +1073,8 @@ export class HoSoHocSinhService {
 
                   tai_khoan_id:
                     true,
+                  ngay_tao: true,
+                  ngay_cap_nhat: true,
                 },
               },
             },
@@ -1134,6 +1089,16 @@ export class HoSoHocSinhService {
       );
     }
 
+
+    const Vang = await this.Prisma.diem_danh.findMany({
+      where: {
+        xep_lop: { hoc_sinh_id: id },
+        trang_thai: { in: ['VANG_CO_PHEP', 'VANG_KHONG_PHEP'] },
+      },
+      select: { ngay_hoc: true, buoi_hoc: true, trang_thai: true },
+      orderBy: [{ ngay_hoc: 'desc' }, { buoi_hoc: 'asc' }],
+    });
+    const ThongKeNghi = TinhThongKeNghi(Vang);
 
     // PH chỉ thấy chính thông tin PH của mình
     // không tự động xem hồ sơ PH khác
@@ -1158,6 +1123,7 @@ export class HoSoHocSinhService {
 
       return {
         ...HocSinh,
+        thong_ke_nghi: ThongKeNghi,
 
         phu_huynh_hoc_sinh:
           HocSinh
@@ -1171,7 +1137,7 @@ export class HoSoHocSinhService {
     }
 
 
-    return HocSinh;
+    return { ...HocSinh, thong_ke_nghi: ThongKeNghi };
   }
 
 
@@ -1429,7 +1395,7 @@ export class HoSoHocSinhService {
   ) {
 
     if (
-      !DuLieu.trang_thai?.trim()
+      !DuLieu.trang_thai?.trim() || DuLieu.trang_thai.trim() === 'DA_XOA'
     ) {
       throw new BadRequestException(
         'Trạng thái không được để trống',

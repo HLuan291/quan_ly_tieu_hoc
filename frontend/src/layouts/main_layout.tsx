@@ -63,10 +63,7 @@ export default function MainLayout() {
     {
       Ten: 'Phân công giảng dạy',
       DuongDan: '/phan_cong',
-      VaiTro: [
-        'ADMIN',
-        'GIAO_VIEN',
-      ],
+      VaiTro: ['ADMIN'],
     },
 
     {

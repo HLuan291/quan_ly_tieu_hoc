@@ -301,15 +301,18 @@ async function Main() {
     Assert.equal((await Prisma.phu_huynh.findFirstOrThrow({ where: { so_dien_thoai: '0950000002' } })).tai_khoan_id, null);
   });
 
-  await Case('ADMIN cập nhật sức khỏe qua hộp thoại native', async () => {
-    const Row = Page.locator('tbody tr').filter({ hasText: FormStudent.ho_ten });
-    await Row.waitFor();
-    PromptValues = ['135', '32', Fixture.today];
+  await Case('ADMIN mở hồ sơ và cập nhật sức khỏe bằng form', async () => {
+    const Row = Page.locator('tbody tr').filter({ hasText: FormStudent.ho_ten }); await Row.waitFor();
+    await HttpAction('GET', '/ho_so_hoc_sinh/hoc_sinh/' + FormStudent.id, () => Row.getByRole('button', { name: 'Xem / sửa', exact: true }).click());
+    const Form = Page.getByRole('form', { name: 'Sức khỏe học sinh', exact: true });
+    await Form.locator('input[name="chieu_cao_cm"]').fill('135');
+    await Form.locator('input[name="can_nang_kg"]').fill('32');
+    Assert.equal(await Form.locator('input[name="ngay_do"]').inputValue(), Fixture.today);
     await HttpAction('PATCH', '/ho_so_hoc_sinh/hoc_sinh/' + FormStudent.id + '/suc_khoe',
-      () => Row.getByRole('button', { name: 'Cập nhật sức khỏe', exact: true }).click());
+      () => Form.getByRole('button', { name: 'Lưu sức khỏe', exact: true }).click());
     const Record = await Prisma.hoc_sinh.findUniqueOrThrow({ where: { id: FormStudent.id } });
     Assert.equal(Number(Record.chieu_cao_cm), 135); Assert.equal(Number(Record.can_nang_kg), 32);
-    Assert.equal(PromptDateDefault, Fixture.today); Assert.equal(PromptValues.length, 0);
+    await Page.getByRole('button', { name: 'Đóng hồ sơ', exact: true }).click();
   });
 
   await Case('ADMIN tạo năm học qua form', async () => {
@@ -336,6 +339,20 @@ async function Main() {
     await HttpAction('POST', '/to_chuc_lop_hoc/xep_lop', () => Form.getByRole('button', { name: 'Xếp lớp', exact: true }).click(), 201);
     Assert(await Prisma.xep_lop.findFirst({ where: { hoc_sinh_id: FormStudent.id, lop_hoc_id: FormClass.id } }));
   });
+  await Case('ADMIN lọc danh sách theo năm, khối, lớp và mở chi tiết', async () => {
+    await Go('/hoc_sinh', 'Quản lý học sinh');
+    await Page.getByRole('combobox', { name: 'Năm học học sinh', exact: true }).selectOption(String(Fixture.year_id));
+    await Page.getByRole('combobox', { name: 'Khối học sinh', exact: true }).selectOption(String(Fixture.grade_id));
+    await Page.getByRole('combobox', { name: 'Lớp học sinh', exact: true }).selectOption(String(FormClass.id));
+    await Page.locator('tbody tr').filter({ hasText: FormStudent.ho_ten }).waitFor();
+    Assert.equal(await Page.locator('tbody tr').filter({ hasText: Student.ho_ten }).count(), 0);
+    const Detail = await HttpAction('GET', '/ho_so_hoc_sinh/hoc_sinh/' + FormStudent.id,
+      () => Page.getByRole('button', { name: FormStudent.ho_ten, exact: true }).click());
+    Assert.equal(Detail.xep_lop[0].lop_hoc.ten_lop, FormClass.ten_lop);
+    await Page.getByRole('heading', { name: 'Phụ huynh và người giám hộ', exact: true }).waitFor();
+    await Shot('admin-student-directory');
+  });
+
   await Case('ADMIN tạo đợt đánh giá qua form', async () => {
     await Go('/danh_gia', 'Cấu hình đánh giá học tập');
     const Form = FormWithHeading('Tạo đợt đánh giá');
@@ -369,6 +386,31 @@ async function Main() {
     Assert.equal((await Prisma.tieu_chi_danh_gia.findUniqueOrThrow({ where: { id: Criterion.id } })).ma_tieu_chi, 'BROWSER_TC');
   });
 
+  await Case('ADMIN xóa học sinh từ danh sách và giữ hồ sơ', async () => {
+    const Last = await Prisma.hoc_sinh.findFirst({ orderBy: { id: 'desc' } });
+    const Spare = await Prisma.hoc_sinh.create({ data: {
+      ma_hoc_sinh: 'HS' + String(Number(Last.ma_hoc_sinh.slice(2)) + 1).padStart(4, '0'), ho_ten: 'Nguyễn Văn Xóa Thử',
+      ngay_sinh: new Date('2016-01-01'), gioi_tinh: 'NAM', dan_toc: 'Kinh', quoc_tich: 'Việt Nam', noi_sinh: 'Địa chỉ giả',
+      so_dien_thoai_lien_he: '0950000098', dia_chi_thuong_tru: 'Địa chỉ giả', dia_chi_hien_tai: 'Địa chỉ giả', ngay_nhap_hoc: new Date('2022-09-01'),
+    } });
+    await Go('/hoc_sinh', 'Quản lý học sinh');
+    const Row = Page.locator('tbody tr').filter({ hasText: Spare.ho_ten }); await Row.waitFor();
+    await HttpAction('DELETE', '/ho_so_hoc_sinh/hoc_sinh/' + Spare.id, () => Row.getByRole('button', { name: 'Xóa', exact: true }).click());
+    await Row.waitFor({ state: 'hidden' });
+    Assert.equal((await Prisma.hoc_sinh.findUniqueOrThrow({ where: { id: Spare.id } })).trang_thai, 'DA_XOA');
+  });
+  await Case('ADMIN xóa giáo viên từ danh sách và khóa tài khoản', async () => {
+    const Account = await Prisma.tai_khoan.create({ data: { ten_dang_nhap: 'archive_browser_teacher', so_dien_thoai: '0950000099', vai_tro: 'GIAO_VIEN', phai_doi_mat_khau: false, mat_khau_bam: await Argon2.hash(InitialPassword) } });
+    const Spare = await Prisma.giao_vien.create({ data: { ma_giao_vien: 'GV9999', ho_ten: 'Trần Thị Xóa Thử',
+      ngay_sinh: new Date('1990-01-01'), gioi_tinh: 'NU', so_dien_thoai: '0950000099', email: 'archive-browser@example.test',
+      dia_chi_lien_he: 'Địa chỉ giả', ngay_vao_truong: new Date('2015-09-01'), trinh_do_chuyen_mon: 'Đại học', tai_khoan_id: Account.id } });
+    await Go('/giao_vien', 'Quản lý giáo viên');
+    const Row = Page.locator('tbody tr').filter({ hasText: Spare.ho_ten }); await Row.waitFor();
+    await HttpAction('DELETE', '/giao_vien/' + Spare.id, () => Row.getByRole('button', { name: 'Xóa', exact: true }).click());
+    await Row.waitFor({ state: 'hidden' });
+    Assert.equal((await Prisma.tai_khoan.findUniqueOrThrow({ where: { id: Account.id } })).trang_thai, 'DA_KHOA');
+  });
+
   await Case('GV bắt buộc đổi mật khẩu', async () => {
     await Login(Teacher.tai_khoan.ten_dang_nhap, ResetPassword, 'GIAO_VIEN', '/doi_mat_khau');
     await Page.goto('http://localhost:5173/diem_danh'); await Page.waitForURL('**/doi_mat_khau');
@@ -392,14 +434,52 @@ async function Main() {
     await Page.goto('http://localhost:5173/giao_vien'); await Page.waitForURL('**/khong_co_quyen');
   });
 
-  await Case('GV xem học sinh và phân công đúng phạm vi', async () => {
+  await Case('GV xem học sinh đúng phạm vi và không còn menu phân công', async () => {
     await Go('/hoc_sinh', 'Quản lý học sinh');
     await Page.locator('tbody tr').filter({ hasText: Student.ho_ten }).waitFor();
     Assert.equal(await Page.getByRole('button', { name: 'Thêm học sinh', exact: true }).count(), 0);
+    Assert.equal(await Page.getByRole('button', { name: 'Xóa', exact: true }).count(), 0);
     Assert.equal(await Page.locator('tbody tr').filter({ hasText: FormStudent.ho_ten }).count(), 0);
-    await Go('/phan_cong', 'Phân công giảng dạy');
-    await Page.getByText(BrowserClass.ten_lop, { exact: true }).first().waitFor();
-    Assert.equal(await Page.getByRole('button', { name: 'Phân công', exact: true }).count(), 0);
+    Assert.equal(await Page.getByRole('link', { name: 'Phân công giảng dạy', exact: true }).count(), 0);
+    await Page.goto('http://localhost:5173/phan_cong'); await Page.waitForURL('**/khong_co_quyen');
+  });
+
+  await Case('GV sửa đầy đủ hồ sơ học sinh và xem tổng ngày nghỉ', async () => {
+    const Yesterday = new Date(Fixture.today); Yesterday.setUTCDate(Yesterday.getUTCDate() - 1);
+    await Prisma.diem_danh.createMany({ data: ['SANG', 'CHIEU'].map(Buoi => ({
+      xep_lop_id: Enrollment.id, ngay_hoc: Yesterday, buoi_hoc: Buoi, trang_thai: Buoi === 'SANG' ? 'VANG_CO_PHEP' : 'VANG_KHONG_PHEP', giao_vien_cap_nhat_id: Teacher.giao_vien.id,
+    })) });
+    await Go('/hoc_sinh', 'Quản lý học sinh');
+    const Detail = await HttpAction('GET', '/ho_so_hoc_sinh/hoc_sinh/' + Student.id,
+      () => Page.locator('tbody tr').filter({ hasText: Student.ho_ten }).getByRole('button', { name: 'Xem / sửa', exact: true }).click());
+    Assert.equal(Detail.thong_ke_nghi.so_ngay_co_vang, 1); Assert.equal(Detail.thong_ke_nghi.so_buoi_vang, 2);
+    const Form = Page.getByRole('form', { name: 'Thông tin học sinh', exact: true });
+    for (const [Name, Value] of Object.entries({ noi_sinh: 'Nơi sinh bổ sung', dan_toc: 'Kinh', quoc_tich: 'Việt Nam',
+      dia_chi_thuong_tru: 'Thường trú sửa từ Chromium', dia_chi_hien_tai: 'Hiện tại sửa từ Chromium' })) await Form.locator('input[name="' + Name + '"]').fill(Value);
+    await Form.locator('textarea[name="ghi_chu"]').fill('Ghi chú bổ sung từ giáo viên');
+    await HttpAction('PATCH', '/ho_so_hoc_sinh/hoc_sinh/' + Student.id, () => Form.getByRole('button', { name: 'Lưu hồ sơ học sinh', exact: true }).click());
+    const Record = await Prisma.hoc_sinh.findUniqueOrThrow({ where: { id: Student.id } });
+    Assert.equal(Record.dia_chi_hien_tai, 'Hiện tại sửa từ Chromium'); Assert.equal(Record.ghi_chu, 'Ghi chú bổ sung từ giáo viên');
+    await Shot('teacher-student-profile');
+  });
+
+  await Case('GV sửa phụ huynh và bổ sung người giám hộ qua hồ sơ', async () => {
+    const Parent = await Prisma.phu_huynh.findFirstOrThrow({ where: { so_dien_thoai: Fixture.parent } });
+    const Form = Page.getByRole('form', { name: 'Thông tin phụ huynh ' + Parent.id, exact: true });
+    await Form.locator('input[name="nghe_nghiep"]').fill('Nghề bổ sung từ Chromium');
+    await HttpAction('PATCH', '/ho_so_hoc_sinh/phu_huynh/' + Parent.id, () => Form.getByRole('button', { name: 'Lưu phụ huynh', exact: true }).click());
+    Assert.equal((await Prisma.phu_huynh.findUniqueOrThrow({ where: { id: Parent.id } })).nghe_nghiep, 'Nghề bổ sung từ Chromium');
+    await Page.getByRole('button', { name: 'Bổ sung phụ huynh', exact: true }).click();
+    const New = Page.getByRole('form', { name: 'Bổ sung phụ huynh', exact: true });
+    await New.locator('input[name="ho_ten"]').fill('Trần Thị Giám Hộ');
+    await New.locator('input[name="so_dien_thoai"]').fill('0950000003');
+    await New.locator('input[name="nam_sinh"]').fill('1985');
+    await New.locator('select[name="moi_quan_he"]').selectOption('NGUOI_GIAM_HO');
+    Assert.equal(await New.locator('input[name="tao_tai_khoan"]').count(), 0);
+    await HttpAction('POST', '/ho_so_hoc_sinh/hoc_sinh/' + Student.id + '/phu_huynh', () => New.getByRole('button', { name: 'Lưu phụ huynh mới', exact: true }).click(), 201);
+    const Record = await Prisma.phu_huynh.findFirstOrThrow({ where: { so_dien_thoai: '0950000003' } });
+    Assert.equal(Record.tai_khoan_id, null); Assert(await Prisma.phu_huynh_hoc_sinh.findFirst({ where: { hoc_sinh_id: Student.id, phu_huynh_id: Record.id, moi_quan_he: 'NGUOI_GIAM_HO' } }));
+    await Page.getByRole('button', { name: 'Đóng hồ sơ', exact: true }).click();
   });
 
   await Case('Ngày điểm danh đúng và tải sổ', async () => {
@@ -422,32 +502,100 @@ async function Main() {
     await HttpAction('POST', '/diem_danh_nghi_hoc/diem_danh', () => Page.getByRole('button', { name: 'Lưu điểm danh', exact: true }).click(), 201);
     Assert.equal((await Prisma.diem_danh.findFirstOrThrow({ where: { xep_lop_id: Enrollment.id } })).trang_thai, 'CO_MAT');
   });
-  await Case('Lưu nhận xét môn từ form', async () => {
-    await Go('/danh_gia', 'Đánh giá học tập'); await SelectValue('Chọn lớp', BrowserClass.id); await SelectValue('Chọn học sinh', Student.id);
-    await SelectValue('Chọn đợt đánh giá', EvaluationDot); await SelectValue('Chọn môn được phân công', Fixture.subject_id);
-    await FormWithHeading('Kết quả môn học').locator('select').selectOption('HOAN_THANH_TOT');
-    await Page.getByPlaceholder('Nhập nhận xét ngắn gọn, rõ ràng về học sinh', { exact: true }).fill('Nhận xét từ Chromium');
-    await HttpAction('PUT', '/danh_gia_hoc_tap/ket_qua_mon_hoc', () => Page.getByRole('button', { name: 'Lưu nhận xét', exact: true }).click());
+  await Case('Lưu nhận xét môn trên bảng danh sách học sinh', async () => {
+    await Go('/danh_gia', 'Đánh giá học tập');
+    await Page.getByRole('combobox', { name: 'Lớp đánh giá', exact: true }).selectOption(String(BrowserClass.id));
+    await Page.getByRole('combobox', { name: 'Đợt đánh giá danh sách', exact: true }).selectOption(String(EvaluationDot));
+    await Page.getByRole('combobox', { name: 'Môn đánh giá danh sách', exact: true }).selectOption(String(Fixture.subject_id));
+    const Row = Page.getByTestId('danh-gia-hs-' + Student.id); await Row.waitFor();
+    await Row.getByRole('combobox', { name: 'Mức đánh giá của ' + Student.ho_ten, exact: true }).selectOption('HOAN_THANH_TOT');
+    await Row.getByRole('textbox', { name: 'Nhận xét của ' + Student.ho_ten, exact: true }).fill('Nhận xét từ Chromium');
+    await HttpAction('PUT', '/danh_gia_hoc_tap/ket_qua_mon_hoc', () => Row.getByRole('button', { name: 'Lưu nhận xét', exact: true }).click());
     Assert.equal((await Prisma.ket_qua_mon_hoc.findFirstOrThrow({ where: { hoc_sinh_id: Student.id, mon_hoc_id: Fixture.subject_id, dot_danh_gia_id: EvaluationDot } })).muc_danh_gia, 'HOAN_THANH_TOT');
   });
 
-  await Case('GV nhập điểm định kỳ qua form', async () => {
-    await HttpAction('GET', '/danh_gia_hoc_tap/cau_hinh_diem', () => Page.getByRole('button', { name: 'Tải cấu hình điểm', exact: true }).click());
-    const Form = FormWithHeading('Điểm định kỳ');
-    await Form.locator('select').selectOption(String(ScoreConfig.id));
-    await Form.getByPlaceholder('Điểm', { exact: true }).fill('8.5');
+  await Case('GV nhập điểm ngay trong dòng học sinh', async () => {
+    const Form = Page.getByRole('form', { name: 'Điểm ' + ScoreConfig.id + ' học sinh ' + Student.id, exact: true });
+    await Form.locator('input[type="number"]').fill('8.5');
     Assert.equal(await Form.locator('input[type="date"]').inputValue(), Fixture.today);
-    await HttpAction('POST', '/danh_gia_hoc_tap/diem_dinh_ky', () => Form.getByRole('button', { name: 'Nhập điểm', exact: true }).click(), 201);
-    const Record = await Prisma.diem_kiem_tra_dinh_ky.findFirstOrThrow({ where: { hoc_sinh_id: Student.id, cau_hinh_diem_id: ScoreConfig.id } });
-    Assert.equal(Number(Record.diem), 8.5);
+    await HttpAction('POST', '/danh_gia_hoc_tap/diem_dinh_ky', () => Form.getByRole('button', { name: 'Lưu điểm', exact: true }).click(), 201);
+    Assert.equal(Number((await Prisma.diem_kiem_tra_dinh_ky.findFirstOrThrow({ where: { hoc_sinh_id: Student.id, cau_hinh_diem_id: ScoreConfig.id } })).diem), 8.5);
   });
-  await Case('GV đánh giá năng lực qua form', async () => {
-    const Form = FormWithHeading('Năng lực / phẩm chất');
-    await Form.locator('select').nth(0).selectOption(String(Criterion.id));
-    await Form.locator('select').nth(1).selectOption('TOT');
-    await HttpAction('PUT', '/danh_gia_hoc_tap/nang_luc_pham_chat', () => Form.getByRole('button', { name: 'Lưu đánh giá', exact: true }).click());
-    const Record = await Prisma.ket_qua_nang_luc_pham_chat.findFirstOrThrow({ where: { hoc_sinh_id: Student.id, dot_danh_gia_id: EvaluationDot, tieu_chi_danh_gia_id: Criterion.id } });
-    Assert.equal(Record.muc_danh_gia, 'TOT');
+
+  await Case('Tải lại bảng nạp đúng nhận xét và điểm đã lưu', async () => {
+    await HttpAction('GET', '/danh_gia_hoc_tap/bang_danh_gia', () => Page.getByRole('button', { name: 'Tải lại bảng', exact: true }).click());
+    const Row = Page.getByTestId('danh-gia-hs-' + Student.id); await Row.waitFor();
+    Assert.equal(await Row.getByRole('textbox', { name: 'Nhận xét của ' + Student.ho_ten, exact: true }).inputValue(), 'Nhận xét từ Chromium');
+    Assert.equal(await Row.getByRole('combobox', { name: 'Mức đánh giá của ' + Student.ho_ten, exact: true }).inputValue(), 'HOAN_THANH_TOT');
+    await Row.getByText('8.5', { exact: true }).waitFor();
+    await Shot('teacher-assessment-table');
+  });
+
+  await Case('GV ghi kiểm tra lại trong bảng, giữ lịch sử điểm', async () => {
+    const Diem = await Prisma.diem_kiem_tra_dinh_ky.findFirstOrThrow({ where: { hoc_sinh_id: Student.id, cau_hinh_diem_id: ScoreConfig.id } });
+    const Form = Page.getByRole('form', { name: 'Điểm ' + ScoreConfig.id + ' học sinh ' + Student.id, exact: true });
+    await Form.locator('input[type="number"]').fill('9');
+    await Form.locator('input[name="ly_do"]').fill('Kiểm tra lại từ bảng Chromium');
+    await HttpAction('POST', '/danh_gia_hoc_tap/diem_dinh_ky/' + Diem.id + '/kiem_tra_lai', () => Form.getByRole('button', { name: 'Lưu kiểm tra lại', exact: true }).click(), 201);
+    Assert.equal(await Prisma.lan_kiem_tra_dinh_ky.count({ where: { diem_kiem_tra_dinh_ky_id: Diem.id } }), 2);
+  });
+
+  await Case('GV đánh giá năng lực theo danh sách', async () => {
+    await Page.getByRole('button', { name: 'Năng lực, phẩm chất', exact: true }).click();
+    await Page.getByRole('combobox', { name: 'Tiêu chí đánh giá danh sách', exact: true }).selectOption(String(Criterion.id));
+    const Row = Page.getByTestId('danh-gia-hs-' + Student.id); await Row.waitFor();
+    await Row.getByRole('combobox', { name: 'Mức đánh giá của ' + Student.ho_ten, exact: true }).selectOption('TOT');
+    await HttpAction('PUT', '/danh_gia_hoc_tap/nang_luc_pham_chat', () => Row.getByRole('button', { name: 'Lưu nhận xét', exact: true }).click());
+    Assert.equal((await Prisma.ket_qua_nang_luc_pham_chat.findFirstOrThrow({ where: { hoc_sinh_id: Student.id, dot_danh_gia_id: EvaluationDot, tieu_chi_danh_gia_id: Criterion.id } })).muc_danh_gia, 'TOT');
+  });
+
+  await Case('Lưu nhiều dòng báo đúng phần lỗi và không ghi nhầm học sinh', async () => {
+    const Last = await Prisma.hoc_sinh.findFirst({ orderBy: { id: 'desc' } });
+    const Second = await Prisma.hoc_sinh.create({ data: { ma_hoc_sinh: 'HS' + String(Number(Last.ma_hoc_sinh.slice(2)) + 1).padStart(4, '0'),
+      ho_ten: 'Nguyễn Văn Thứ Hai', ngay_sinh: new Date('2016-01-01'), gioi_tinh: 'NU', dan_toc: 'Tày', quoc_tich: 'Việt Nam',
+      noi_sinh: 'Địa chỉ giả', so_dien_thoai_lien_he: '0950000010', dia_chi_thuong_tru: 'Địa chỉ giả', dia_chi_hien_tai: 'Địa chỉ giả', ngay_nhap_hoc: new Date('2022-09-01') } });
+    await Prisma.xep_lop.create({ data: { hoc_sinh_id: Second.id, lop_hoc_id: BrowserClass.id, ngay_bat_dau: new Date(Fixture.today) } });
+    await Page.getByRole('button', { name: 'Môn học', exact: true }).click();
+    await HttpAction('GET', '/danh_gia_hoc_tap/bang_danh_gia', () => Page.getByRole('button', { name: 'Tải lại bảng', exact: true }).click());
+    const FirstRow = Page.getByTestId('danh-gia-hs-' + Student.id), SecondRow = Page.getByTestId('danh-gia-hs-' + Second.id);
+    await FirstRow.getByRole('combobox').selectOption('HOAN_THANH');
+    await FirstRow.getByRole('combobox').selectOption('HOAN_THANH_TOT');
+    await SecondRow.getByRole('textbox', { name: 'Nhận xét của ' + Second.ho_ten, exact: true }).fill('Nhận xét hàng hai');
+    await HttpAction('PUT', '/danh_gia_hoc_tap/ket_qua_mon_hoc', () => Page.getByRole('button', { name: 'Lưu mức và nhận xét đã sửa (2)', exact: true }).click());
+    await SecondRow.getByText('Cần chọn mức đánh giá.', { exact: true }).waitFor();
+    Assert.equal(await Prisma.ket_qua_mon_hoc.count({ where: { hoc_sinh_id: Second.id, dot_danh_gia_id: EvaluationDot } }), 0);
+    await SecondRow.getByRole('combobox').selectOption('HOAN_THANH');
+    await HttpAction('PUT', '/danh_gia_hoc_tap/ket_qua_mon_hoc', () => SecondRow.getByRole('button', { name: 'Lưu nhận xét', exact: true }).click());
+    const First = await Prisma.ket_qua_mon_hoc.findFirstOrThrow({ where: { hoc_sinh_id: Student.id, dot_danh_gia_id: EvaluationDot } });
+    const Other = await Prisma.ket_qua_mon_hoc.findFirstOrThrow({ where: { hoc_sinh_id: Second.id, dot_danh_gia_id: EvaluationDot } });
+    Assert.equal(First.nhan_xet, 'Nhận xét từ Chromium'); Assert.equal(Other.nhan_xet, 'Nhận xét hàng hai');
+  });
+
+  await Case('GV xem thống kê đúng lớp và tỷ lệ', async () => {
+    await Page.getByRole('button', { name: 'Thống kê', exact: true }).click();
+    await Page.getByRole('combobox', { name: 'Đợt thống kê', exact: true }).selectOption(String(EvaluationDot));
+    const Table = Page.getByRole('table', { name: 'Bảng thống kê đánh giá', exact: true });
+    await Table.getByText(BrowserClass.ten_lop, { exact: true }).waitFor();
+    Assert.equal(await Page.getByRole('combobox', { name: 'Lớp thống kê', exact: true }).locator('option').count(), 2);
+    const Total = Table.locator('tbody tr').filter({ hasText: 'Tổng lớp được phân công' }).first();
+    Assert.equal(await Total.locator('td').nth(1).innerText(), '2');
+    Assert.equal(await Total.locator('td').nth(4).innerText(), '1');
+    Assert.equal(await Total.locator('td').nth(5).innerText(), '50');
+    await Shot('teacher-assessment-statistics');
+  });
+
+  await Case('Bảng học sinh và đánh giá không làm tràn ngang điện thoại', async () => {
+    await Page.setViewportSize({ width: 390, height: 844 });
+    await Go('/hoc_sinh', 'Quản lý học sinh');
+    await Page.locator('tbody tr').filter({ hasText: Student.ho_ten }).waitFor();
+    Assert(await Page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+    await Shot('teacher-student-mobile');
+    await Go('/danh_gia', 'Đánh giá học tập');
+    await Page.getByRole('combobox', { name: 'Lớp đánh giá', exact: true }).selectOption(String(BrowserClass.id));
+    await Page.getByTestId('danh-gia-hs-' + Student.id).waitFor();
+    Assert(await Page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
+    await Shot('teacher-assessment-mobile');
+    await Page.setViewportSize({ width: 1440, height: 1000 });
   });
 
   await Case('PH đăng nhập, menu đúng quyền', async () => {

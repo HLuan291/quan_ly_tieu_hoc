@@ -1563,6 +1563,7 @@ export class DanhGiaHocTapService {
         .phan_cong_giao_vien
         .findFirst({
           where: {
+            ...this.DieuKienPhanCongHienTai(),
             giao_vien_id:
               GiaoVien.id,
 
@@ -2114,5 +2115,122 @@ export class DanhGiaHocTapService {
       hoc_sinh:
         HocSinh,
     };
+  }
+  async LayBangDanhGia(TaiKhoanId: number, VaiTro: string, LopHocId: number, DotId: number, MonHocId?: number) {
+    if (!['ADMIN', 'GIAO_VIEN'].includes(VaiTro)) throw new ForbiddenException('Chỉ Admin và giáo viên được xem bảng đánh giá');
+    const Lop = await this.Prisma.lop_hoc.findUnique({
+      where: { id: LopHocId }, include: { nam_hoc: true, khoi: true },
+    });
+    const Dot = await this.Prisma.dot_danh_gia.findUnique({ where: { id: DotId } });
+    if (!Lop || !Dot) throw new NotFoundException('Không tìm thấy lớp hoặc đợt đánh giá');
+    let PhanCong: Array<{ loai_phan_cong: string; mon_hoc_id: number | null }> = [];
+    if (VaiTro === 'GIAO_VIEN') {
+      const GiaoVien = await this.LayGiaoVienTuTaiKhoan(TaiKhoanId);
+      PhanCong = await this.Prisma.phan_cong_giao_vien.findMany({
+        where: { giao_vien_id: GiaoVien.id, lop_hoc_id: LopHocId, ...this.DieuKienPhanCongHienTai() },
+        select: { loai_phan_cong: true, mon_hoc_id: true },
+      });
+      if (!PhanCong.length) throw new ForbiddenException('Bạn không được phân công tại lớp này');
+    }
+    if (Dot.nam_hoc_id !== Lop.nam_hoc_id) throw new BadRequestException('Đợt đánh giá không thuộc năm học của lớp');
+    const HomNay = LayNgayNghiepVu();
+    const XepLop = await this.Prisma.xep_lop.findMany({
+      where: {
+        lop_hoc_id: LopHocId, trang_thai: 'DANG_HOC',
+        ngay_bat_dau: { lte: HomNay }, OR: [{ ngay_ket_thuc: null }, { ngay_ket_thuc: { gte: HomNay } }],
+        hoc_sinh: { trang_thai: { not: 'DA_XOA' } },
+      },
+      select: { hoc_sinh: { select: { id: true, ma_hoc_sinh: true, ho_ten: true, ngay_sinh: true, gioi_tinh: true, dan_toc: true } } },
+      orderBy: { hoc_sinh: { ho_ten: 'asc' } },
+    });
+    const HocSinh = [...new Map(XepLop.map(Item => [Item.hoc_sinh.id, Item.hoc_sinh])).values()];
+    const Ids = HocSinh.map(Item => Item.id);
+    const [Mon, CauHinhDiem, TieuChi, KetQuaMon, Diem, NangLuc] = await Promise.all([
+      this.Prisma.cau_hinh_danh_gia_mon.findMany({
+        where: { dot_danh_gia_id: DotId, khoi_id: Lop.khoi_id }, include: { mon_hoc: true },
+      }),
+      this.Prisma.cau_hinh_diem.findMany({
+        where: { dot_danh_gia_id: DotId, khoi_id: Lop.khoi_id, ...(MonHocId ? { mon_hoc_id: MonHocId } : {}) },
+        orderBy: { thu_tu_hien_thi: 'asc' },
+      }),
+      this.Prisma.tieu_chi_danh_gia.findMany({ where: { trang_thai: 'HOAT_DONG' }, orderBy: { thu_tu_hien_thi: 'asc' } }),
+      this.Prisma.ket_qua_mon_hoc.findMany({
+        where: { hoc_sinh_id: { in: Ids }, dot_danh_gia_id: DotId, ...(MonHocId ? { mon_hoc_id: MonHocId } : {}) },
+      }),
+      this.Prisma.diem_kiem_tra_dinh_ky.findMany({
+        where: { hoc_sinh_id: { in: Ids }, cau_hinh_diem: { dot_danh_gia_id: DotId, khoi_id: Lop.khoi_id, ...(MonHocId ? { mon_hoc_id: MonHocId } : {}) } },
+        include: { lan_kiem_tra_dinh_ky: { orderBy: { lan_thu: 'desc' }, take: 1 } },
+      }),
+      this.Prisma.ket_qua_nang_luc_pham_chat.findMany({ where: { hoc_sinh_id: { in: Ids }, dot_danh_gia_id: DotId } }),
+    ]);
+    if (MonHocId && !Mon.some(Item => Item.mon_hoc_id === MonHocId)) throw new BadRequestException('Môn học chưa được cấu hình trong đợt và khối này');
+    return {
+      lop_hoc: Lop, dot_danh_gia: Dot,
+      mon_hoc: Mon.map(Item => ({ ...Item.mon_hoc, duoc_nhap: PhanCong.some(PC => PC.mon_hoc_id === Item.mon_hoc_id) })),
+      duoc_nhap_nang_luc: PhanCong.some(Item => Item.loai_phan_cong === 'GVCN' && Item.mon_hoc_id === null),
+      cau_hinh_diem: CauHinhDiem, tieu_chi: TieuChi,
+      danh_sach: HocSinh.map(Item => ({
+        ...Item,
+        ket_qua_mon_hoc: KetQuaMon.filter(KQ => KQ.hoc_sinh_id === Item.id),
+        diem_dinh_ky: Diem.filter(KQ => KQ.hoc_sinh_id === Item.id),
+        nang_luc_pham_chat: NangLuc.filter(KQ => KQ.hoc_sinh_id === Item.id),
+      })),
+    };
+  }
+
+  async LayThongKeDanhGia(TaiKhoanId: number, VaiTro: string, DotId: number, KhoiId?: number, LopHocId?: number) {
+    if (!['ADMIN', 'GIAO_VIEN'].includes(VaiTro)) throw new ForbiddenException('Chỉ Admin và giáo viên được xem thống kê');
+    const Dot = await this.Prisma.dot_danh_gia.findUnique({ where: { id: DotId } });
+    if (!Dot) throw new NotFoundException('Không tìm thấy đợt đánh giá');
+    const HomNay = LayNgayNghiepVu();
+    const Lop = await this.Prisma.lop_hoc.findMany({
+      where: {
+        nam_hoc_id: Dot.nam_hoc_id, ...(KhoiId ? { khoi_id: KhoiId } : {}), ...(LopHocId ? { id: LopHocId } : {}),
+        ...(VaiTro === 'GIAO_VIEN' ? { phan_cong_giao_vien: { some: {
+          giao_vien: { tai_khoan_id: TaiKhoanId }, ...this.DieuKienPhanCongHienTai(),
+        } } } : {}),
+      },
+      select: { id: true, ten_lop: true, khoi_id: true },
+      orderBy: { ten_lop: 'asc' },
+    });
+    if (LopHocId && VaiTro === 'GIAO_VIEN' && !Lop.length) throw new ForbiddenException('Bạn không được phân công tại lớp này');
+    const XepLop = await this.Prisma.xep_lop.findMany({
+      where: {
+        lop_hoc_id: { in: Lop.map(Item => Item.id) }, trang_thai: 'DANG_HOC',
+        ngay_bat_dau: { lte: HomNay }, OR: [{ ngay_ket_thuc: null }, { ngay_ket_thuc: { gte: HomNay } }],
+        hoc_sinh: { trang_thai: { not: 'DA_XOA' } },
+      },
+      select: { lop_hoc_id: true, hoc_sinh: { select: {
+        id: true, gioi_tinh: true, dan_toc: true,
+        ket_qua_mon_hoc: { where: { dot_danh_gia_id: DotId }, select: { mon_hoc_id: true, muc_danh_gia: true } },
+      } } },
+    });
+    const Mon = await this.Prisma.cau_hinh_danh_gia_mon.findMany({
+      where: { dot_danh_gia_id: DotId, khoi_id: { in: Lop.map(Item => Item.khoi_id) } }, include: { mon_hoc: true },
+    });
+    const MonHoc = [...new Map(Mon.map(Item => [Item.mon_hoc_id, Item.mon_hoc])).values()];
+    function ThongKe(Ids: number[], Id: number | null, Ten: string) {
+      const HS = [...new Map(XepLop.filter(Item => Ids.includes(Item.lop_hoc_id)).map(Item => [Item.hoc_sinh.id, Item.hoc_sinh])).values()];
+      return {
+        lop_hoc_id: Id, ten_lop: Ten, si_so: HS.length,
+        mon_hoc: MonHoc.filter(MH => Mon.some(CH => CH.mon_hoc_id === MH.id && Lop.some(L => Ids.includes(L.id) && L.khoi_id === CH.khoi_id))).map(MH => {
+          const ApDung = Lop.filter(L => Ids.includes(L.id) && Mon.some(CH => CH.mon_hoc_id === MH.id && CH.khoi_id === L.khoi_id)).map(L => L.id);
+          const HSMon = [...new Map(XepLop.filter(Item => ApDung.includes(Item.lop_hoc_id)).map(Item => [Item.hoc_sinh.id, Item.hoc_sinh])).values()];
+          return {
+          ...MH, si_so_ap_dung: HSMon.length,
+          muc_do: ['HOAN_THANH_TOT', 'HOAN_THANH', 'CHUA_HOAN_THANH', 'CHUA_DANH_GIA'].map(Muc => {
+            const DS = HSMon.filter(Item => {
+              const KQ = Item.ket_qua_mon_hoc.find(K => K.mon_hoc_id === MH.id);
+              return Muc === 'CHUA_DANH_GIA' ? !KQ : KQ?.muc_danh_gia === Muc;
+            });
+            return { muc_danh_gia: Muc, so_luong: DS.length, ty_le: HSMon.length ? Math.round(DS.length / HSMon.length * 10000) / 100 : 0,
+              so_nu: DS.filter(Item => Item.gioi_tinh === 'NU').length,
+              dan_toc_thieu_so: DS.filter(Item => Item.dan_toc.trim().toLowerCase() !== 'kinh').length };
+          }),
+        }; }),
+      };
+    }
+    return { dot_danh_gia: Dot, danh_sach: [ThongKe(Lop.map(Item => Item.id), null, VaiTro === 'ADMIN' ? 'Tổng phạm vi đã chọn' : 'Tổng lớp được phân công'),
+      ...Lop.map(Item => ThongKe([Item.id], Item.id, Item.ten_lop))] };
   }
 }

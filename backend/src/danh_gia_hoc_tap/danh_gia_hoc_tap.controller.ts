@@ -529,4 +529,31 @@ export class DanhGiaHocTapController {
         DotDanhGiaId,
       );
   }
+  @Get('bang_danh_gia')
+  LayBangDanhGia(
+    @Req() Request: RequestCoNguoiDung,
+    @Query('lop_hoc_id') LopHocId?: string,
+    @Query('dot_danh_gia_id') DotId?: string,
+    @Query('mon_hoc_id') MonHocId?: string,
+  ) {
+    const NguoiDung = this.LayNguoiDung(Request);
+    const Lop = this.ChuyenQuerySoNguyenDuong(LopHocId, 'Lớp');
+    const Dot = this.ChuyenQuerySoNguyenDuong(DotId, 'Đợt đánh giá');
+    if (!Lop || !Dot) throw new BadRequestException('Cần chọn lớp và đợt đánh giá');
+    return this.Service.LayBangDanhGia(NguoiDung.sub, NguoiDung.vai_tro, Lop, Dot, this.ChuyenQuerySoNguyenDuong(MonHocId, 'Môn học'));
+  }
+
+  @Get('thong_ke_danh_gia')
+  LayThongKeDanhGia(
+    @Req() Request: RequestCoNguoiDung,
+    @Query('dot_danh_gia_id') DotId?: string,
+    @Query('khoi_id') KhoiId?: string,
+    @Query('lop_hoc_id') LopHocId?: string,
+  ) {
+    const NguoiDung = this.LayNguoiDung(Request);
+    const Dot = this.ChuyenQuerySoNguyenDuong(DotId, 'Đợt đánh giá');
+    if (!Dot) throw new BadRequestException('Cần chọn đợt đánh giá');
+    return this.Service.LayThongKeDanhGia(NguoiDung.sub, NguoiDung.vai_tro, Dot,
+      this.ChuyenQuerySoNguyenDuong(KhoiId, 'Khối'), this.ChuyenQuerySoNguyenDuong(LopHocId, 'Lớp'));
+  }
 }

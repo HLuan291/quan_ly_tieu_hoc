@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -93,6 +94,26 @@ export class HoSoHocSinhController {
   }
 
 
+  private QueryId(Value: string | undefined, Label: string) {
+    if (Value === undefined || Value === '') return undefined;
+    const Id = Number(Value);
+    if (!Number.isInteger(Id) || Id <= 0) throw new BadRequestException(Label + ' không hợp lệ');
+    return Id;
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('danh_muc')
+  LayDanhMuc(@Req() Request: RequestCoNguoiDung) {
+    return this.HoSoHocSinhService.LayDanhMuc(this.LayNguoiDung(Request));
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('hoc_sinh/:Id')
+  XoaHocSinh(@Req() Request: RequestCoNguoiDung, @Param('Id', ParseIntPipe) Id: number) {
+    this.KiemTraAdmin(Request);
+    return this.HoSoHocSinhService.XoaHocSinh(Id);
+  }
+
   // ==================================================
   // HỌC SINH
   // ==================================================
@@ -136,6 +157,9 @@ export class HoSoHocSinhController {
 
     @Query('trang_thai')
     TrangThai?: string,
+    @Query('nam_hoc_id') NamHocId?: string,
+    @Query('khoi_id') KhoiId?: string,
+    @Query('lop_hoc_id') LopHocId?: string,
   ) {
 
     return this.HoSoHocSinhService
@@ -145,6 +169,9 @@ export class HoSoHocSinhController {
         ),
         TuKhoa,
         TrangThai,
+        this.QueryId(NamHocId, 'Năm học'),
+        this.QueryId(KhoiId, 'Khối'),
+        this.QueryId(LopHocId, 'Lớp'),
       );
   }
 
@@ -178,7 +205,7 @@ export class HoSoHocSinhController {
 
   @UseGuards(JwtAuthGuard)
   @Patch('hoc_sinh/:Id')
-  CapNhatHocSinh(
+  async CapNhatHocSinh(
     @Req()
     Request: RequestCoNguoiDung,
 
@@ -192,9 +219,7 @@ export class HoSoHocSinhController {
     Body: CapNhatHocSinhDto,
   ) {
 
-    this.KiemTraAdmin(
-      Request,
-    );
+    await this.HoSoHocSinhService.KiemTraQuyenSuaHocSinh(this.LayNguoiDung(Request), Id);
 
     return this.HoSoHocSinhService
       .CapNhatHocSinh(
@@ -210,7 +235,7 @@ export class HoSoHocSinhController {
   @Patch(
     'hoc_sinh/:Id/trang_thai',
   )
-  CapNhatTrangThaiHocSinh(
+  async CapNhatTrangThaiHocSinh(
     @Req()
     Request: RequestCoNguoiDung,
 
@@ -224,9 +249,7 @@ export class HoSoHocSinhController {
     Body: CapNhatTrangThaiHocSinhDto,
   ) {
 
-    this.KiemTraAdmin(
-      Request,
-    );
+    await this.HoSoHocSinhService.KiemTraQuyenSuaHocSinh(this.LayNguoiDung(Request), Id);
 
     return this.HoSoHocSinhService
       .CapNhatTrangThaiHocSinh(
@@ -242,7 +265,7 @@ export class HoSoHocSinhController {
   @Patch(
     'hoc_sinh/:Id/suc_khoe',
   )
-  CapNhatSucKhoeHocSinh(
+  async CapNhatSucKhoeHocSinh(
     @Req()
     Request: RequestCoNguoiDung,
 
@@ -256,9 +279,7 @@ export class HoSoHocSinhController {
     Body: CapNhatSucKhoeHocSinhDto,
   ) {
 
-    this.KiemTraAdmin(
-      Request,
-    );
+    await this.HoSoHocSinhService.KiemTraQuyenSuaHocSinh(this.LayNguoiDung(Request), Id);
 
     return this.HoSoHocSinhService
       .CapNhatSucKhoeHocSinh(
@@ -359,7 +380,7 @@ export class HoSoHocSinhController {
 
   @UseGuards(JwtAuthGuard)
   @Patch('phu_huynh/:Id')
-  CapNhatPhuHuynh(
+  async CapNhatPhuHuynh(
     @Req()
     Request: RequestCoNguoiDung,
 
@@ -373,9 +394,7 @@ export class HoSoHocSinhController {
     Body: CapNhatPhuHuynhDto,
   ) {
 
-    this.KiemTraAdmin(
-      Request,
-    );
+    await this.HoSoHocSinhService.KiemTraQuyenSuaPhuHuynh(this.LayNguoiDung(Request), Id);
 
     return this.HoSoHocSinhService
       .CapNhatPhuHuynh(
@@ -452,7 +471,7 @@ export class HoSoHocSinhController {
   @Post(
     'hoc_sinh/:Id/phu_huynh',
   )
-  ThemPhuHuynhVaoHocSinh(
+  async ThemPhuHuynhVaoHocSinh(
     @Req()
     Request: RequestCoNguoiDung,
 
@@ -466,9 +485,10 @@ export class HoSoHocSinhController {
     Body: ThongTinPhuHuynhDto,
   ) {
 
-    this.KiemTraAdmin(
-      Request,
-    );
+    await this.HoSoHocSinhService.KiemTraQuyenSuaHocSinh(this.LayNguoiDung(Request), HocSinhId);
+    if (this.LayNguoiDung(Request).vai_tro === 'GIAO_VIEN' && (Body.phu_huynh_id !== undefined || Body.tao_tai_khoan === true)) {
+      throw new ForbiddenException('Giáo viên được bổ sung phụ huynh mới; liên kết hồ sơ có sẵn và cấp tài khoản do Admin thực hiện');
+    }
 
     return this.HoSoHocSinhService
       .ThemPhuHuynhVaoHocSinh(
@@ -484,7 +504,7 @@ export class HoSoHocSinhController {
   @Patch(
     'hoc_sinh/:hoc_sinh_id/phu_huynh/:phu_huynh_id/moi_quan_he',
   )
-  CapNhatMoiQuanHe(
+  async CapNhatMoiQuanHe(
     @Req()
     Request: RequestCoNguoiDung,
 
@@ -504,9 +524,7 @@ export class HoSoHocSinhController {
     Body: CapNhatMoiQuanHeDto,
   ) {
 
-    this.KiemTraAdmin(
-      Request,
-    );
+    await this.HoSoHocSinhService.KiemTraQuyenSuaHocSinh(this.LayNguoiDung(Request), HocSinhId);
 
     return this.HoSoHocSinhService
       .CapNhatMoiQuanHe(

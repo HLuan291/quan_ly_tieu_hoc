@@ -120,7 +120,7 @@ async function Main() {
   const Runtime = spawn(process.execPath, ['scripts/runtime-audit.cjs'], { env: { ...process.env, AUDIT_REPORT_FILE: FileHoiQuy }, stdio: 'inherit' });
   await new Promise((Done, Reject) => Runtime.on('exit', (Ma) => Ma === 0 ? Done() : Reject(new Error('API regression failed'))));
   const HoiQuy = JSON.parse(fs.readFileSync(FileHoiQuy, 'utf8'));
-  Ghi('231 ca API đạt khi chk_pc_loai mới được thực thi', HoiQuy.tong === 231 && HoiQuy.khong_dat === 0);
+  Ghi('Toàn bộ ca API core đạt khi chk_pc_loai mới được thực thi', HoiQuy.tong >= 231 && HoiQuy.khong_dat === 0);
   const Report = { thoi_diem: new Date().toISOString(), mysql: ThongTin.server_version, database: 'DB riêng từ Prisma schema với chk_pc_loai được thực thi', du_lieu: 'Giả; không kết nối DB người dùng', tong: KetQua.length, dat: KetQua.filter((Dong) => Dong.dat).length, ket_qua: KetQua, hoi_quy_api: { tong: HoiQuy.tong, dat: HoiQuy.dat, khong_dat: HoiQuy.khong_dat } };
   fs.writeFileSync(path.resolve('../docs/assignment-constraint-audit-results.json'), JSON.stringify(Report, null, 2) + '\n');
   console.log(JSON.stringify({ migration_checks: Report.tong, passed: Report.dat, api_checks: HoiQuy.tong }));

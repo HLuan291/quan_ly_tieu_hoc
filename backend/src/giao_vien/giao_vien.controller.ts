@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   ForbiddenException,
   Get,
   Param,
@@ -149,5 +150,10 @@ export class GiaoVienController {
         Id,
         Body.mat_khau_moi,
       );
+  }
+  @Delete(':id')
+  XoaGiaoVien(@Req() Request: RequestCoNguoiDung, @Param('id', ParseIntPipe) Id: number) {
+    this.KiemTraAdmin(Request);
+    return this.GiaoVienService.XoaGiaoVien(Id);
   }
 }

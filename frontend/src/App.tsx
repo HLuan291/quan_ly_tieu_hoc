@@ -109,6 +109,12 @@ export default function App() {
                 <LopHocPage />
               }
             />
+            <Route
+              path="/phan_cong"
+              element={
+                <PhanCongPage />
+              }
+            />
           </Route>
 
           <Route
@@ -128,12 +134,6 @@ export default function App() {
               }
             />
 
-            <Route
-              path="/phan_cong"
-              element={
-                <PhanCongPage />
-              }
-            />
 
             <Route
               path="/danh_gia"

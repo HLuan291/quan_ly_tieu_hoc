@@ -10,6 +10,8 @@ import type {
 } from 'react';
 
 import Api from '../api/api';
+import BangDanhGiaGiaoVien from './bang_danh_gia_giao_vien';
+import ThongKeDanhGia from './thong_ke_danh_gia';
 import { LayNgayHomNay } from '../utils/ngay_local';
 import { QuyUoc } from '../utils/quy_uoc_nghiep_vu';
 
@@ -101,7 +103,7 @@ interface TieuChi {
   nhom_danh_gia: string;
 }
 
-export default function DanhGiaPage() {
+function DanhGiaNoiDung() {
   const [CauHinhDaTai, SetCauHinhDaTai] = useState('');
   const NguoiDung =
     DocJwt();
@@ -1776,4 +1778,11 @@ export default function DanhGiaPage() {
       </div>
     </div>
   );
+}
+
+export default function DanhGiaPage() {
+  const LaAdmin = DocJwt()?.vai_tro === 'ADMIN';
+  const [ThongKe, SetThongKe] = useState(false);
+  if (!LaAdmin) return <BangDanhGiaGiaoVien />;
+  return <><div className="mb-4 flex flex-wrap gap-2"><button aria-pressed={!ThongKe} className="rounded border bg-white px-4 py-2" onClick={() => SetThongKe(false)}>Cấu hình đánh giá</button><button aria-pressed={ThongKe} className="rounded border bg-white px-4 py-2" onClick={() => SetThongKe(true)}>Xem thống kê</button></div>{ThongKe ? <ThongKeDanhGia /> : <DanhGiaNoiDung />}</>;
 }

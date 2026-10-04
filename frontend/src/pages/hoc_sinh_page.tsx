@@ -1,6 +1,4 @@
 import {
-  useCallback,
-  useEffect,
   useState,
 } from 'react';
 
@@ -11,6 +9,7 @@ import type {
 
 import Api from '../api/api';
 import { LayNgayHomNay } from '../utils/ngay_local';
+import DanhSachHocSinh from './danh_sach_hoc_sinh';
 
 import {
   DocJwt,
@@ -19,33 +18,6 @@ import {
 import {
   LayThongBaoLoi,
 } from '../utils/loi_api';
-
-interface XepLopTomTat {
-  id: number;
-  lop_hoc_id: number;
-  ngay_bat_dau: string;
-  ngay_ket_thuc: string | null;
-  trang_thai: string;
-}
-
-interface HocSinh {
-  id: number;
-  ma_hoc_sinh: string;
-  ho_ten: string;
-  ngay_sinh: string;
-  gioi_tinh: string;
-  so_dien_thoai_lien_he: string;
-  trang_thai: string;
-  chieu_cao_cm: string | number | null;
-  can_nang_kg: string | number | null;
-  ngay_do: string | null;
-  xep_lop: XepLopTomTat[];
-}
-
-interface DanhSachResponse {
-  tong_so: number;
-  danh_sach: HocSinh[];
-}
 
 interface PhuHuynhMoi {
   ho_ten: string;
@@ -120,25 +92,12 @@ export default function HocSinhPage() {
     NguoiDung?.vai_tro ===
     'ADMIN';
 
-  const [
-    DanhSach,
-    SetDanhSach,
-  ] = useState<HocSinh[]>([]);
-
-  const [
-    TuKhoa,
-    SetTuKhoa,
-  ] = useState('');
+  const [LanTai, SetLanTai] = useState(0);
 
   const [
     Loi,
     SetLoi,
   ] = useState('');
-
-  const [
-    DangTai,
-    SetDangTai,
-  ] = useState(false);
 
   const [
     HienForm,
@@ -190,60 +149,6 @@ export default function HocSinhPage() {
       ho_ten: string;
     }>
   >([]);
-
-  const TaiDanhSach =
-    useCallback(
-      async () => {
-        try {
-          SetDangTai(true);
-          SetLoi('');
-
-          const Response =
-            await Api.get<DanhSachResponse>(
-              '/ho_so_hoc_sinh/hoc_sinh',
-              {
-                params: {
-                  ...(TuKhoa.trim()
-                    ? {
-                        tu_khoa:
-                          TuKhoa.trim(),
-                      }
-                    : {}),
-                },
-              },
-            );
-
-          SetDanhSach(
-            Response.data.danh_sach,
-          );
-        } catch (Error: unknown) {
-          SetLoi(
-            LayThongBaoLoi(
-              Error,
-            ),
-          );
-        } finally {
-          SetDangTai(false);
-        }
-      },
-      [
-        TuKhoa,
-      ],
-    );
-
-  useEffect(
-    () => {
-      // Hủy lần khởi tạo chưa chạy khi effect bị dọn (bao gồm StrictMode).
-      let DaHuy = false;
-      void Promise.resolve().then(() => {
-        if (!DaHuy) return TaiDanhSach();
-      });
-      return () => { DaHuy = true; };
-    },
-    [
-      TaiDanhSach,
-    ],
-  );
 
   function CapNhatHocSinh(
     Event:
@@ -500,77 +405,7 @@ export default function HocSinhPage() {
       );
       SetQuocTichKhac('');
 
-      await TaiDanhSach();
-    } catch (Error: unknown) {
-      SetLoi(
-        LayThongBaoLoi(
-          Error,
-        ),
-      );
-    }
-  }
-
-  async function CapNhatSucKhoe(
-    HocSinhItem: HocSinh,
-  ) {
-    const ChieuCao =
-      window.prompt(
-        'Chiều cao (cm)',
-        String(
-          HocSinhItem.chieu_cao_cm ??
-          '',
-        ),
-      );
-
-    if (ChieuCao === null) {
-      return;
-    }
-
-    const CanNang =
-      window.prompt(
-        'Cân nặng (kg)',
-        String(
-          HocSinhItem.can_nang_kg ??
-          '',
-        ),
-      );
-
-    if (CanNang === null) {
-      return;
-    }
-
-    const NgayDo =
-      window.prompt(
-        'Ngày đo (YYYY-MM-DD)',
-        LayNgayHomNay(),
-      );
-
-    if (!NgayDo) {
-      return;
-    }
-
-    try {
-      SetLoi('');
-
-      await Api.patch(
-        `/ho_so_hoc_sinh/hoc_sinh/${HocSinhItem.id}/suc_khoe`,
-        {
-          chieu_cao_cm:
-            Number(
-              ChieuCao,
-            ),
-
-          can_nang_kg:
-            Number(
-              CanNang,
-            ),
-
-          ngay_do:
-            NgayDo,
-        },
-      );
-
-      await TaiDanhSach();
+      SetLanTai(Value => Value + 1);
     } catch (Error: unknown) {
       SetLoi(
         LayThongBaoLoi(
@@ -1133,139 +968,7 @@ export default function HocSinhPage() {
         </form>
       )}
 
-      <div className="mt-6 rounded-xl bg-white p-5 shadow-sm">
-        <input
-          value={
-            TuKhoa
-          }
-          onChange={
-            (Event) =>
-              SetTuKhoa(
-                Event.target.value,
-              )
-          }
-          placeholder="Tìm theo mã, họ tên hoặc số điện thoại"
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 md:max-w-lg"
-        />
-
-        <div className="mt-5 overflow-x-auto">
-          <table className="min-w-full text-sm">
-            <thead>
-              <tr className="border-b bg-slate-50 text-left">
-                <th className="px-3 py-3">
-                  Mã
-                </th>
-                <th className="px-3 py-3">
-                  Họ tên
-                </th>
-                <th className="px-3 py-3">
-                  Ngày sinh
-                </th>
-                <th className="px-3 py-3">
-                  SĐT
-                </th>
-                <th className="px-3 py-3">
-                  Trạng thái
-                </th>
-                <th className="px-3 py-3">
-                  Lớp gần nhất
-                </th>
-
-                {LaAdmin && (
-                  <th className="px-3 py-3">
-                    Thao tác
-                  </th>
-                )}
-              </tr>
-            </thead>
-
-            <tbody>
-              {DanhSach.map(
-                (HocSinhItem) => (
-                  <tr
-                    key={
-                      HocSinhItem.id
-                    }
-                    className="border-b"
-                  >
-                    <td className="px-3 py-3 font-medium">
-                      {
-                        HocSinhItem.ma_hoc_sinh
-                      }
-                    </td>
-
-                    <td className="px-3 py-3">
-                      {
-                        HocSinhItem.ho_ten
-                      }
-                    </td>
-
-                    <td className="px-3 py-3">
-                      {
-                        HocSinhItem.ngay_sinh
-                          .slice(
-                            0,
-                            10,
-                          )
-                      }
-                    </td>
-
-                    <td className="px-3 py-3">
-                      {
-                        HocSinhItem.so_dien_thoai_lien_he
-                      }
-                    </td>
-
-                    <td className="px-3 py-3">
-                      {
-                        HocSinhItem.trang_thai
-                      }
-                    </td>
-
-                    <td className="px-3 py-3">
-                      {
-                        HocSinhItem.xep_lop[0]
-                          ?.lop_hoc_id ??
-                        'Chưa xếp'
-                      }
-                    </td>
-
-                    {LaAdmin && (
-                      <td className="px-3 py-3">
-                        <button
-                          type="button"
-                          onClick={
-                            () =>
-                              void CapNhatSucKhoe(
-                                HocSinhItem,
-                              )
-                          }
-                          className="text-blue-600 hover:underline"
-                        >
-                          Cập nhật sức khỏe
-                        </button>
-                      </td>
-                    )}
-                  </tr>
-                ),
-              )}
-            </tbody>
-          </table>
-
-          {DangTai && (
-            <p className="py-6 text-center text-slate-500">
-              Đang tải...
-            </p>
-          )}
-
-          {!DangTai &&
-            DanhSach.length === 0 && (
-            <p className="py-6 text-center text-slate-500">
-              Không có học sinh.
-            </p>
-          )}
-        </div>
-      </div>
+      <DanhSachHocSinh LanTai={LanTai} LaAdmin={LaAdmin} />
     </div>
   );
 }

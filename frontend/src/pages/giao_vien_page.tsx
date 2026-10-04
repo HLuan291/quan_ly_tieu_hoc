@@ -607,6 +607,15 @@ export default function GiaoVienPage() {
     }
   }
 
+  async function XoaGiaoVien(Item: GiaoVien) {
+    if (!window.confirm('Xóa ' + Item.ho_ten + ' khỏi danh sách sử dụng và khóa tài khoản? Lịch sử được lưu giữ.')) return;
+    try {
+      SetLoi('');
+      await Api.delete(`/giao_vien/${Item.id}`);
+      await TaiDanhSach();
+    } catch (Error) { SetLoi(LayThongBaoLoi(Error)); }
+  }
+
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -1162,6 +1171,7 @@ export default function GiaoVienPage() {
                       >
                         Cấp lại mật khẩu
                       </button>
+                      <button type="button" disabled={DangCapMatKhau} onClick={() => { void XoaGiaoVien(GiaoVienItem); }} className="ml-3 text-red-700 hover:underline">Xóa</button>
                     </td>
                   </tr>
                 ),
