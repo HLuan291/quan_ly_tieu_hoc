@@ -3,7 +3,8 @@ import type { FormEvent } from 'react';
 import Api from '../api/api';
 import { LayThongBaoLoi } from '../utils/loi_api';
 import { LayNgayHomNay } from '../utils/ngay_local';
-import type { LopHoc } from './hoc_sinh_types';
+import NhanLopGiaoVien from '../components/nhan_lop_giao_vien';
+import type { DanhMucLop, LopHoc } from './hoc_sinh_types';
 import ThongKeDanhGia from './thong_ke_danh_gia';
 
 interface KetQua { id: number; muc_danh_gia: string; nhan_xet: string | null; mon_hoc_id?: number; tieu_chi_danh_gia_id?: number }
@@ -61,6 +62,7 @@ function DiemForm({ HS, CH, DaCo, DuocNhap }: { HS: HocSinh; CH: Bang['cau_hinh_
 }
 
 export default function BangDanhGiaGiaoVien() {
+  const [CheDo, SetCheDo] = useState<DanhMucLop['che_do']>('CHUA_PHAN_CONG');
   const [Lop, SetLop] = useState<LopHoc[]>([]);
   const [Nam, SetNam] = useState('');
   const [Khoi, SetKhoi] = useState('');
@@ -83,8 +85,13 @@ export default function BangDanhGiaGiaoVien() {
   const HuyYeuCau = useCallback(() => { Lan.current++; }, []);
   useEffect(() => {
     let Huy = false;
-    void Api.get<{ lop_hoc: LopHoc[] }>('/ho_so_hoc_sinh/danh_muc').then(R => {
-      if (!Huy) { SetLop(R.data.lop_hoc); SetNam(String(R.data.lop_hoc[0]?.nam_hoc_id ?? '')); }
+    void Api.get<DanhMucLop>('/ho_so_hoc_sinh/danh_muc').then(R => {
+      if (!Huy) {
+        SetLop(R.data.lop_hoc); SetCheDo(R.data.che_do);
+        const L = R.data.lop_hoc.find(L => L.id === R.data.lop_chu_nhiem_id) ?? R.data.lop_hoc[0];
+        SetNam(String(L?.nam_hoc_id ?? ''));
+        if (R.data.che_do !== 'ADMIN') { SetLopId(String(L?.id ?? '')); SetKhoi(String(L?.khoi_id ?? '')); }
+      }
     }).catch(E => { if (!Huy) SetLoi(LayThongBaoLoi(E)); });
     return () => { Huy = true; };
   }, []);
@@ -150,9 +157,8 @@ export default function BangDanhGiaGiaoVien() {
     SetNhap(Cu => ({ ...Cu, [HS.id]: { ...(Cu[HS.id] ?? DaLuu(HS)), [Field]: Value } }));
     SetTinDong(Cu => ({ ...Cu, [HS.id]: '' }));
   }
-  const NamHoc = [...new Map(Lop.map(L => [L.nam_hoc.id, L.nam_hoc])).values()];
-  const KhoiHoc = [...new Map(Lop.filter(L => String(L.nam_hoc_id) === Nam).map(L => [L.khoi.id, L.khoi])).values()];
-  const LopLoc = Lop.filter(L => String(L.nam_hoc_id) === Nam && (!Khoi || String(L.khoi_id) === Khoi));
+  const KhoiHoc = [...new Map(Lop.filter(L => CheDo !== 'ADMIN' || String(L.nam_hoc_id) === Nam).map(L => [L.khoi.id, L.khoi])).values()];
+  const LopLoc = Lop.filter(L => (CheDo !== 'ADMIN' || String(L.nam_hoc_id) === Nam) && (!Khoi || String(L.khoi_id) === Khoi));
   const DuocNhap = !!Data && (Tab === 'MON' ? Data.mon_hoc.find(M => M.id === Number(MonId))?.duoc_nhap : Data.duoc_nhap_nang_luc && Data.tieu_chi.some(T => T.id === Number(TieuChiId)));
   const SoTrang = Math.max(1, Math.ceil((Data?.danh_sach.length ?? 0) / SoDong));
   return <div className="min-w-0">
@@ -160,16 +166,23 @@ export default function BangDanhGiaGiaoVien() {
     <p className="mt-1 text-sm text-slate-600">Nhập mức đánh giá, nhận xét và điểm theo danh sách học sinh của lớp được phân công.</p>
     <div className="mt-4 flex flex-wrap gap-2">{[['MON', 'Môn học'], ['NANG', 'Năng lực, phẩm chất'], ['THONG_KE', 'Thống kê']].map(([Key, Ten]) => <button key={Key} disabled={DangLuu} aria-pressed={Tab === Key} onClick={() => Chuyen(() => SetTab(Key))} className={'rounded border px-4 py-2 text-sm ' + (Tab === Key ? 'bg-sky-700 text-white' : 'bg-white')}>{Ten}</button>)}</div>
     {Tab === 'THONG_KE' ? <ThongKeDanhGia /> : <section className="mt-4 rounded-lg border bg-white p-4">
-      <fieldset disabled={DangLuu} className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <label>Năm học<select aria-label="Năm học đánh giá" className={O} value={Nam} onChange={E => Chuyen(() => { SetNam(E.target.value); SetKhoi(''); SetLopId(''); SetDotId(''); SetDot([]); SetMonId(''); })}>{NamHoc.map(N => <option key={N.id} value={N.id}>{N.ten_nam_hoc}</option>)}</select></label>
-        <label>Khối<select aria-label="Khối đánh giá" className={O} value={Khoi} onChange={E => Chuyen(() => { SetKhoi(E.target.value); SetLopId(''); SetMonId(''); })}><option value="">Tất cả khối được phân công</option>{KhoiHoc.map(K => <option key={K.id} value={K.id}>{K.ten_khoi}</option>)}</select></label>
-        <label>Lớp<select aria-label="Lớp đánh giá" className={O} value={LopId} onChange={E => Chuyen(() => { SetLopId(E.target.value); SetMonId(''); })}><option value="">Chọn lớp</option>{LopLoc.map(L => <option key={L.id} value={L.id}>{L.ten_lop}</option>)}</select></label>
+      <NhanLopGiaoVien Lop={Lop.find(L => String(L.id) === LopId)} CheDo={CheDo} />
+      <fieldset disabled={DangLuu} className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {CheDo === 'GVBM' && <>
+        <label>Khối<select aria-label="Khối đánh giá" className={O} value={Khoi} onChange={E => Chuyen(() => {
+          SetKhoi(E.target.value); const L = Lop.find(L => !E.target.value || String(L.khoi_id) === E.target.value);
+          SetLopId(String(L?.id ?? '')); if (String(L?.nam_hoc_id ?? '') !== Nam) { SetDot([]); SetDotId(''); } SetNam(String(L?.nam_hoc_id ?? '')); SetMonId('');
+        })}><option value="">Tất cả khối được phân công</option>{KhoiHoc.map(K => <option key={K.id} value={K.id}>{K.ten_khoi}</option>)}</select></label>
+        <label>Lớp<select aria-label="Lớp đánh giá" className={O} value={LopId} onChange={E => Chuyen(() => {
+          const L = Lop.find(L => String(L.id) === E.target.value); SetLopId(E.target.value); SetNam(String(L?.nam_hoc_id ?? '')); SetMonId('');
+        })}>{LopLoc.map(L => <option key={L.id} value={L.id}>{L.ten_lop} · {L.nam_hoc.ten_nam_hoc}</option>)}</select></label>
+        </>}
         <label>Đợt đánh giá<select aria-label="Đợt đánh giá danh sách" className={O} value={DotId} onChange={E => Chuyen(() => { SetDotId(E.target.value); SetMonId(''); })}><option value="">Chọn đợt</option>{Dot.map(D => <option key={D.id} value={D.id}>{D.ten_dot}</option>)}</select></label>
         {Tab === 'MON' ? <label>Môn học<select aria-label="Môn đánh giá danh sách" className={O} value={MonId} onChange={E => Chuyen(() => SetMonId(E.target.value))}><option value="">Chọn môn học</option>{Data?.mon_hoc.map(M => <option key={M.id} value={M.id}>{M.ten_mon_hoc}{M.duoc_nhap ? '' : ' (chỉ xem)'}</option>)}</select></label>
           : <label className="xl:col-span-2">Tiêu chí<select aria-label="Tiêu chí đánh giá danh sách" className={O} value={TieuChiId} onChange={E => Chuyen(() => SetTieuChiId(E.target.value))}><option value="">Chọn tiêu chí</option>{Data?.tieu_chi.map(T => <option key={T.id} value={T.id}>{T.ten_tieu_chi} · {T.nhom_danh_gia}</option>)}</select></label>}
       </fieldset>
       {Loi && <p role="alert" className="mt-3 rounded bg-red-50 p-3 text-red-700">{Loi}</p>}
-      {!LopId && <p className="mt-4 text-slate-600">Chọn lớp để mở danh sách học sinh.</p>}
+      {!LopId && <p className="mt-4 text-slate-600">Chưa được phân công lớp để đánh giá. Vui lòng liên hệ Admin.</p>}
       {DangTai && <p role="status" className="mt-4">Đang tải bảng đánh giá...</p>}
       {Data && <>
         <div className="my-4 flex flex-wrap items-center justify-between gap-3 text-sm"><span>{Data.danh_sach.length} học sinh · {Data.dot_danh_gia.ten_dot}{!DuocNhap ? ' · Bạn có quyền xem bảng này' : ''}</span><div className="flex flex-wrap gap-2"><button disabled={DangTai || DangLuu || !!Object.keys(Nhap).length} onClick={() => { void Tai(); }} className="rounded border px-3 py-2">Tải lại bảng</button><button disabled={!DuocNhap || DangLuu || !Object.keys(Nhap).length} onClick={() => { void Luu(Data.danh_sach.filter(H => Nhap[H.id])); }} className={Nut}>Lưu mức và nhận xét đã sửa ({Object.keys(Nhap).length})</button></div></div>

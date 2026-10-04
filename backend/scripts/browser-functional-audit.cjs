@@ -89,7 +89,7 @@ async function Go(Route, Heading) {
 async function Shot(Name) {
   const Bytes = await Page.screenshot({ path: Path.join(Output, Name + '.png'), fullPage: true });
   Screens.push(Name + '.png');
-  if (Name === 'parent-mobile') console.log('CI_SCREENSHOT_MOBILE ' + Bytes.toString('base64'));
+  if (['parent-mobile', 'attendance-quick', 'student-modal-mobile'].includes(Name)) console.log('CI_SCREENSHOT_' + Name.replaceAll('-', '_').toUpperCase() + ' ' + Bytes.toString('base64'));
 }
 
 function WithDeadline(PromiseValue) {
@@ -240,6 +240,7 @@ async function Main() {
     await Page.locator('select').filter({ has: Page.locator('option[value="GVCN_CHINH"]') }).selectOption('GVCN_CHINH');
     const Form = Page.locator('form').filter({ has: Page.getByRole('button', { name: 'Phân công', exact: true }) });
     Assert.equal(await Form.locator('input[type="date"]').inputValue(), Fixture.today);
+    await Form.locator('input[type="date"]').fill('2026-09-01');
     await HttpAction('POST', '/phan_cong_giang_day/phan_cong/gvcn', () => Form.getByRole('button', { name: 'Phân công', exact: true }).click(), 201);
     const Records = await Prisma.phan_cong_giao_vien.findMany({ where: { lop_hoc_id: BrowserClass.id, giao_vien_id: Teacher.giao_vien.id } });
     Assert(Records.length === 2 && Records.some(Row => Row.mon_hoc_id === Fixture.subject_id && Row.nguon_phan_cong === 'TU_DONG_GVCN'));
@@ -284,6 +285,9 @@ async function Main() {
   await Case('ADMIN tạo học sinh qua form', async () => {
     await Go('/hoc_sinh', 'Quản lý học sinh');
     await Page.getByRole('button', { name: 'Thêm học sinh', exact: true }).click();
+    const Dialog = Page.getByRole('dialog', { name: 'Thêm học sinh và phụ huynh', exact: true }); await Dialog.waitFor();
+    Assert(await Dialog.evaluate(E => E.open && E.matches(':modal')));
+    Assert(await Page.evaluate(() => document.body.style.overflow === 'hidden' && !!document.activeElement.closest('dialog')));
     const Form = FormWithHeading('Thông tin học sinh');
     for (const [Name, Value] of Object.entries({
       ho_ten: 'Nguyễn Văn Giao Diện', ngay_sinh: '2016-01-01', noi_sinh: 'Địa chỉ giả',
@@ -437,6 +441,8 @@ async function Main() {
   await Case('GV xem học sinh đúng phạm vi và không còn menu phân công', async () => {
     await Go('/hoc_sinh', 'Quản lý học sinh');
     await Page.locator('tbody tr').filter({ hasText: Student.ho_ten }).waitFor();
+    for (const Name of ['Năm học học sinh', 'Khối học sinh', 'Lớp học sinh']) Assert.equal(await Page.getByRole('combobox', { name: Name, exact: true }).count(), 0);
+    await Page.getByRole('status', { name: 'Lớp gắn với giáo viên', exact: true }).getByText('Lớp chủ nhiệm: ' + BrowserClass.ten_lop, { exact: true }).waitFor();
     Assert.equal(await Page.getByRole('button', { name: 'Thêm học sinh', exact: true }).count(), 0);
     Assert.equal(await Page.getByRole('button', { name: 'Xóa', exact: true }).count(), 0);
     Assert.equal(await Page.locator('tbody tr').filter({ hasText: FormStudent.ho_ten }).count(), 0);
@@ -445,7 +451,8 @@ async function Main() {
   });
 
   await Case('GV sửa đầy đủ hồ sơ học sinh và xem tổng ngày nghỉ', async () => {
-    const Yesterday = new Date(Fixture.today); Yesterday.setUTCDate(Yesterday.getUTCDate() - 1);
+    const Yesterday = new Date(Fixture.attendance_day); Yesterday.setUTCDate(Yesterday.getUTCDate() - 1);
+    if (Yesterday.getUTCDay() === 0) Yesterday.setUTCDate(Yesterday.getUTCDate() - 1);
     await Prisma.diem_danh.createMany({ data: ['SANG', 'CHIEU'].map(Buoi => ({
       xep_lop_id: Enrollment.id, ngay_hoc: Yesterday, buoi_hoc: Buoi, trang_thai: Buoi === 'SANG' ? 'VANG_CO_PHEP' : 'VANG_KHONG_PHEP', giao_vien_cap_nhat_id: Teacher.giao_vien.id,
     })) });
@@ -482,29 +489,92 @@ async function Main() {
     await Page.getByRole('button', { name: 'Đóng hồ sơ', exact: true }).click();
   });
 
-  await Case('Ngày điểm danh đúng và tải sổ', async () => {
+  await Case('Ngày điểm danh đúng và danh sách tự tải', async () => {
     await Go('/diem_danh', 'Điểm danh');
-    Assert.equal(await Page.locator('input[type="date"]').inputValue(), Fixture.today);
+    Assert.equal(await Page.locator('input[type="date"]').inputValue(), Fixture.attendance_day);
     Assert.equal(await Page.locator('input[type="date"]').getAttribute('max'), Fixture.today);
-    await SelectValue('Chọn lớp chủ nhiệm', BrowserClass.id);
-    await HttpAction('GET', '/diem_danh_nghi_hoc/diem_danh', () => Page.getByRole('button', { name: 'Tải sổ điểm danh', exact: true }).click());
+    Assert.equal(await Page.getByRole('button', { name: 'Tải sổ điểm danh', exact: true }).count(), 0);
+    Assert.equal(await Page.getByRole('combobox', { name: 'Chọn lớp chủ nhiệm', exact: true }).count(), 0);
     await Page.locator('tbody tr').filter({ hasText: Student.ho_ten }).waitFor();
   });
   await Case('Native validation chặn thiếu trạng thái', async () => {
     const Select = Page.getByRole('combobox', { name: 'Trạng thái điểm danh ' + Student.ho_ten, exact: true });
     Assert(await Select.evaluate(Element => Element.required && Element.validity.valueMissing));
     const Before = Requests.filter(Row => Row.method === 'POST' && Row.endpoint === '/diem_danh_nghi_hoc/diem_danh').length;
+    await Page.getByRole('textbox', { name: 'Ghi chú điểm danh ' + Student.ho_ten, exact: true }).fill('Thử thiếu trạng thái');
     await Page.getByRole('button', { name: 'Lưu điểm danh', exact: true }).click(); await Page.waitForTimeout(300);
     Assert.equal(Requests.filter(Row => Row.method === 'POST' && Row.endpoint === '/diem_danh_nghi_hoc/diem_danh').length, Before);
   });
   await Case('Lưu điểm danh từ form', async () => {
     await Page.getByRole('combobox', { name: 'Trạng thái điểm danh ' + Student.ho_ten, exact: true }).selectOption('CO_MAT');
     await HttpAction('POST', '/diem_danh_nghi_hoc/diem_danh', () => Page.getByRole('button', { name: 'Lưu điểm danh', exact: true }).click(), 201);
-    Assert.equal((await Prisma.diem_danh.findFirstOrThrow({ where: { xep_lop_id: Enrollment.id, ngay_hoc: new Date(Fixture.today), buoi_hoc: 'SANG' } })).trang_thai, 'CO_MAT');
+    Assert.equal((await Prisma.diem_danh.findFirstOrThrow({ where: { xep_lop_id: Enrollment.id, ngay_hoc: new Date(Fixture.attendance_day), buoi_hoc: 'SANG' } })).trang_thai, 'CO_MAT');
+  });
+  await Case('Điểm danh tất cả tích Có mặt và chỉ lưu khi bấm Lưu', async () => {
+    const Before = Requests.filter(R => R.method === 'POST' && R.endpoint === '/diem_danh_nghi_hoc/diem_danh').length;
+    await Page.getByRole('button', { name: 'Điểm danh tất cả', exact: true }).click();
+    const Boxes = Page.getByRole('checkbox', { name: /^Có mặt / });
+    Assert(await Boxes.count() > 0); for (const Box of await Boxes.all()) Assert(await Box.isChecked());
+    Assert.equal(Requests.filter(R => R.method === 'POST' && R.endpoint === '/diem_danh_nghi_hoc/diem_danh').length, Before);
+  });
+  await Case('Sửa từng em sang ba trạng thái ngoại lệ và đọc lại', async () => {
+    for (const Status of ['VANG_CO_PHEP', 'VANG_KHONG_PHEP', 'DI_TRE']) {
+      await Page.getByRole('combobox', { name: 'Trạng thái điểm danh ' + Student.ho_ten, exact: true }).selectOption(Status);
+      Assert(!(await Page.getByRole('checkbox', { name: 'Có mặt ' + Student.ho_ten, exact: true }).isChecked()));
+      await HttpAction('POST', '/diem_danh_nghi_hoc/diem_danh', () => Page.getByRole('button', { name: 'Lưu điểm danh', exact: true }).click(), 201);
+      Assert.equal((await Prisma.diem_danh.findFirstOrThrow({ where: { xep_lop_id: Enrollment.id, ngay_hoc: new Date(Fixture.attendance_day), buoi_hoc: 'SANG' } })).trang_thai, Status);
+      await Go('/diem_danh', 'Điểm danh');
+      await Page.locator('tbody tr').filter({ hasText: Student.ho_ten }).waitFor();
+      Assert.equal(await Page.getByRole('combobox', { name: 'Trạng thái điểm danh ' + Student.ho_ten, exact: true }).inputValue(), Status);
+    }
+    await Shot('attendance-quick');
+  });
+  await Case('Đổi buổi tự tải và lưu sáng chiều độc lập', async () => {
+    await HttpAction('GET', '/diem_danh_nghi_hoc/diem_danh', () => Page.getByRole('combobox', { name: 'Buổi học điểm danh', exact: true }).selectOption('CHIEU'));
+    await Page.getByRole('combobox', { name: 'Trạng thái điểm danh ' + Student.ho_ten, exact: true }).waitFor();
+    Assert.equal(await Page.getByRole('combobox', { name: 'Trạng thái điểm danh ' + Student.ho_ten, exact: true }).inputValue(), '');
+    await Page.getByRole('button', { name: 'Điểm danh tất cả', exact: true }).click();
+    await HttpAction('POST', '/diem_danh_nghi_hoc/diem_danh', () => Page.getByRole('button', { name: 'Lưu điểm danh', exact: true }).click(), 201);
+    await HttpAction('GET', '/diem_danh_nghi_hoc/diem_danh', () => Page.getByRole('combobox', { name: 'Buổi học điểm danh', exact: true }).selectOption('SANG'));
+    await Page.locator('tbody tr').filter({ hasText: Student.ho_ten }).waitFor();
+    Assert.equal(await Page.getByRole('combobox', { name: 'Trạng thái điểm danh ' + Student.ho_ten, exact: true }).inputValue(), 'DI_TRE');
+  });
+  await Case('Chọn Chủ nhật chặn cả danh sách và nút lưu', async () => {
+    const Sunday = new Date(Fixture.today); Sunday.setUTCDate(Sunday.getUTCDate() - Sunday.getUTCDay());
+    const Before = Requests.filter(R => R.method === 'POST' && R.endpoint === '/diem_danh_nghi_hoc/diem_danh').length;
+    await Page.locator('input[type="date"]').fill(Sunday.toISOString().slice(0, 10));
+    await Page.getByRole('alert').filter({ hasText: 'Chủ nhật không điểm danh' }).waitFor();
+    Assert(await Page.getByRole('button', { name: 'Điểm danh tất cả', exact: true }).isDisabled());
+    Assert(await Page.getByRole('button', { name: 'Lưu điểm danh', exact: true }).isDisabled());
+    Assert.equal(await Page.locator('tbody tr').count(), 0);
+    Assert.equal(Requests.filter(R => R.method === 'POST' && R.endpoint === '/diem_danh_nghi_hoc/diem_danh').length, Before);
+    await HttpAction('GET', '/diem_danh_nghi_hoc/diem_danh', () => Page.locator('input[type="date"]').fill(Fixture.attendance_day));
+    await Page.locator('tbody tr').filter({ hasText: Student.ho_ten }).waitFor();
+  });
+  await Case('Phản hồi điểm danh cũ không ghi đè ngày đang xem', async () => {
+    let Release, HeldResolve;
+    const Gate = new Promise(R => { Release = R; }), Held = new Promise(R => { HeldResolve = R; });
+    const Handler = async Route => {
+      const Response = await Route.fetch();
+      HeldResolve(); await Gate; await Route.fulfill({ response: Response });
+    };
+    await Page.route('**/diem_danh_nghi_hoc/diem_danh?*', Handler);
+    try {
+      await Go('/diem_danh', 'Điểm danh'); await WithDeadline(Held);
+      const Sunday = new Date(Fixture.today); Sunday.setUTCDate(Sunday.getUTCDate() - Sunday.getUTCDay());
+      await Page.locator('input[type="date"]').fill(Sunday.toISOString().slice(0, 10));
+      await Page.getByRole('alert').filter({ hasText: 'Chủ nhật không điểm danh' }).waitFor();
+      Release(); await Page.waitForTimeout(300);
+      Assert.equal(await Page.locator('tbody tr').count(), 0);
+    } finally { Release(); await Page.unroute('**/diem_danh_nghi_hoc/diem_danh?*', Handler); }
+    await HttpAction('GET', '/diem_danh_nghi_hoc/diem_danh', () => Page.locator('input[type="date"]').fill(Fixture.attendance_day));
+    await Page.locator('tbody tr').filter({ hasText: Student.ho_ten }).waitFor();
   });
   await Case('Lưu nhận xét môn trên bảng danh sách học sinh', async () => {
     await Go('/danh_gia', 'Đánh giá học tập');
-    await Page.getByRole('combobox', { name: 'Lớp đánh giá', exact: true }).selectOption(String(BrowserClass.id));
+    Assert.equal(await Page.getByRole('combobox', { name: 'Lớp đánh giá', exact: true }).count(), 0);
+    Assert.equal(await Page.getByRole('combobox', { name: 'Khối đánh giá', exact: true }).count(), 0);
+    Assert.equal(await Page.getByRole('combobox', { name: 'Năm học đánh giá', exact: true }).count(), 0);
     await Page.getByRole('combobox', { name: 'Đợt đánh giá danh sách', exact: true }).selectOption(String(EvaluationDot));
     await Page.getByRole('combobox', { name: 'Môn đánh giá danh sách', exact: true }).selectOption(String(Fixture.subject_id));
     const Row = Page.getByTestId('danh-gia-hs-' + Student.id); await Row.waitFor();
@@ -576,7 +646,7 @@ async function Main() {
     await Page.getByRole('combobox', { name: 'Đợt thống kê', exact: true }).selectOption(String(EvaluationDot));
     const Table = Page.getByRole('table', { name: 'Bảng thống kê đánh giá', exact: true });
     await Table.getByText(BrowserClass.ten_lop, { exact: true }).waitFor();
-    Assert.equal(await Page.getByRole('combobox', { name: 'Lớp thống kê', exact: true }).locator('option').count(), 2);
+    Assert.equal(await Page.getByRole('combobox', { name: 'Lớp thống kê', exact: true }).count(), 0);
     const Total = Table.locator('tbody tr').filter({ hasText: 'Tổng lớp được phân công' }).first();
     Assert.equal(await Total.locator('td').nth(1).innerText(), '2');
     Assert.equal(await Total.locator('td').nth(4).innerText(), '1');
@@ -590,6 +660,13 @@ async function Main() {
     await Page.locator('tbody tr').filter({ hasText: Student.ho_ten }).waitFor();
     Assert(await Page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
     await Shot('teacher-student-mobile');
+    await Page.locator('tbody tr').filter({ hasText: Student.ho_ten }).getByRole('button', { name: 'Xem / sửa', exact: true }).click();
+    const Dialog = Page.getByRole('dialog', { name: 'Hồ sơ học sinh: ' + Student.ho_ten, exact: true }); await Dialog.waitFor();
+    Assert(await Dialog.evaluate(E => E.open && E.matches(':modal') && E.getBoundingClientRect().width <= innerWidth));
+    await Shot('student-modal-mobile');
+    await Page.keyboard.press('Escape'); await Dialog.waitFor({ state: 'hidden' });
+    Assert.equal(await Page.evaluate(() => document.body.style.overflow), '');
+
     await Go('/danh_gia', 'Đánh giá học tập');
     await Page.getByRole('combobox', { name: 'Lớp đánh giá', exact: true }).selectOption(String(BrowserClass.id));
     await Page.getByTestId('danh-gia-hs-' + Student.id).waitFor();
@@ -598,6 +675,36 @@ async function Main() {
     await Page.setViewportSize({ width: 1440, height: 1000 });
   });
 
+  await Case('GVBM chọn đúng các lớp và khối được phân công ở học sinh', async () => {
+    await Login(Fixture.subject_teacher, Fixture.password, 'GIAO_VIEN');
+    await Go('/hoc_sinh', 'Quản lý học sinh');
+    await Page.locator('tbody tr').filter({ hasText: 'Nguyễn Văn Khối Bốn' }).waitFor();
+    Assert.equal(await Page.getByRole('combobox', { name: 'Năm học học sinh', exact: true }).count(), 0);
+    const Grades = Page.getByRole('combobox', { name: 'Khối học sinh', exact: true });
+    Assert.equal(await Grades.locator('option').count(), 3);
+    await Grades.selectOption(String(Fixture.grade_id));
+    await Page.locator('tbody tr').filter({ hasText: Fixture.student_name }).waitFor();
+    Assert.equal(await Page.locator('tbody tr').filter({ hasText: Student.ho_ten }).count(), 0);
+    const Options = await Page.getByRole('combobox', { name: 'Lớp học sinh', exact: true }).locator('option').evaluateAll(O => O.map(E => E.value));
+    Assert.deepEqual(Options, ['', String(Fixture.class_id)]);
+  });
+  await Case('GVBM đổi khối lớp trên bảng đánh giá và chỉ nhập môn mình', async () => {
+    await Go('/danh_gia', 'Đánh giá học tập');
+    await Page.getByTestId('danh-gia-hs-' + Fixture.subject_student_id).waitFor();
+    Assert.equal(await Page.getByRole('combobox', { name: 'Năm học đánh giá', exact: true }).count(), 0);
+    Assert.equal(await Page.getByRole('combobox', { name: 'Khối đánh giá', exact: true }).locator('option').count(), 3);
+    await Page.getByRole('combobox', { name: 'Khối đánh giá', exact: true }).selectOption(String(Fixture.grade_id));
+    await Page.getByTestId('danh-gia-hs-' + Fixture.student_id).waitFor();
+    Assert.equal(await Page.getByTestId('danh-gia-hs-' + Student.id).count(), 0);
+    await Page.getByRole('combobox', { name: 'Môn đánh giá danh sách', exact: true }).selectOption(String(Fixture.subject_id));
+    Assert(await Page.getByTestId('danh-gia-hs-' + Fixture.student_id).getByRole('combobox').isDisabled());
+    await Page.getByRole('combobox', { name: 'Môn đánh giá danh sách', exact: true }).selectOption(String(Fixture.subject_id_2));
+    Assert(!(await Page.getByTestId('danh-gia-hs-' + Fixture.student_id).getByRole('combobox').isDisabled()));
+    await Page.getByRole('combobox', { name: 'Khối đánh giá', exact: true }).selectOption(String(Fixture.subject_grade_id));
+    await Page.getByTestId('danh-gia-hs-' + Fixture.subject_student_id).waitFor();
+    Assert.equal(await Page.getByRole('combobox', { name: 'Lớp đánh giá', exact: true }).locator('option').count(), 1);
+    await Shot('subject-teacher-assessment');
+  });
   await Case('PH đăng nhập, menu đúng quyền', async () => {
     await Login(Fixture.parent, Fixture.password, 'PHU_HUYNH'); await Page.getByRole('link', { name: 'Con của tôi', exact: true }).waitFor();
     Assert.equal(await Page.getByRole('link', { name: 'Giáo viên', exact: true }).count(), 0);

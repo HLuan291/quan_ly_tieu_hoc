@@ -10,6 +10,7 @@ import { randomBytes } from 'crypto';
 import * as argon2 from 'argon2';
 
 import { PrismaService } from '../prisma.service';
+import { LayPhamViGiaoVien } from '../pham_vi_giao_vien';
 import { LayNgayNghiepVu } from '../ngay_nghiep_vu';
 import { TinhThongKeNghi } from './thong_ke_nghi';
 
@@ -231,74 +232,9 @@ export class HoSoHocSinhService {
       'GIAO_VIEN'
     ) {
 
-      const GiaoVien =
-        await this.Prisma.giao_vien.findUnique({
-          where: {
-            tai_khoan_id:
-              NguoiDung.sub,
-          },
-
-          select: {
-            id: true,
-          },
-        });
-
-
-      if (!GiaoVien) {
-        throw new ForbiddenException(
-          'Không tìm thấy hồ sơ giáo viên',
-        );
-      }
-
-
-      const HomNay =
-        this.HomNay();
-
-
-      const PhanCong =
-        await this.Prisma
-          .phan_cong_giao_vien
-          .findMany({
-            where: {
-              giao_vien_id:
-                GiaoVien.id,
-
-              ngay_bat_dau: {
-                lte:
-                  HomNay,
-              },
-
-              OR: [
-                {
-                  ngay_ket_thuc:
-                    null,
-                },
-
-                {
-                  ngay_ket_thuc: {
-                    gte:
-                      HomNay,
-                  },
-                },
-              ],
-            },
-
-            select: {
-              lop_hoc_id:
-                true,
-            },
-          });
-
-
-      const LopHocIds = [
-        ...new Set(
-          PhanCong.map(
-            (Item) =>
-              Item.lop_hoc_id,
-          ),
-        ),
-      ];
-
+      const HomNay = this.HomNay();
+      const PhamVi = await LayPhamViGiaoVien(this.Prisma, { tai_khoan_id: NguoiDung.sub });
+      const LopHocIds = PhamVi.lop_hoc.map(L => L.id);
 
       if (
         LopHocIds.length === 0
@@ -849,19 +785,16 @@ export class HoSoHocSinhService {
     if (!['ADMIN', 'GIAO_VIEN'].includes(NguoiDung.vai_tro)) {
       throw new ForbiddenException('Chỉ Admin và giáo viên được xem danh mục lớp');
     }
-    const HomNay = this.HomNay();
+    if (NguoiDung.vai_tro === 'GIAO_VIEN') {
+      const PhamVi = await LayPhamViGiaoVien(this.Prisma, { tai_khoan_id: NguoiDung.sub });
+      return { che_do: PhamVi.che_do, lop_chu_nhiem_id: PhamVi.lop_chu_nhiem_id,
+        giao_vien: PhamVi.giao_vien, lop_hoc: PhamVi.lop_hoc };
+    }
     const Lop = await this.Prisma.lop_hoc.findMany({
-      where: NguoiDung.vai_tro === 'ADMIN' ? {} : {
-        phan_cong_giao_vien: { some: {
-          giao_vien: { tai_khoan_id: NguoiDung.sub },
-          ngay_bat_dau: { lte: HomNay },
-          OR: [{ ngay_ket_thuc: null }, { ngay_ket_thuc: { gte: HomNay } }],
-        } },
-      },
       include: { khoi: true, nam_hoc: true },
       orderBy: [{ nam_hoc_id: 'desc' }, { ten_lop: 'asc' }],
     });
-    return { lop_hoc: Lop };
+    return { che_do: 'ADMIN', lop_chu_nhiem_id: null, lop_hoc: Lop };
   }
 
   async KiemTraQuyenSuaHocSinh(NguoiDung: NguoiDungJwt, Id: number) {

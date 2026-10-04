@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 import Api from '../api/api';
 import { LayThongBaoLoi } from '../utils/loi_api';
 import { LayNgayHomNay } from '../utils/ngay_local';
+import HopThoai from '../components/hop_thoai';
 import type { HoSoHocSinh, PhuHuynh } from './hoc_sinh_types';
 
 const O = 'mt-1 w-full rounded border border-slate-300 bg-white px-3 py-2';
@@ -67,7 +68,6 @@ export default function HoSoHocSinhChiTiet({ Id, LaAdmin, Dong, CapNhat }: { Id:
   const [DangLuu, SetDangLuu] = useState(false);
   const [ThemPH, SetThemPH] = useState(false);
   const [MatKhauMoi, SetMatKhauMoi] = useState<string | null>(null);
-  const Panel = useRef<HTMLDivElement>(null);
   const LanYeuCau = useRef(0);
   const HuyYeuCau = useCallback(() => { LanYeuCau.current++; }, []);
   const Tai = useCallback(async () => {
@@ -82,7 +82,6 @@ export default function HoSoHocSinhChiTiet({ Id, LaAdmin, Dong, CapNhat }: { Id:
     void Promise.resolve().then(async () => {
       if (Huy) return;
       await Tai();
-      if (!Huy) { Panel.current?.focus(); Panel.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
     });
     return () => { Huy = true; HuyYeuCau(); };
   }, [Tai, HuyYeuCau]);
@@ -119,8 +118,9 @@ export default function HoSoHocSinhChiTiet({ Id, LaAdmin, Dong, CapNhat }: { Id:
       SetThemPH(false); SetTin('Đã bổ sung phụ huynh.'); await Tai(); CapNhat();
     } catch (E) { SetLoi(LayThongBaoLoi(E)); } finally { SetDangLuu(false); }
   }
-  return <div ref={Panel} tabIndex={-1} role="region" aria-label="Hồ sơ chi tiết học sinh" className="mt-6 scroll-mt-4 rounded-lg border-2 border-sky-700 text-sm outline-none">
-    <div className="flex flex-wrap items-center justify-between gap-3 bg-sky-700 p-4 text-white"><h2 className="text-lg font-semibold">Hồ sơ học sinh{HS ? ': ' + HS.ho_ten : ''}</h2><button disabled={DangLuu} onClick={Dong} className="rounded border border-white/60 px-3 py-1">Đóng hồ sơ</button></div>
+  return <HopThoai TieuDe={HS ? 'Hồ sơ học sinh: ' + HS.ho_ten : 'Hồ sơ học sinh'} Dong={Dong} DangLuu={DangLuu} Rong>
+    <div className="text-sm">
+      <button disabled={DangLuu} onClick={Dong} className="mb-3 rounded border px-3 py-1 text-sky-800">Đóng hồ sơ</button>
     <div className="space-y-6 p-4">
       {Loi && <p role="alert" className="rounded bg-red-50 p-3 text-red-700">{Loi}</p>}
       {Tin && <p role="status" className="rounded bg-green-50 p-3 text-green-700">{Tin}</p>}
@@ -153,7 +153,7 @@ export default function HoSoHocSinhChiTiet({ Id, LaAdmin, Dong, CapNhat }: { Id:
         </form>
         <section><div className="mb-3 flex flex-wrap items-center justify-between gap-3"><h3 className="text-base font-semibold text-sky-800">Phụ huynh và người giám hộ</h3><button disabled={DangLuu} onClick={() => SetThemPH(V => !V)} className="rounded border border-blue-700 px-3 py-2 text-blue-700">{ThemPH ? 'Hủy bổ sung' : 'Bổ sung phụ huynh'}</button></div>
           <div className="grid gap-4 xl:grid-cols-2">{HS.phu_huynh_hoc_sinh.map(LK => <PhuHuynhForm key={LK.phu_huynh.id} PH={LK.phu_huynh} MoiQuanHe={LK.moi_quan_he} HocSinhId={Id} Luu={() => { void Tai(); }} />)}</div>
-          {ThemPH && <form aria-label="Bổ sung phụ huynh" onSubmit={E => { void TaoPH(E); }} className="mt-4 rounded border bg-slate-50 p-4">
+          {ThemPH && <HopThoai TieuDe="Bổ sung phụ huynh" Dong={() => SetThemPH(false)} DangLuu={DangLuu}><form aria-label="Bổ sung phụ huynh" onSubmit={E => { void TaoPH(E); }} className="mt-4 rounded border bg-slate-50 p-4">
             <h4 className="mb-3 font-semibold">Thông tin phụ huynh mới</h4><div className="grid gap-3 sm:grid-cols-2">
               <label>Họ tên<input name="ho_ten" required maxLength={100} className={O} /></label>
               <label>Năm sinh<input name="nam_sinh" type="number" min={1900} max={Number(LayNgayHomNay().slice(0, 4)) - 18} className={O} /></label>
@@ -162,10 +162,11 @@ export default function HoSoHocSinhChiTiet({ Id, LaAdmin, Dong, CapNhat }: { Id:
               <label>Mối quan hệ<select name="moi_quan_he" className={O}><option value="CHA">Cha</option><option value="ME">Mẹ</option><option value="NGUOI_GIAM_HO">Người giám hộ</option></select></label>
             </div>{LaAdmin && <label className="mt-3 block"><input type="checkbox" name="tao_tai_khoan" /> Tạo tài khoản đăng nhập</label>}
             <button disabled={DangLuu} className={Nut + ' mt-3'}>Lưu phụ huynh mới</button>
-          </form>}
+            {Loi && <p role="alert" className="mt-3 text-red-700">{Loi}</p>}
+          </form></HopThoai>}
         </section>
         <section><h3 className="mb-3 text-base font-semibold text-sky-800">Lịch sử lớp học</h3><div className="overflow-auto"><table className="min-w-[700px] w-full text-left"><thead className="bg-sky-700 text-white"><tr>{['Lớp', 'Khối', 'Năm học', 'Bắt đầu', 'Kết thúc', 'Trạng thái', 'Ghi chú'].map(T => <th key={T} className="p-2">{T}</th>)}</tr></thead><tbody>{HS.xep_lop.map(X => <tr key={X.id} className="border-b"><td className="p-2">{X.lop_hoc.ten_lop}</td><td className="p-2">{X.lop_hoc.khoi.ten_khoi}</td><td className="p-2">{X.lop_hoc.nam_hoc.ten_nam_hoc}</td><td className="p-2">{Ngay(X.ngay_bat_dau)}</td><td className="p-2">{Ngay(X.ngay_ket_thuc) || '—'}</td><td className="p-2">{X.trang_thai}</td><td className="p-2">{X.ghi_chu || '—'}</td></tr>)}</tbody></table>{!HS.xep_lop.length && <p className="p-3">Chưa xếp lớp.</p>}</div></section>
       </>}
     </div>
-  </div>;
+  </div></HopThoai>;
 }

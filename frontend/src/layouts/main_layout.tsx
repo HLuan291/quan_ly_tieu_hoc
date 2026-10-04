@@ -107,144 +107,21 @@ export default function MainLayout() {
     );
 
   return (
-    <div
-      className="
-        flex
-        flex-col
-        md:flex-row
-        min-h-screen
-        bg-slate-100
-      "
-    >
-      <aside
-        className="
-          w-full
-          md:w-64
-          shrink-0
-          bg-slate-900
-          text-white
-        "
-      >
-        <div
-          className="
-            border-b
-            border-slate-700
-            p-6
-          "
-        >
-          <h1 className="text-lg font-bold">
-            QL Học Sinh
-          </h1>
-
-          <p
-            className="
-              mt-1
-              text-xs
-              text-slate-400
-            "
-          >
-            {
-              LayTenVaiTro(
-                NguoiDung?.vai_tro,
-              )
-            }
-          </p>
+    <div className="min-h-screen min-w-0 bg-slate-100">
+      <header className="flex flex-wrap items-center justify-between gap-3 bg-sky-600 px-4 py-3 text-white shadow-sm">
+        <div className="flex min-w-0 items-center gap-3">
+          <span aria-hidden="true" className="grid h-10 w-10 shrink-0 place-items-center rounded-full border-2 border-white/70 bg-sky-700 text-xl">🎓</span>
+          <div><p className="text-base font-bold uppercase tracking-wide">Quản lý giáo dục tiểu học</p><p className="text-xs text-sky-100">Hệ thống quản lý học sinh tiểu học</p></div>
         </div>
-
-        <nav className="flex gap-2 overflow-x-auto p-3 md:block">
-          {MenuHienThi.map(
-            (Item) => (
-              <NavLink
-                key={
-                  Item.DuongDan
-                }
-                to={
-                  Item.DuongDan
-                }
-                className={({ isActive: IsActive }) =>
-                  `
-                    shrink-0
-                    whitespace-nowrap
-                    md:mb-1
-                    block
-                    rounded-lg
-                    px-4
-                    py-3
-                    text-sm
-                    ${
-                      IsActive
-                        ? 'bg-blue-600 text-white'
-                        : 'text-slate-300 hover:bg-slate-800'
-                    }
-                  `
-                }
-              >
-                {Item.Ten}
-              </NavLink>
-            ),
-          )}
-        </nav>
-      </aside>
-
-      <div
-        className="
-          flex
-          min-w-0
-          flex-1
-          flex-col
-        "
-      >
-        <header
-          className="
-            flex
-            min-h-16
-            flex-wrap
-            gap-3
-            items-center
-            justify-between
-            border-b
-            bg-white
-            px-4
-            py-3
-            md:px-6
-          "
-        >
-          <span
-            className="
-              min-w-0
-              flex-1
-              text-sm
-              md:text-base
-              font-semibold
-              text-slate-700
-            "
-          >
-            Hệ thống quản lý học sinh tiểu học
-          </span>
-
-          <button
-            onClick={
-              XuLyDangXuat
-            }
-            className="
-              shrink-0
-              rounded-lg
-              border
-              border-slate-300
-              px-4
-              py-2
-              text-sm
-              hover:bg-slate-100
-            "
-          >
-            Đăng xuất
-          </button>
-        </header>
-
-        <main className="min-w-0 flex-1 p-4 md:p-6">
-          <Outlet />
-        </main>
-      </div>
+        <div className="flex shrink-0 items-center gap-3 text-sm"><span>{LayTenVaiTro(NguoiDung?.vai_tro)}</span><button onClick={XuLyDangXuat} className="rounded border border-white/70 px-3 py-2 hover:bg-sky-700">Đăng xuất</button></div>
+      </header>
+      <nav aria-label="Menu chức năng" className="flex w-full gap-1 overflow-x-auto border-b border-slate-300 bg-white px-2 py-1">
+        {MenuHienThi.map((Item, I) => <NavLink key={Item.DuongDan} to={Item.DuongDan}
+          className={({ isActive: IsActive }) => 'shrink-0 whitespace-nowrap rounded px-3 py-3 text-sm font-medium ' + (IsActive ? 'bg-sky-100 text-sky-800' : 'text-slate-700 hover:bg-slate-100')}>
+          <span aria-hidden="true" className="mr-2 text-sky-600">{I + 1}.</span>{Item.Ten}
+        </NavLink>)}
+      </nav>
+      <main className="min-w-0 p-3 md:p-5"><Outlet /></main>
     </div>
   );
 }

@@ -9,6 +9,7 @@ import type {
 
 import Api from '../api/api';
 import { LayNgayHomNay } from '../utils/ngay_local';
+import HopThoai from '../components/hop_thoai';
 import DanhSachHocSinh from './danh_sach_hoc_sinh';
 
 import {
@@ -85,6 +86,7 @@ function LayNamPhuHuynhToiDa() {
 }
 
 export default function HocSinhPage() {
+  const [DangLuu, SetDangLuu] = useState(false);
   const NguoiDung =
     DocJwt();
 
@@ -338,6 +340,7 @@ export default function HocSinhPage() {
     Event: FormEvent,
   ) {
     Event.preventDefault();
+    SetDangLuu(true);
 
     try {
       SetLoi('');
@@ -406,13 +409,14 @@ export default function HocSinhPage() {
       SetQuocTichKhac('');
 
       SetLanTai(Value => Value + 1);
+      SetHienForm(false);
     } catch (Error: unknown) {
       SetLoi(
         LayThongBaoLoi(
           Error,
         ),
       );
-    }
+    } finally { SetDangLuu(false); }
   }
 
   return (
@@ -447,14 +451,14 @@ export default function HocSinhPage() {
         )}
       </div>
 
-      {Loi && (
+      {Loi && !HienForm && (
         <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
           {Loi}
         </div>
       )}
 
       {TaiKhoanMoi.length > 0 && (
-        <div className="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm">
+        <HopThoai TieuDe="Tài khoản phụ huynh vừa tạo" Dong={() => SetTaiKhoanMoi([])}><div className="rounded border border-amber-300 bg-amber-50 p-4 text-sm">
           <p className="font-semibold">
             Tài khoản phụ huynh vừa tạo
           </p>
@@ -478,11 +482,13 @@ export default function HocSinhPage() {
               </p>
             ),
           )}
-        </div>
+        </div></HopThoai>
       )}
 
       {LaAdmin &&
         HienForm && (
+        <HopThoai TieuDe="Thêm học sinh và phụ huynh" Dong={() => SetHienForm(false)} DangLuu={DangLuu} Rong>
+        {Loi && <p role="alert" className="mb-3 rounded bg-red-50 p-3 text-red-700">{Loi}</p>}
         <form
           onSubmit={
             TaoHocSinh
@@ -961,11 +967,12 @@ export default function HocSinhPage() {
 
           <button
             type="submit"
+            disabled={DangLuu}
             className="mt-5 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white"
           >
             Lưu học sinh
           </button>
-        </form>
+        </form></HopThoai>
       )}
 
       <DanhSachHocSinh LanTai={LanTai} LaAdmin={LaAdmin} />

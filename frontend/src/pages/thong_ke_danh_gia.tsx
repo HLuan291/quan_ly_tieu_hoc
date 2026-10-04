@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Api from '../api/api';
 import { LayThongBaoLoi } from '../utils/loi_api';
-import type { LopHoc } from './hoc_sinh_types';
+import NhanLopGiaoVien from '../components/nhan_lop_giao_vien';
+import type { DanhMucLop, LopHoc } from './hoc_sinh_types';
 
 interface Dot { id: number; ten_dot: string }
 interface Muc { muc_danh_gia: string; so_luong: number; ty_le: number; so_nu: number; dan_toc_thieu_so: number }
@@ -9,6 +10,7 @@ interface Dong { lop_hoc_id: number | null; ten_lop: string; si_so: number; mon_
 const TenMuc: Record<string, string> = { HOAN_THANH_TOT: 'Hoàn thành tốt', HOAN_THANH: 'Hoàn thành', CHUA_HOAN_THANH: 'Chưa hoàn thành', CHUA_DANH_GIA: 'Chưa đánh giá' };
 const O = 'mt-1 w-full rounded border border-slate-300 p-2';
 export default function ThongKeDanhGia() {
+  const [CheDo, SetCheDo] = useState<DanhMucLop['che_do']>('CHUA_PHAN_CONG');
   const [Lop, SetLop] = useState<LopHoc[]>([]);
   const [Nam, SetNam] = useState('');
   const [Khoi, SetKhoi] = useState('');
@@ -22,8 +24,13 @@ export default function ThongKeDanhGia() {
   const HuyYeuCau = useCallback(() => { Lan.current++; }, []);
   useEffect(() => {
     let Huy = false;
-    void Api.get<{ lop_hoc: LopHoc[] }>('/ho_so_hoc_sinh/danh_muc').then(R => {
-      if (!Huy) { SetLop(R.data.lop_hoc); SetNam(String(R.data.lop_hoc[0]?.nam_hoc_id ?? '')); }
+    void Api.get<DanhMucLop>('/ho_so_hoc_sinh/danh_muc').then(R => {
+      if (!Huy) {
+        SetLop(R.data.lop_hoc); SetCheDo(R.data.che_do);
+        const L = R.data.lop_hoc.find(L => L.id === R.data.lop_chu_nhiem_id) ?? R.data.lop_hoc[0];
+        SetNam(String(L?.nam_hoc_id ?? ''));
+        if (R.data.che_do !== 'ADMIN') { SetLopId(String(L?.id ?? '')); SetKhoi(String(L?.khoi_id ?? '')); }
+      }
     }).catch(E => { if (!Huy) SetLoi(LayThongBaoLoi(E)); });
     return () => { Huy = true; };
   }, []);
@@ -52,14 +59,15 @@ export default function ThongKeDanhGia() {
     return () => { HuyYeuCau(); };
   }, [DotId, Khoi, LopId, HuyYeuCau]);
   const NamHoc = [...new Map(Lop.map(L => [L.nam_hoc.id, L.nam_hoc])).values()];
-  const KhoiHoc = [...new Map(Lop.filter(L => String(L.nam_hoc_id) === Nam).map(L => [L.khoi.id, L.khoi])).values()];
-  const LopLoc = Lop.filter(L => String(L.nam_hoc_id) === Nam && (!Khoi || String(L.khoi_id) === Khoi));
+  const KhoiHoc = [...new Map(Lop.filter(L => CheDo !== 'ADMIN' || String(L.nam_hoc_id) === Nam).map(L => [L.khoi.id, L.khoi])).values()];
+  const LopLoc = Lop.filter(L => (CheDo !== 'ADMIN' || String(L.nam_hoc_id) === Nam) && (!Khoi || String(L.khoi_id) === Khoi));
   return <section className="mt-5 min-w-0 rounded-lg border bg-white p-4">
     <h2 className="text-lg font-semibold text-sky-800">Thống kê đánh giá môn học</h2>
+    {CheDo !== 'ADMIN' && <NhanLopGiaoVien Lop={Lop.find(L => String(L.id) === LopId)} CheDo={CheDo} />}
     <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-      <label>Năm học<select aria-label="Năm học thống kê" className={O} value={Nam} onChange={E => { SetNam(E.target.value); SetKhoi(''); SetLopId(''); SetDot([]); SetDotId(''); }}>{NamHoc.map(N => <option key={N.id} value={N.id}>{N.ten_nam_hoc}</option>)}</select></label>
-      <label>Khối<select aria-label="Khối thống kê" className={O} value={Khoi} onChange={E => { SetKhoi(E.target.value); SetLopId(''); }}><option value="">Tất cả khối trong phạm vi</option>{KhoiHoc.map(K => <option key={K.id} value={K.id}>{K.ten_khoi}</option>)}</select></label>
-      <label>Lớp<select aria-label="Lớp thống kê" className={O} value={LopId} onChange={E => SetLopId(E.target.value)}><option value="">Tất cả lớp trong phạm vi</option>{LopLoc.map(L => <option key={L.id} value={L.id}>{L.ten_lop}</option>)}</select></label>
+      {CheDo === 'ADMIN' && <label>Năm học<select aria-label="Năm học thống kê" className={O} value={Nam} onChange={E => { SetNam(E.target.value); SetKhoi(''); SetLopId(''); SetDot([]); SetDotId(''); }}>{NamHoc.map(N => <option key={N.id} value={N.id}>{N.ten_nam_hoc}</option>)}</select></label>}
+      {(CheDo === 'ADMIN' || CheDo === 'GVBM') && <><label>Khối<select aria-label="Khối thống kê" className={O} value={Khoi} onChange={E => { SetKhoi(E.target.value); SetLopId(''); }}><option value="">Tất cả khối trong phạm vi</option>{KhoiHoc.map(K => <option key={K.id} value={K.id}>{K.ten_khoi}</option>)}</select></label>
+      <label>Lớp<select aria-label="Lớp thống kê" className={O} value={LopId} onChange={E => { SetLopId(E.target.value); if (CheDo !== 'ADMIN' && E.target.value) SetNam(String(Lop.find(L => String(L.id) === E.target.value)?.nam_hoc_id ?? '')); }}><option value="">Tất cả lớp trong phạm vi</option>{LopLoc.map(L => <option key={L.id} value={L.id}>{L.ten_lop}</option>)}</select></label></>}
       <label>Đợt đánh giá<select aria-label="Đợt thống kê" className={O} value={DotId} onChange={E => SetDotId(E.target.value)}><option value="">Chọn đợt đánh giá</option>{Dot.map(D => <option key={D.id} value={D.id}>{D.ten_dot}</option>)}</select></label>
     </div>
     <p className="my-3 text-xs text-slate-600">Sĩ số áp dụng gồm học sinh đang học ở khối đã cấu hình môn trong đợt và trong phạm vi được phép xem. Tỷ lệ tính trên sĩ số áp dụng; cột dân tộc thiểu số đếm học sinh có dân tộc khác Kinh.</p>

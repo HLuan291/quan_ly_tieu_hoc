@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 
 import { PrismaService } from '../prisma.service';
+import { LayPhamViGiaoVien, KiemTraLopTrongPhamVi } from '../pham_vi_giao_vien';
 import { LayNgayNghiepVu } from '../ngay_nghiep_vu';
 import { KiemTraGiaTriQuyUoc, QuyUoc } from '../quy_uoc_nghiep_vu';
 
@@ -185,6 +186,8 @@ export class DanhGiaHocTapService {
         Dot.nam_hoc_id,
       );
 
+    await KiemTraLopTrongPhamVi(this.Prisma, GiaoVienId, XepLop.lop_hoc_id);
+
     const PhanCong =
       await this.Prisma
         .phan_cong_giao_vien
@@ -243,6 +246,8 @@ export class DanhGiaHocTapService {
         HocSinhId,
         Dot.nam_hoc_id,
       );
+
+    await KiemTraLopTrongPhamVi(this.Prisma, GiaoVienId, XepLop.lop_hoc_id);
 
     const Gvcn =
       await this.Prisma
@@ -1558,6 +1563,8 @@ export class DanhGiaHocTapService {
         Dot.nam_hoc_id,
       );
 
+    await KiemTraLopTrongPhamVi(this.Prisma, GiaoVien.id, XepLop.lop_hoc_id);
+
     const PhanCong =
       await this.Prisma
         .phan_cong_giao_vien
@@ -2039,6 +2046,8 @@ export class DanhGiaHocTapService {
         TaiKhoanId,
       );
 
+    await KiemTraLopTrongPhamVi(this.Prisma, GiaoVien.id, lopHocId);
+
     const PhanCong =
       await this.Prisma
         .phan_cong_giao_vien
@@ -2126,6 +2135,7 @@ export class DanhGiaHocTapService {
     let PhanCong: Array<{ loai_phan_cong: string; mon_hoc_id: number | null }> = [];
     if (VaiTro === 'GIAO_VIEN') {
       const GiaoVien = await this.LayGiaoVienTuTaiKhoan(TaiKhoanId);
+      await KiemTraLopTrongPhamVi(this.Prisma, GiaoVien.id, LopHocId);
       PhanCong = await this.Prisma.phan_cong_giao_vien.findMany({
         where: { giao_vien_id: GiaoVien.id, lop_hoc_id: LopHocId, ...this.DieuKienPhanCongHienTai() },
         select: { loai_phan_cong: true, mon_hoc_id: true },
@@ -2183,12 +2193,12 @@ export class DanhGiaHocTapService {
     const Dot = await this.Prisma.dot_danh_gia.findUnique({ where: { id: DotId } });
     if (!Dot) throw new NotFoundException('Không tìm thấy đợt đánh giá');
     const HomNay = LayNgayNghiepVu();
+    const PhamVi = VaiTro === 'GIAO_VIEN' ? await LayPhamViGiaoVien(this.Prisma, { tai_khoan_id: TaiKhoanId }) : null;
+    if (PhamVi && LopHocId && !PhamVi.lop_hoc.some(L => L.id === LopHocId)) throw new ForbiddenException('Lớp không thuộc phạm vi của giáo viên');
     const Lop = await this.Prisma.lop_hoc.findMany({
       where: {
         nam_hoc_id: Dot.nam_hoc_id, ...(KhoiId ? { khoi_id: KhoiId } : {}), ...(LopHocId ? { id: LopHocId } : {}),
-        ...(VaiTro === 'GIAO_VIEN' ? { phan_cong_giao_vien: { some: {
-          giao_vien: { tai_khoan_id: TaiKhoanId }, ...this.DieuKienPhanCongHienTai(),
-        } } } : {}),
+        ...(PhamVi ? { AND: [{ id: { in: PhamVi.lop_hoc.map(L => L.id) } }] } : {}),
       },
       select: { id: true, ten_lop: true, khoi_id: true },
       orderBy: { ten_lop: 'asc' },

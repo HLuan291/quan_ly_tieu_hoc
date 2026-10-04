@@ -587,6 +587,15 @@ export class PhanCongGiangDayService {
         // Kiểm tra lớp đã có GVCN trong thời gian này
         // ------------------------------------------
 
+        // Khóa hồ sơ giáo viên để hai yêu cầu đồng thời không gắn GVCN vào hai lớp.
+        await Tx.$queryRaw`SELECT id FROM giao_vien WHERE id = ${DuLieu.giao_vien_id} FOR UPDATE`;
+        const ChuNhiemKhac = await Tx.phan_cong_giao_vien.findFirst({
+          where: { giao_vien_id: DuLieu.giao_vien_id, loai_phan_cong: 'GVCN', mon_hoc_id: null,
+            ...(NgayKetThuc ? { ngay_bat_dau: { lte: NgayKetThuc } } : {}),
+            OR: [{ ngay_ket_thuc: null }, { ngay_ket_thuc: { gte: NgayBatDau } }] },
+        });
+        if (ChuNhiemKhac) throw new ConflictException('Giáo viên đã chủ nhiệm một lớp trong khoảng thời gian này');
+
         const GvcnTrung =
           await Tx.phan_cong_giao_vien.findFirst({
             where: {

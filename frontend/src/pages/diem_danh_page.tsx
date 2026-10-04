@@ -1,519 +1,133 @@
-import {
-  useEffect,
-  useState,
-} from 'react';
-
-import type {
-  FormEvent,
-} from 'react';
-
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { FormEvent } from 'react';
 import Api from '../api/api';
 import { LayNgayHomNay } from '../utils/ngay_local';
+import { DoiNgay, LaChuNhat, LayNgayHocGanNhat } from '../utils/ngay_diem_danh';
 import { QuyUoc } from '../utils/quy_uoc_nghiep_vu';
+import { LayThongBaoLoi } from '../utils/loi_api';
+import NhanLopGiaoVien from '../components/nhan_lop_giao_vien';
+import type { DanhMucLop } from './hoc_sinh_types';
 
-import {
-  LayThongBaoLoi,
-} from '../utils/loi_api';
-
-interface LopChuNhiem {
+interface Item {
   id: number;
-  lop_hoc_id: number;
-  lop_hoc: {
-    id: number;
-    ten_lop: string;
-    nam_hoc: {
-      ten_nam_hoc: string;
-    };
-  };
+  hoc_sinh: { id: number; ma_hoc_sinh: string; ho_ten: string };
+  diem_danh: Array<{ trang_thai: string; ghi_chu: string | null }>;
 }
-
-interface SoDiemDanhItem {
-  id: number;
-  hoc_sinh: {
-    id: number;
-    ma_hoc_sinh: string;
-    ho_ten: string;
-  };
-  diem_danh: Array<{
-    trang_thai: string;
-    ghi_chu: string | null;
-  }>;
-}
-
-interface SoDiemDanhResponse {
-  danh_sach: SoDiemDanhItem[];
-}
-
-interface DongDiemDanh {
-  xep_lop_id: number;
-  ma_hoc_sinh: string;
-  ho_ten: string;
-  trang_thai: string;
-  ghi_chu: string;
-}
+interface Dong { xep_lop_id: number; ma_hoc_sinh: string; ho_ten: string; trang_thai: string; ghi_chu: string }
+const O = 'w-full rounded border border-slate-300 bg-white px-3 py-2 disabled:bg-slate-100';
+const Nut = 'rounded bg-sky-700 px-4 py-2 font-medium text-white disabled:opacity-40';
 
 export default function DiemDanhPage() {
-  const [
-    LopHoc,
-    SetLopHoc,
-  ] = useState<LopChuNhiem[]>([]);
+  const HomNay = LayNgayHomNay();
+  const [PhamVi, SetPhamVi] = useState<DanhMucLop | null>(null);
+  const [Ngay, SetNgay] = useState(() => LayNgayHocGanNhat(LayNgayHomNay()));
+  const [Buoi, SetBuoi] = useState('SANG');
+  const [DanhSach, SetDanhSach] = useState<Dong[]>([]);
+  const [DaTai, SetDaTai] = useState('');
+  const [DaSua, SetDaSua] = useState(false);
+  const [DangTai, SetDangTai] = useState(false);
+  const [DangLuu, SetDangLuu] = useState(false);
+  const [Loi, SetLoi] = useState('');
+  const [Tin, SetTin] = useState('');
+  const Lan = useRef(0);
+  const Lop = PhamVi?.lop_hoc.find(L => L.id === PhamVi.lop_chu_nhiem_id);
+  const LopId = Lop?.id;
+  const ChuNhat = LaChuNhat(Ngay);
+  const Khoa = String(LopId) + '|' + Ngay + '|' + Buoi;
+  const HopLe = !!LopId && !!Ngay && !ChuNhat && Ngay <= HomNay;
+  const SanSang = HopLe && DaTai === Khoa && !DangTai && !DangLuu;
+  const DongHienThi = DaTai === Khoa && HopLe ? DanhSach : [];
 
-  const [
-    LopHocId,
-    SetLopHocId,
-  ] = useState('');
-
-  const [
-    NgayHoc,
-    SetNgayHoc,
-  ] = useState(
-    LayNgayHomNay(),
-  );
-
-  const [
-    BuoiHoc,
-    SetBuoiHoc,
-  ] = useState('SANG');
-
-  const [
-    DanhSach,
-    SetDanhSach,
-  ] = useState<DongDiemDanh[]>([]);
-
-  const [
-    Loi,
-    SetLoi,
-  ] = useState('');
-  const [SoDaTai, SetSoDaTai] = useState('');
-  const SoDangChon = `${LopHocId}|${NgayHoc}|${BuoiHoc}`;
-
-  useEffect(
-    () => {
-      async function TaiLop() {
-        try {
-          const Response =
-            await Api.get<LopChuNhiem[]>(
-              '/diem_danh_nghi_hoc/lop_chu_nhiem_cua_toi',
-            );
-
-          SetLopHoc(
-            Response.data,
-          );
-
-          if (
-            Response.data[0]
-          ) {
-            SetLopHocId(
-              String(
-                Response.data[0]
-                  .lop_hoc_id,
-              ),
-            );
-          }
-        } catch (Error: unknown) {
-          SetLoi(
-            LayThongBaoLoi(
-              Error,
-            ),
-          );
-        }
-      }
-
-      void TaiLop();
-    },
-    [],
-  );
-
-  async function TaiSoDiemDanh() {
-    if (!LopHocId) {
-      return;
-    }
-
+  useEffect(() => {
+    let Huy = false;
+    void Api.get<DanhMucLop>('/ho_so_hoc_sinh/danh_muc').then(R => {
+      if (!Huy) SetPhamVi(R.data);
+    }).catch(E => { if (!Huy) SetLoi(LayThongBaoLoi(E)); });
+    return () => { Huy = true; };
+  }, []);
+  const Tai = useCallback(async () => {
+    const Ma = ++Lan.current;
+    SetLoi(''); SetTin(''); SetDangTai(false); SetDaTai(''); SetDanhSach([]); SetDaSua(false);
+    if (!LopId || !Ngay || LaChuNhat(Ngay) || Ngay > LayNgayHomNay()) return;
+    SetDangTai(true);
     try {
-      SetLoi('');
-      const SoCanTai = SoDangChon;
-
-      const Response =
-        await Api.get<SoDiemDanhResponse>(
-          '/diem_danh_nghi_hoc/diem_danh',
-          {
-            params: {
-              lop_hoc_id:
-                Number(LopHocId),
-
-              ngay_hoc:
-                NgayHoc,
-
-              buoi_hoc:
-                BuoiHoc,
-            },
-          },
-        );
-
-      SetDanhSach(
-        Response.data.danh_sach.map(
-          (Item) => ({
-            xep_lop_id:
-              Item.id,
-
-            ma_hoc_sinh:
-              Item.hoc_sinh
-                .ma_hoc_sinh,
-
-            ho_ten:
-              Item.hoc_sinh
-                .ho_ten,
-
-            trang_thai:
-              Item.diem_danh[0]
-                ?.trang_thai ??
-              '',
-
-            ghi_chu:
-              Item.diem_danh[0]
-                ?.ghi_chu ??
-              '',
-          }),
-        ),
-      );
-      SetSoDaTai(SoCanTai);
-    } catch (Error: unknown) {
-      SetLoi(
-        LayThongBaoLoi(
-          Error,
-        ),
-      );
-    }
+      const R = await Api.get<{ danh_sach: Item[] }>('/diem_danh_nghi_hoc/diem_danh', {
+        params: { lop_hoc_id: LopId, ngay_hoc: Ngay, buoi_hoc: Buoi },
+      });
+      if (Ma !== Lan.current) return;
+      SetDanhSach(R.data.danh_sach.map(I => ({ xep_lop_id: I.id, ma_hoc_sinh: I.hoc_sinh.ma_hoc_sinh,
+        ho_ten: I.hoc_sinh.ho_ten, trang_thai: I.diem_danh[0]?.trang_thai ?? '', ghi_chu: I.diem_danh[0]?.ghi_chu ?? '' })));
+      SetDaTai(Khoa);
+    } catch (E) { if (Ma === Lan.current) SetLoi(LayThongBaoLoi(E)); }
+    finally { if (Ma === Lan.current) SetDangTai(false); }
+  }, [LopId, Ngay, Buoi, Khoa]);
+  useEffect(() => {
+    let Huy = false;
+    void Promise.resolve().then(() => { if (!Huy) return Tai(); });
+    return () => { Huy = true; Lan.current++; };
+  }, [Tai]);
+  useEffect(() => {
+    const CanhBao = (E: BeforeUnloadEvent) => { if (DaSua) { E.preventDefault(); E.returnValue = ''; } };
+    window.addEventListener('beforeunload', CanhBao);
+    return () => window.removeEventListener('beforeunload', CanhBao);
+  }, [DaSua]);
+  function Chuyen(Work: () => void) {
+    if (DangLuu) return;
+    if (DaSua && !window.confirm('Điểm danh đang sửa chưa được lưu. Đổi ngày hoặc buổi và bỏ các thay đổi?')) return;
+    Lan.current++; SetDaSua(false); SetTin(''); Work();
   }
-
-  async function LuuDiemDanh(
-    Event: FormEvent,
-  ) {
-    Event.preventDefault();
-    if (SoDaTai !== SoDangChon) {
-      SetLoi('Hãy tải lại sổ điểm danh cho lớp, ngày và buổi đang chọn.');
-      return;
-    }
-
-    if (
-      DanhSach.some(
-        (Item) =>
-          !QuyUoc.DiemDanh.some((TrangThai) => TrangThai.Ma === Item.trang_thai),
-      )
-    ) {
-      SetLoi(
-        'Hãy chọn trạng thái hợp lệ cho tất cả học sinh.',
-      );
-      return;
-    }
-
+  function Sua(Id: number, Field: 'trang_thai' | 'ghi_chu', Value: string) {
+    if (!SanSang) return;
+    SetDanhSach(Cu => Cu.map(D => D.xep_lop_id === Id ? { ...D, [Field]: Value } : D));
+    SetDaSua(true); SetTin('');
+  }
+  async function Luu(E: FormEvent<HTMLFormElement>) {
+    E.preventDefault();
+    if (!SanSang || !DanhSach.length) return;
+    if (DanhSach.some(D => !D.trang_thai)) { SetLoi('Chọn trạng thái cho tất cả học sinh trước khi lưu.'); return; }
+    SetDangLuu(true); SetLoi(''); SetTin('');
     try {
-      SetLoi('');
-
-      await Api.post(
-        '/diem_danh_nghi_hoc/diem_danh',
-        {
-          lop_hoc_id:
-            Number(LopHocId),
-
-          ngay_hoc:
-            NgayHoc,
-
-          buoi_hoc:
-            BuoiHoc,
-
-          danh_sach:
-            DanhSach.map(
-              (Item) => ({
-                xep_lop_id:
-                  Item.xep_lop_id,
-
-                trang_thai:
-                  Item.trang_thai,
-
-                ghi_chu:
-                  Item.ghi_chu,
-              }),
-            ),
-        },
-      );
-
-      window.alert(
-        'Lưu điểm danh thành công',
-      );
-
-      await TaiSoDiemDanh();
-    } catch (Error: unknown) {
-      SetLoi(
-        LayThongBaoLoi(
-          Error,
-        ),
-      );
-    }
+      await Api.post('/diem_danh_nghi_hoc/diem_danh', {
+        lop_hoc_id: LopId, ngay_hoc: Ngay, buoi_hoc: Buoi,
+        danh_sach: DanhSach.map(D => ({ xep_lop_id: D.xep_lop_id, trang_thai: D.trang_thai, ghi_chu: D.ghi_chu })),
+      });
+      SetDaSua(false); SetTin('Đã lưu điểm danh ' + (Buoi === 'SANG' ? 'buổi sáng' : 'buổi chiều') + ' ngày ' + Ngay + '.');
+    } catch (Error) { SetLoi(LayThongBaoLoi(Error)); } finally { SetDangLuu(false); }
   }
-
-  return (
-    <div>
-      <h1 className="text-2xl font-bold text-slate-800">
-        Điểm danh
-      </h1>
-
-      <p className="mt-1 text-sm text-slate-500">
-        GVCN điểm danh học sinh theo ngày và buổi học.
-      </p>
-
-      {Loi && (
-        <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
-          {Loi}
+  return <div className="min-w-0">
+    <h1 className="text-2xl font-bold text-slate-800">Điểm danh</h1>
+    <p className="mt-1 text-sm text-slate-600">Điểm danh lớp chủ nhiệm theo ngày và buổi học. Danh sách tự hiển thị khi đổi ngày hoặc buổi.</p>
+    <section className="mt-4 rounded-lg border bg-white p-4">
+      {PhamVi && <NhanLopGiaoVien Lop={Lop} CheDo={PhamVi.che_do} />}
+      <fieldset disabled={DangLuu} className="mt-4 flex flex-wrap items-end gap-3">
+        <label className="min-w-44 flex-1 text-sm font-medium">Ngày học<input aria-label="Ngày học điểm danh" type="date" value={Ngay} max={HomNay} onChange={E => Chuyen(() => SetNgay(E.target.value))} className={O + ' mt-1'} /></label>
+        <div className="flex gap-2"><button type="button" disabled={!Ngay} onClick={() => Chuyen(() => SetNgay(DoiNgay(Ngay, -1)))} className="rounded border px-3 py-2">Ngày trước</button><button type="button" disabled={!Ngay || Ngay >= HomNay} onClick={() => Chuyen(() => SetNgay(DoiNgay(Ngay, 1)))} className="rounded border px-3 py-2">Ngày sau</button></div>
+        <label className="min-w-44 flex-1 text-sm font-medium">Buổi học<select aria-label="Buổi học điểm danh" value={Buoi} onChange={E => Chuyen(() => SetBuoi(E.target.value))} className={O + ' mt-1'}><option value="SANG">Sáng</option><option value="CHIEU">Chiều</option></select></label>
+        <button type="button" disabled={!SanSang || !DanhSach.length} onClick={() => { SetDanhSach(Cu => Cu.map(D => ({ ...D, trang_thai: 'CO_MAT' }))); SetDaSua(true); SetTin(''); }} className={Nut}>Điểm danh tất cả</button>
+      </fieldset>
+      {LaChuNhat(HomNay) && Ngay === LayNgayHocGanNhat(HomNay) && <p className="mt-3 text-sm text-slate-600">Hôm nay là Chủ nhật; đang hiển thị ngày học gần nhất.</p>}
+      {ChuNhat && <p role="alert" className="mt-3 rounded bg-amber-50 p-3 text-amber-800">Chủ nhật không điểm danh. Chọn ngày học khác để xem danh sách.</p>}
+      {Ngay > HomNay && <p role="alert" className="mt-3 text-red-700">Không được điểm danh ngày trong tương lai.</p>}
+      {Loi && <p role="alert" className="mt-3 rounded bg-red-50 p-3 text-red-700">{Loi} {HopLe && <button disabled={DangLuu} onClick={() => { void Tai(); }} className="ml-2 underline">Thử lại</button>}</p>}
+      {Tin && <p role="status" className="mt-3 rounded bg-green-50 p-3 text-green-700">{Tin}</p>}
+      <p className="my-3 text-sm text-slate-600">{DongHienThi.length} học sinh · {QuyUoc.DiemDanh.map(T => T.Ten + ': ' + DongHienThi.filter(D => D.trang_thai === T.Ma).length).join(' · ')}{DaSua ? ' · Chưa lưu thay đổi' : ''}</p>
+      <form aria-label="Danh sách điểm danh" onSubmit={E => { void Luu(E); }}>
+        <div className="max-h-[650px] overflow-auto rounded border" aria-busy={DangTai}>
+          <table aria-label="Bảng điểm danh" className="w-full min-w-[850px] border-collapse text-left text-sm">
+            <thead className="sticky top-0 bg-sky-700 text-white"><tr>{['STT', 'Có mặt', 'Mã học sinh', 'Họ tên', 'Trạng thái', 'Ghi chú'].map(T => <th key={T} className="border-r border-sky-600 p-3">{T}</th>)}</tr></thead>
+            <tbody>{DongHienThi.map((D, I) => <tr key={D.xep_lop_id} className="border-b even:bg-slate-50">
+              <td className="p-3">{I + 1}</td>
+              <td className="p-3"><input aria-label={'Có mặt ' + D.ho_ten} type="checkbox" disabled={!SanSang} checked={D.trang_thai === 'CO_MAT'} onChange={E => Sua(D.xep_lop_id, 'trang_thai', E.target.checked ? 'CO_MAT' : '')} /></td>
+              <td className="p-3">{D.ma_hoc_sinh}</td><td className="p-3 font-medium">{D.ho_ten}</td>
+              <td className="p-3"><select aria-label={'Trạng thái điểm danh ' + D.ho_ten} required disabled={!SanSang} value={D.trang_thai} onChange={E => Sua(D.xep_lop_id, 'trang_thai', E.target.value)} className={O}><option value="">Chọn trạng thái</option>{QuyUoc.DiemDanh.map(T => <option key={T.Ma} value={T.Ma}>{T.Ten}</option>)}</select></td>
+              <td className="p-3"><input aria-label={'Ghi chú điểm danh ' + D.ho_ten} disabled={!SanSang} value={D.ghi_chu} maxLength={500} onChange={E => Sua(D.xep_lop_id, 'ghi_chu', E.target.value)} className={O} /></td>
+            </tr>)}</tbody>
+          </table>
+          {DangTai && <p role="status" className="p-4 text-center">Đang tải danh sách điểm danh...</p>}
+          {!DangTai && !DongHienThi.length && <p className="p-4 text-center">{ChuNhat ? 'Chủ nhật nghỉ học.' : !PhamVi ? 'Đang xác định lớp chủ nhiệm...' : !Lop ? 'Chỉ giáo viên chủ nhiệm được điểm danh lớp.' : 'Không có học sinh tại ngày và buổi đã chọn.'}</p>}
         </div>
-      )}
-
-      <div className="mt-6 rounded-xl bg-white p-5 shadow-sm">
-        <div className="grid gap-4 md:grid-cols-4">
-          <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
-              Lớp chủ nhiệm
-            </label>
-          <select
-            value={
-              LopHocId
-            }
-            onChange={
-              (Event) =>
-                SetLopHocId(
-                  Event.target.value,
-                )
-            }
-            className="rounded-lg border border-slate-300 px-3 py-2"
-          >
-            <option value="">
-              Chọn lớp chủ nhiệm
-            </option>
-
-            {LopHoc.map(
-              (Item) => (
-                <option
-                  key={
-                    Item.id
-                  }
-                  value={
-                    Item.lop_hoc_id
-                  }
-                >
-                  {
-                    Item.lop_hoc
-                      .nam_hoc
-                      .ten_nam_hoc
-                  } - {
-                    Item.lop_hoc
-                      .ten_lop
-                  }
-                </option>
-              ),
-            )}
-          </select>
-          </div>
-
-          <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
-              Ngày học
-            </label>
-
-          <input
-            type="date"
-            value={
-              NgayHoc
-            }
-            onChange={
-              (Event) =>
-                SetNgayHoc(
-                  Event.target.value,
-                )
-            }
-            max={
-              LayNgayHomNay()
-            }
-            className="w-full rounded-lg border border-slate-300 px-3 py-2"
-          />
-          </div>
-
-          <div>
-            <label className="mb-1 block text-sm font-medium text-slate-700">
-              Buổi học
-            </label>
-
-          <select
-            value={
-              BuoiHoc
-            }
-            onChange={
-              (Event) =>
-                SetBuoiHoc(
-                  Event.target.value,
-                )
-            }
-            className="w-full rounded-lg border border-slate-300 px-3 py-2"
-          >
-            <option value="SANG">
-              Sáng
-            </option>
-            <option value="CHIEU">
-              Chiều
-            </option>
-          </select>
-          </div>
-
-          <div className="flex items-end">
-          <button
-            type="button"
-            onClick={
-              () =>
-                void TaiSoDiemDanh()
-            }
-            className="w-full rounded-lg bg-blue-600 px-4 py-2 text-white"
-          >
-            Tải sổ điểm danh
-          </button>
-          </div>
-        </div>
-      </div>
-
-      {DanhSach.length > 0 && SoDaTai === SoDangChon && (
-        <form
-          onSubmit={
-            LuuDiemDanh
-          }
-          className="mt-6 rounded-xl bg-white p-5 shadow-sm"
-        >
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-sm">
-              <thead>
-                <tr className="border-b bg-slate-50 text-left">
-                  <th className="px-3 py-3">
-                    Mã
-                  </th>
-                  <th className="px-3 py-3">
-                    Họ tên
-                  </th>
-                  <th className="px-3 py-3">
-                    Trạng thái
-                  </th>
-                  <th className="px-3 py-3">
-                    Ghi chú
-                  </th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {DanhSach.map(
-                  (
-                    Item,
-                    Index,
-                  ) => (
-                    <tr
-                      key={
-                        Item.xep_lop_id
-                      }
-                      className="border-b"
-                    >
-                      <td className="px-3 py-3">
-                        {
-                          Item.ma_hoc_sinh
-                        }
-                      </td>
-
-                      <td className="px-3 py-3">
-                        {
-                          Item.ho_ten
-                        }
-                      </td>
-
-                      <td className="px-3 py-3">
-                        <select
-                          value={
-                            Item.trang_thai
-                          }
-                          onChange={
-                            (Event) =>
-                              SetDanhSach(
-                                (Cu) =>
-                                  Cu.map(
-                                    (
-                                      Dong,
-                                      ViTri,
-                                    ) =>
-                                      ViTri ===
-                                      Index
-                                        ? {
-                                            ...Dong,
-                                            trang_thai:
-                                              Event
-                                                .target
-                                                .value,
-                                          }
-                                        : Dong,
-                                  ),
-                              )
-                          }
-                          required
-                          aria-label={`Trạng thái điểm danh ${Item.ho_ten}`}
-                          className="w-56 rounded-lg border border-slate-300 px-3 py-2"
-                        >
-                          <option value="">Chọn trạng thái</option>
-                          {Item.trang_thai && !QuyUoc.DiemDanh.some((TrangThai) => TrangThai.Ma === Item.trang_thai) && (
-                            <option value={Item.trang_thai} disabled>Chọn lại trạng thái (giá trị cũ: {Item.trang_thai})</option>
-                          )}
-                          {QuyUoc.DiemDanh.map((TrangThai) => (
-                            <option key={TrangThai.Ma} value={TrangThai.Ma}>{TrangThai.Ten}</option>
-                          ))}
-                        </select>
-                      </td>
-
-                      <td className="px-3 py-3">
-                        <input
-                          value={
-                            Item.ghi_chu
-                          }
-                          onChange={
-                            (Event) =>
-                              SetDanhSach(
-                                (Cu) =>
-                                  Cu.map(
-                                    (
-                                      Dong,
-                                      ViTri,
-                                    ) =>
-                                      ViTri ===
-                                      Index
-                                        ? {
-                                            ...Dong,
-                                            ghi_chu:
-                                              Event
-                                                .target
-                                                .value,
-                                          }
-                                        : Dong,
-                                  ),
-                              )
-                          }
-                          className="w-64 rounded-lg border border-slate-300 px-3 py-2"
-                        />
-                      </td>
-                    </tr>
-                  ),
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          <button
-            type="submit"
-            className="mt-5 rounded-lg bg-blue-600 px-4 py-2 font-medium text-white"
-          >
-            Lưu điểm danh
-          </button>
-        </form>
-      )}
-    </div>
-  );
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3"><span className="text-xs text-slate-500">Chọn Có mặt tất cả, sửa các em vắng hoặc đi trễ, rồi lưu.</span><button type="submit" disabled={!SanSang || !DongHienThi.length || !DaSua} className={Nut}>{DangLuu ? 'Đang lưu...' : 'Lưu điểm danh'}</button></div>
+      </form>
+    </section>
+  </div>;
 }

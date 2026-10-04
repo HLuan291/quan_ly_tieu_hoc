@@ -1,27 +1,76 @@
 {
   "DiemDanh": [
-    { "Ma": "CO_MAT", "Ten": "Có mặt" },
-    { "Ma": "VANG_CO_PHEP", "Ten": "Vắng có phép" },
-    { "Ma": "VANG_KHONG_PHEP", "Ten": "Vắng không phép" }
+    {
+      "Ma": "CO_MAT",
+      "Ten": "Có mặt"
+    },
+    {
+      "Ma": "VANG_CO_PHEP",
+      "Ten": "Vắng có phép"
+    },
+    {
+      "Ma": "VANG_KHONG_PHEP",
+      "Ten": "Vắng không phép"
+    },
+    {
+      "Ma": "DI_TRE",
+      "Ten": "Đi trễ"
+    }
   ],
   "DanhGiaMon": [
-    { "Ma": "HOAN_THANH_TOT", "Ten": "Hoàn thành tốt" },
-    { "Ma": "HOAN_THANH", "Ten": "Hoàn thành" },
-    { "Ma": "CHUA_HOAN_THANH", "Ten": "Chưa hoàn thành" }
+    {
+      "Ma": "HOAN_THANH_TOT",
+      "Ten": "Hoàn thành tốt"
+    },
+    {
+      "Ma": "HOAN_THANH",
+      "Ten": "Hoàn thành"
+    },
+    {
+      "Ma": "CHUA_HOAN_THANH",
+      "Ten": "Chưa hoàn thành"
+    }
   ],
   "NangLucPhamChat": [
-    { "Ma": "TOT", "Ten": "Tốt" },
-    { "Ma": "DAT", "Ten": "Đạt" },
-    { "Ma": "CAN_CO_GANG", "Ten": "Cần cố gắng" }
+    {
+      "Ma": "TOT",
+      "Ten": "Tốt"
+    },
+    {
+      "Ma": "DAT",
+      "Ten": "Đạt"
+    },
+    {
+      "Ma": "CAN_CO_GANG",
+      "Ten": "Cần cố gắng"
+    }
   ],
   "TongKetGiaoDuc": [
-    { "Ma": "HOAN_THANH_XUAT_SAC", "Ten": "Hoàn thành xuất sắc" },
-    { "Ma": "HOAN_THANH_TOT", "Ten": "Hoàn thành tốt" },
-    { "Ma": "HOAN_THANH", "Ten": "Hoàn thành" },
-    { "Ma": "CHUA_HOAN_THANH", "Ten": "Chưa hoàn thành" }
+    {
+      "Ma": "HOAN_THANH_XUAT_SAC",
+      "Ten": "Hoàn thành xuất sắc"
+    },
+    {
+      "Ma": "HOAN_THANH_TOT",
+      "Ten": "Hoàn thành tốt"
+    },
+    {
+      "Ma": "HOAN_THANH",
+      "Ten": "Hoàn thành"
+    },
+    {
+      "Ma": "CHUA_HOAN_THANH",
+      "Ten": "Chưa hoàn thành"
+    }
   ],
   "HoanThanhLop": [
-    { "Ma": "HOAN_THANH", "Ten": "Hoàn thành" },
-    { "Ma": "CHUA_HOAN_THANH", "Ten": "Chưa hoàn thành" }
+    {
+      "Ma": "HOAN_THANH",
+      "Ten": "Hoàn thành"
+    },
+    {
+      "Ma": "CHUA_HOAN_THANH",
+      "Ten": "Chưa hoàn thành"
+    }
   ]
 }

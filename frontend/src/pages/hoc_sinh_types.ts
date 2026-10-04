@@ -19,3 +19,8 @@ export interface HoSoHocSinh extends HocSinhTomTat {
   phu_huynh_hoc_sinh: Array<{ moi_quan_he: string; ngay_lien_ket: string; phu_huynh: PhuHuynh }>;
   thong_ke_nghi: { so_ngay_co_vang: number; so_buoi_vang: number; so_buoi_co_phep: number; so_buoi_khong_phep: number };
 }
+
+export interface DanhMucLop {
+  che_do: 'ADMIN' | 'GVCN' | 'GVBM' | 'CHUA_PHAN_CONG';
+  lop_chu_nhiem_id: number | null; lop_hoc: LopHoc[];
+}

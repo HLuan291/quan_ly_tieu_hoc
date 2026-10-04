@@ -42,5 +42,19 @@ if (process.argv[2] === 'case') {
     process.stdout.write(Run.stdout || '');
     if (Run.status !== 0) throw new Error(Run.stderr || 'Date regression failed');
   });
-  console.log(JSON.stringify({ total: Cases.length, passed: Cases.length }));
+  const Source = Fs.readFileSync(Path.resolve(__dirname, '../src/utils/ngay_diem_danh.ts'), 'utf8');
+  const Output = Ts.transpileModule(Source, { compilerOptions: { module: Ts.ModuleKind.CommonJS } }).outputText;
+  const Exports = {};
+  Vm.runInNewContext(Output, { exports: Exports, Date, String });
+  const Calendar = [
+    () => Assert.equal(Exports.LaChuNhat('2026-10-04'), true),
+    () => Assert.equal(Exports.LaChuNhat('2026-10-03'), false),
+    () => Assert.equal(Exports.LaChuNhat(''), false),
+    () => Assert.equal(Exports.LayNgayHocGanNhat('2026-10-04'), '2026-10-03'),
+    () => Assert.equal(Exports.LayNgayHocGanNhat('2026-10-05'), '2026-10-05'),
+    () => Assert.equal(Exports.DoiNgay('2027-01-01', -1), '2026-12-31'),
+    () => Assert.equal(Exports.DoiNgay('2024-03-01', -1), '2024-02-29'),
+  ];
+  Calendar.forEach(Work => Work());
+  console.log(JSON.stringify({ total: Cases.length + Calendar.length, passed: Cases.length + Calendar.length }));
 }

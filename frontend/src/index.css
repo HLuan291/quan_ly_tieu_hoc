@@ -18,3 +18,11 @@ select,
 textarea {
   font: inherit;
 }
+dialog::backdrop { background: rgb(15 23 42 / 55%); }
+dialog { color: #1e293b; }
+button:not(:disabled), select:not(:disabled) { cursor: pointer; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid #0284c7; outline-offset: 2px;
+}
+table tbody td { border-right: 1px solid #e2e8f0; }
+table tbody tr:hover { background-color: #f0f9ff; }

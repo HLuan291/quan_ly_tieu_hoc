@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Api from '../api/api';
 import { LayThongBaoLoi } from '../utils/loi_api';
-import type { HocSinhTomTat, LopHoc } from './hoc_sinh_types';
+import type { DanhMucLop, HocSinhTomTat, LopHoc } from './hoc_sinh_types';
+import NhanLopGiaoVien from '../components/nhan_lop_giao_vien';
 import HoSoHocSinhChiTiet from './ho_so_hoc_sinh_chi_tiet';
 
 const O = 'w-full rounded border border-slate-300 px-3 py-2';
 export default function DanhSachHocSinh({ LanTai, LaAdmin }: { LanTai: number; LaAdmin: boolean }) {
+  const [CheDo, SetCheDo] = useState<DanhMucLop['che_do']>(LaAdmin ? 'ADMIN' : 'CHUA_PHAN_CONG');
+  const [DaTaiPhamVi, SetDaTaiPhamVi] = useState(false);
   const [Lop, SetLop] = useState<LopHoc[]>([]);
   const [DanhSach, SetDanhSach] = useState<HocSinhTomTat[]>([]);
   const [Nam, SetNam] = useState('');
@@ -23,13 +26,21 @@ export default function DanhSachHocSinh({ LanTai, LaAdmin }: { LanTai: number; L
   const HuyYeuCau = useCallback(() => { LanYeuCau.current++; }, []);
   useEffect(() => {
     let Huy = false;
-    void Api.get<{ lop_hoc: LopHoc[] }>('/ho_so_hoc_sinh/danh_muc').then(R => {
-      if (!Huy) SetLop(R.data.lop_hoc);
+    void Api.get<DanhMucLop>('/ho_so_hoc_sinh/danh_muc').then(R => {
+      if (!Huy) {
+        SetLop(R.data.lop_hoc); SetCheDo(R.data.che_do);
+        if (!LaAdmin) {
+          const L = R.data.lop_hoc.find(L => L.id === R.data.lop_chu_nhiem_id) ?? R.data.lop_hoc[0];
+          SetLopId(String(L?.id ?? '')); SetNam(String(L?.nam_hoc_id ?? '')); SetKhoi(String(L?.khoi_id ?? ''));
+        }
+        SetDaTaiPhamVi(true);
+      }
     }).catch(E => { if (!Huy) SetLoi(LayThongBaoLoi(E)); });
     return () => { Huy = true; };
-  }, []);
+  }, [LaAdmin]);
   const TaiDanhSach = useCallback(async () => {
     const Lan = ++LanYeuCau.current;
+    if (!DaTaiPhamVi || (!LaAdmin && !Lop.length)) return;
     SetDangTai(true);
     SetLoi('');
     try {
@@ -40,7 +51,7 @@ export default function DanhSachHocSinh({ LanTai, LaAdmin }: { LanTai: number; L
       if (Lan === LanYeuCau.current) { SetDanhSach(R.data.danh_sach); SetTrang(1); }
     } catch (E) { if (Lan === LanYeuCau.current) { SetDanhSach([]); SetLoi(LayThongBaoLoi(E)); } }
     finally { if (Lan === LanYeuCau.current) SetDangTai(false); }
-  }, [TuKhoa, TrangThai, Nam, Khoi, LopId]);
+  }, [TuKhoa, TrangThai, Nam, Khoi, LopId, DaTaiPhamVi, LaAdmin, Lop.length]);
   useEffect(() => {
     const Timer = setTimeout(() => { void TaiDanhSach(); }, 150);
     return () => { clearTimeout(Timer); HuyYeuCau(); };
@@ -56,14 +67,15 @@ export default function DanhSachHocSinh({ LanTai, LaAdmin }: { LanTai: number; L
     finally { SetDangXoa(false); }
   }
   const NamHoc = [...new Map(Lop.map(L => [L.nam_hoc.id, L.nam_hoc])).values()];
-  const KhoiHoc = [...new Map(Lop.filter(L => !Nam || String(L.nam_hoc_id) === Nam).map(L => [L.khoi.id, L.khoi])).values()].sort((A, B) => A.so_khoi - B.so_khoi);
-  const CacLop = Lop.filter(L => (!Nam || String(L.nam_hoc_id) === Nam) && (!Khoi || String(L.khoi_id) === Khoi));
+  const KhoiHoc = [...new Map(Lop.filter(L => !LaAdmin || !Nam || String(L.nam_hoc_id) === Nam).map(L => [L.khoi.id, L.khoi])).values()].sort((A, B) => A.so_khoi - B.so_khoi);
+  const CacLop = Lop.filter(L => (!LaAdmin || !Nam || String(L.nam_hoc_id) === Nam) && (!Khoi || String(L.khoi_id) === Khoi));
   const SoTrang = Math.max(1, Math.ceil(DanhSach.length / SoDong));
   return <section className="mt-6 min-w-0 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-      <label className="text-sm font-medium">Năm học<select aria-label="Năm học học sinh" className={O} value={Nam} onChange={E => { SetNam(E.target.value); SetKhoi(''); SetLopId(''); }}><option value="">Tất cả năm học</option>{NamHoc.map(N => <option key={N.id} value={N.id}>{N.ten_nam_hoc}</option>)}</select></label>
-      <label className="text-sm font-medium">Khối<select aria-label="Khối học sinh" className={O} value={Khoi} onChange={E => { SetKhoi(E.target.value); SetLopId(''); }}><option value="">Tất cả khối</option>{KhoiHoc.map(K => <option key={K.id} value={K.id}>{K.ten_khoi}</option>)}</select></label>
-      <label className="text-sm font-medium">Lớp<select aria-label="Lớp học sinh" className={O} value={LopId} onChange={E => SetLopId(E.target.value)}><option value="">{LaAdmin ? 'Toàn trường' : 'Tất cả lớp được phân công'}</option>{CacLop.map(L => <option key={L.id} value={L.id}>{L.ten_lop} · {L.nam_hoc.ten_nam_hoc}</option>)}</select></label>
+    {!LaAdmin && <NhanLopGiaoVien Lop={Lop.find(L => String(L.id) === LopId)} CheDo={CheDo} />}
+    <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      {LaAdmin && <label className="text-sm font-medium">Năm học<select aria-label="Năm học học sinh" className={O} value={Nam} onChange={E => { SetNam(E.target.value); SetKhoi(''); SetLopId(''); }}><option value="">Tất cả năm học</option>{NamHoc.map(N => <option key={N.id} value={N.id}>{N.ten_nam_hoc}</option>)}</select></label>}
+      {(LaAdmin || CheDo === 'GVBM') && <><label className="text-sm font-medium">Khối<select aria-label="Khối học sinh" className={O} value={Khoi} onChange={E => { SetKhoi(E.target.value); const L = Lop.find(L => !E.target.value || String(L.khoi_id) === E.target.value); SetLopId(LaAdmin ? '' : String(L?.id ?? '')); if (!LaAdmin) SetNam(String(L?.nam_hoc_id ?? '')); }}><option value="">Tất cả khối</option>{KhoiHoc.map(K => <option key={K.id} value={K.id}>{K.ten_khoi}</option>)}</select></label>
+      <label className="text-sm font-medium">Lớp<select aria-label="Lớp học sinh" className={O} value={LopId} onChange={E => { SetLopId(E.target.value); if (!LaAdmin) SetNam(String(Lop.find(L => String(L.id) === E.target.value)?.nam_hoc_id ?? '')); }}><option value="">{LaAdmin ? 'Toàn trường' : 'Tất cả lớp được phân công'}</option>{CacLop.map(L => <option key={L.id} value={L.id}>{L.ten_lop} · {L.nam_hoc.ten_nam_hoc}</option>)}</select></label></>}
       <label className="text-sm font-medium">Trạng thái<select aria-label="Trạng thái học sinh" className={O} value={TrangThai} onChange={E => SetTrangThai(E.target.value)}><option value="">Tất cả hồ sơ đang sử dụng</option><option value="DANG_HOC">Đang học</option><option value="CHUYEN_TRUONG">Chuyển trường</option><option value="THOI_HOC">Thôi học</option></select></label>
     </div>
     <input aria-label="Tìm học sinh" value={TuKhoa} onChange={E => SetTuKhoa(E.target.value)} placeholder="Tìm theo mã, họ tên hoặc số điện thoại" className={O + ' mt-4 sm:max-w-lg'} />

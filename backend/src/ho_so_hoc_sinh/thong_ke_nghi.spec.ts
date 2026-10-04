@@ -14,6 +14,12 @@ describe('Thống kê nghỉ theo điểm danh', () => {
       { ngay_hoc: Ngay, buoi_hoc: 'SANG', trang_thai: 'VANG_KHONG_PHEP' },
     ])).toEqual({ so_ngay_co_vang: 1, so_buoi_vang: 1, so_buoi_co_phep: 0, so_buoi_khong_phep: 1 });
   });
+  it('đi trễ không được tính vào buổi hoặc ngày vắng', () => {
+    expect(TinhThongKeNghi([
+      { ngay_hoc: Ngay, buoi_hoc: 'SANG', trang_thai: 'DI_TRE' },
+      { ngay_hoc: Ngay, buoi_hoc: 'CHIEU', trang_thai: 'CO_MAT' },
+    ])).toEqual({ so_ngay_co_vang: 0, so_buoi_vang: 0, so_buoi_co_phep: 0, so_buoi_khong_phep: 0 });
+  });
   it('hồ sơ chưa có điểm danh vắng trả các tổng bằng 0', () => {
     expect(TinhThongKeNghi([]).so_ngay_co_vang).toBe(0);
   });

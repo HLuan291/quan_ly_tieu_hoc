@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 
 import { PrismaService } from '../prisma.service';
+import { LayPhamViGiaoVien } from '../pham_vi_giao_vien';
 import { LayNgayNghiepVu } from '../ngay_nghiep_vu';
 import { KiemTraGiaTriQuyUoc, QuyUoc } from '../quy_uoc_nghiep_vu';
 
@@ -40,6 +41,11 @@ export class DiemDanhNghiHocService {
     }
 
     return Ngay;
+  }
+
+  private KiemTraNgayDiemDanh(Ngay: Date) {
+    if (Ngay.getUTCDay() === 0) throw new BadRequestException('Chủ nhật không điểm danh');
+    if (Ngay > LayNgayNghiepVu()) throw new BadRequestException('Không được điểm danh ngày trong tương lai');
   }
 
   private KiemTraBuoiHoc(
@@ -178,56 +184,8 @@ export class DiemDanhNghiHocService {
   async LayLopChuNhiemCuaToi(
     TaiKhoanId: number,
   ) {
-    const GiaoVien =
-      await this.LayGiaoVienTuTaiKhoan(
-        TaiKhoanId,
-      );
-
-    const HomNay =
-      LayNgayNghiepVu();
-
-    return this.Prisma
-      .phan_cong_giao_vien
-      .findMany({
-        where: {
-          giao_vien_id:
-            GiaoVien.id,
-
-          loai_phan_cong:
-            'GVCN',
-
-          mon_hoc_id:
-            null,
-
-          ngay_bat_dau: {
-            lte:
-              HomNay,
-          },
-
-          OR: [
-            {
-              ngay_ket_thuc:
-                null,
-            },
-
-            {
-              ngay_ket_thuc: {
-                gte:
-                  HomNay,
-              },
-            },
-          ],
-        },
-
-        include: {
-          lop_hoc: {
-            include: {
-              nam_hoc: true,
-              khoi: true,
-            },
-          },
-        },
-      });
+    const PhamVi = await LayPhamViGiaoVien(this.Prisma, { tai_khoan_id: TaiKhoanId });
+    return PhamVi.phan_cong.filter(P => P.loai_phan_cong === 'GVCN' && P.mon_hoc_id === null);
   }
 
   // ==================================================
@@ -252,6 +210,7 @@ export class DiemDanhNghiHocService {
         .trim()
         .toUpperCase();
 
+    this.KiemTraNgayDiemDanh(NgayHoc);
     this.KiemTraBuoiHoc(
       BuoiHoc,
     );
@@ -306,6 +265,8 @@ export class DiemDanhNghiHocService {
         where: {
           lop_hoc_id:
             LopHocId,
+
+          hoc_sinh: { trang_thai: { not: 'DA_XOA' } },
 
           ngay_bat_dau: {
             lte:
@@ -405,6 +366,7 @@ export class DiemDanhNghiHocService {
         ?.trim()
         .toUpperCase();
 
+    this.KiemTraNgayDiemDanh(NgayHoc);
     this.KiemTraBuoiHoc(
       BuoiHoc,
     );
@@ -487,6 +449,8 @@ export class DiemDanhNghiHocService {
 
                 lop_hoc_id:
                   DuLieu.lop_hoc_id,
+
+                hoc_sinh: { trang_thai: { not: 'DA_XOA' } },
 
                 ngay_bat_dau: {
                   lte:

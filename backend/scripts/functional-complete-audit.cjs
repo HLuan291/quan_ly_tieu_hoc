@@ -181,11 +181,14 @@ async function Main() {
   Check('Mọi endpoint cũ có happy path; endpoint hồ sơ mới kiểm tra ở bước tiếp theo', Missing.every(Key => Moi.has(Key)));
   Fs.writeFileSync(Path.resolve('../docs/ci-route-coverage.json'), JSON.stringify({ total: Routes.length, covered: Covered.size, missing: Missing }, null, 2) + '\n');
   console.log('CI_BASELINE_ROUTE_COVERAGE ' + JSON.stringify({ total: Routes.length, covered: Covered.size, missing: Missing }));
+  const Today = LayNgayNghiepVu();
+  const AttendanceDay = new Date(Today);
+  if (AttendanceDay.getUTCDay() === 0) AttendanceDay.setUTCDate(AttendanceDay.getUTCDate() - 1);
   Fs.writeFileSync(FixtureFile, JSON.stringify({
     admin: Admin.ten_dang_nhap, teacher: Teacher.tai_khoan.ten_dang_nhap, teacher_id: Teacher.giao_vien.id,
     parent: Parent.so_dien_thoai, password: Password, student_id: StudentId, student_name: 'Nguyễn Văn Kiểm Thử',
     class_id: Class.lop_hoc.id, class_name: '5 CI', grade_id: Grade.id, year_id: Year.id, subject_id: Subject.mon_hoc.id,
-    dot_id: Dot.id, enrollment_id: Enrollment.xep_lop.id, today: LayNgayNghiepVu().toISOString().slice(0, 10),
+    dot_id: Dot.id, enrollment_id: Enrollment.xep_lop.id, today: Today.toISOString().slice(0, 10), attendance_day: AttendanceDay.toISOString().slice(0, 10),
   }));
 }
 Main().catch(Error => {

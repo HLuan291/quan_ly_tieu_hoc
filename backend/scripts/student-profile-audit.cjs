@@ -142,7 +142,7 @@ async function Main() {
   await Call('GV không cấp TK khi bổ sung phụ huynh', 'POST', Own + '/phu_huynh', 'GIAO_VIEN', { ho_ten: 'Trần Thị Cấm', so_dien_thoai: '0940000003', moi_quan_he: 'ME', tao_tai_khoan: true }, 403);
   await Call('GV không cấp lại mật khẩu PH', 'POST', '/ho_so_hoc_sinh/phu_huynh/' + Parent.id + '/cap_lai_mat_khau', 'GIAO_VIEN', undefined, 403);
   await Call('GV không duyệt danh mục toàn bộ phụ huynh', 'GET', '/ho_so_hoc_sinh/phu_huynh', 'GIAO_VIEN', undefined, 403);
-  const AbsenceDate = F.today;
+  const AbsenceDate = F.attendance_day;
   for (const [Buoi, TrangThai] of [['SANG', 'VANG_CO_PHEP'], ['CHIEU', 'VANG_KHONG_PHEP']]) {
     await Call('Ghi vắng ' + Buoi, 'POST', '/diem_danh_nghi_hoc/diem_danh', 'GIAO_VIEN', {
       lop_hoc_id: F.class_id, ngay_hoc: AbsenceDate, buoi_hoc: Buoi,
@@ -223,8 +223,12 @@ async function Main() {
   await Call('Không cấp lại mật khẩu GV đã xóa', 'POST', '/giao_vien/' + NoAssignment.giao_vien.id + '/cap_lai_mat_khau', 'ADMIN', {}, 409);
   const ArchivedAssignments = await Prisma.phan_cong_giao_vien.findMany({ where: { giao_vien_id: NoAssignment.giao_vien.id, lop_hoc_id: ForeignClass.lop_hoc.id } });
   Check('Phân công hiện tại được kết thúc và lịch sử giữ lại', ArchivedAssignments.length >= 2 && ArchivedAssignments.every(PC => PC.ngay_ket_thuc?.toISOString().slice(0, 10) === F.today));
+  const Replacement = await Call('Tạo GVCN thay thế chưa chủ nhiệm lớp khác', 'POST', '/giao_vien', 'ADMIN', {
+    ho_ten: 'Trần Thị Thay Thế', ngay_sinh: '1990-01-01', gioi_tinh: 'NU', so_dien_thoai: '0940000005', email: 'replacement@example.test',
+    dia_chi_lien_he: 'Địa chỉ giả', ngay_vao_truong: '2015-09-01', trinh_do_chuyen_mon: 'Đại học',
+  }, 201);
   await Call('Thay GVCN cùng ngày sau khi xóa GV cũ', 'POST', '/phan_cong_giang_day/phan_cong/gvcn', 'ADMIN', {
-    giao_vien_id: F.teacher_id, lop_hoc_id: ForeignClass.lop_hoc.id, ngay_bat_dau: F.today,
+    giao_vien_id: Replacement.giao_vien.id, lop_hoc_id: ForeignClass.lop_hoc.id, ngay_bat_dau: F.today,
   }, 201);
   const Teachers = await Call('Danh sách GV sau xóa', 'GET', '/giao_vien', 'ADMIN');
   Check('GV đã xóa không còn trong danh sách mặc định', !Teachers.danh_sach.some(T => T.id === NoAssignment.giao_vien.id));

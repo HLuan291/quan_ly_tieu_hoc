@@ -11,6 +11,7 @@ import type {
 
 import axios from 'axios';
 
+import HopThoai from '../components/hop_thoai';
 import Api from '../api/api';
 import { LayNgayHomNay, LayNgaySinhToiDa } from '../utils/ngay_local';
 
@@ -376,6 +377,7 @@ export default function GiaoVienPage() {
   }
 
   function DongForm() {
+    SetTaiKhoanMoi(null);
     SetMatKhauBanDau('');
     SetHienMatKhauBanDau(false);
     SetHienForm(false);
@@ -616,38 +618,7 @@ export default function GiaoVienPage() {
     } catch (Error) { SetLoi(LayThongBaoLoi(Error)); }
   }
 
-  return (
-    <div>
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">
-            Quản lý giáo viên
-          </h1>
-
-          <p className="mt-1 text-sm text-slate-500">
-            Thêm, tìm kiếm và cập nhật hồ sơ giáo viên.
-          </p>
-        </div>
-
-        <button
-          type="button"
-          disabled={DangCapMatKhau}
-          onClick={
-            MoFormThem
-          }
-          className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700"
-        >
-          Thêm giáo viên
-        </button>
-      </div>
-
-      {Loi && (
-        <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
-          {Loi}
-        </div>
-      )}
-
-      {TaiKhoanMoi && (
+  const ThongTinTaiKhoan = TaiKhoanMoi && (
         <div className="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-4">
           <p className="font-semibold text-amber-900">
             Thông tin đăng nhập giáo viên
@@ -679,9 +650,45 @@ export default function GiaoVienPage() {
             </button>
           </div>
         </div>
+       );
+
+  return (
+    <div>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-800">
+            Quản lý giáo viên
+          </h1>
+
+          <p className="mt-1 text-sm text-slate-500">
+            Thêm, tìm kiếm và cập nhật hồ sơ giáo viên.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          disabled={DangCapMatKhau}
+          onClick={
+            MoFormThem
+          }
+          className="rounded-lg bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700"
+        >
+          Thêm giáo viên
+        </button>
+      </div>
+
+      {Loi && !HienForm && (
+        <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
+          {Loi}
+        </div>
       )}
 
+      {TaiKhoanMoi && !HienForm && !GiaoVienCapMatKhau && <HopThoai TieuDe="Tài khoản giáo viên vừa cấp" Dong={() => SetTaiKhoanMoi(null)}>{ThongTinTaiKhoan}</HopThoai>}
+
       {HienForm && (
+        <HopThoai TieuDe={GiaoVienDangSua ? 'Chỉnh sửa hồ sơ giáo viên' : 'Tạo hồ sơ giáo viên'} Dong={DongForm} DangLuu={DangLuu}>
+        {Loi && <p role="alert" className="mb-3 rounded bg-red-50 p-3 text-red-700">{Loi}</p>}
+        {ThongTinTaiKhoan}
         <form
           onSubmit={
             LuuGiaoVien
@@ -697,6 +704,7 @@ export default function GiaoVienPage() {
 
             <button
               type="button"
+              disabled={DangLuu}
               onClick={
                 DongForm
               }
@@ -988,10 +996,11 @@ export default function GiaoVienPage() {
               Hủy
             </button>
           </div>
-        </form>
+        </form></HopThoai>
       )}
 
       {GiaoVienCapMatKhau && (
+        <HopThoai TieuDe="Cấp lại mật khẩu giáo viên" Dong={DongFormCapMatKhau} DangLuu={DangCapMatKhau}>
         <form onSubmit={CapLaiMatKhau} aria-labelledby="tieu-de-cap-mat-khau" className="mt-6 rounded-xl border border-amber-200 bg-white p-5 shadow-sm">
           <h2 id="tieu-de-cap-mat-khau" className="text-lg font-semibold text-slate-800">
             Cấp lại mật khẩu cho {GiaoVienCapMatKhau.ho_ten}
