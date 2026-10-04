@@ -84,6 +84,10 @@ jobs:
           npm run test:dates
           npm run lint
           npm run build
+      - name: Dependency audit (all and production)
+        if: always()
+        working-directory: backend
+        run: node scripts/dependency-audit.cjs
       - name: Install Chromium test tools
         run: |
           npm install --prefix "$RUNNER_TEMP/browser-tools" --no-audit --no-fund --ignore-scripts playwright@1.56.1
