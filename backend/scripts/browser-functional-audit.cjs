@@ -145,7 +145,7 @@ async function Main() {
   await StartServer('frontend', ['node_modules/vite/bin/vite.js', '--host', '127.0.0.1', '--port', '5173', '--strictPort'],
     Path.join(Root, 'frontend'), { VITE_API_URL: 'http://localhost:3000' }, 'http://localhost:5173/');
   Browser = await Chromium.launch({ headless: true });
-  Context = await Browser.newContext({ viewport: { width: 1440, height: 1000 }, timezoneId: 'Asia/Ho_Chi_Minh', permissions: ['clipboard-read', 'clipboard-write'] });
+  Context = await Browser.newContext({ viewport: { width: 1440, height: 1000 }, locale: 'vi-VN', timezoneId: 'Asia/Ho_Chi_Minh', permissions: ['clipboard-read', 'clipboard-write'] });
   await Context.addInitScript(({ Time }) => {
     const OriginalDate = Date;
     class FrozenDate extends OriginalDate {
@@ -697,6 +697,7 @@ async function Main() {
   });
   await Case('GVBM đổi khối lớp trên bảng đánh giá và chỉ nhập môn mình', async () => {
     await Go('/danh_gia', 'Đánh giá học tập');
+    await Page.getByRole('combobox', { name: 'Đợt đánh giá danh sách', exact: true }).selectOption(String(Fixture.dot_id));
     await Page.getByTestId('danh-gia-hs-' + Fixture.subject_student_id).waitFor();
     Assert.equal(await Page.getByRole('combobox', { name: 'Năm học đánh giá', exact: true }).count(), 0);
     Assert.equal(await Page.getByRole('combobox', { name: 'Khối đánh giá', exact: true }).locator('option').count(), 3);
