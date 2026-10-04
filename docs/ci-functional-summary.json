@@ -1,0 +1,172 @@
+{
+  "thoi_diem": "2026-10-04T10:23:49.905Z",
+  "source_commit": "d9aceb33b591fdaf36f899dc15df9b46b709cc2c",
+  "branch": "backend_audit_fix",
+  "run_id": 37195130671,
+  "job_id": 111415303612,
+  "run_url": "https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37195130671",
+  "workflow_conclusion": "success",
+  "environment": {
+    "execution": "GitHub Actions Ubuntu 24.04",
+    "node": "24",
+    "mysql": "8.0",
+    "browser": "Chromium, Playwright 1.56.1",
+    "data": "Giả, database CI riêng",
+    "windows_database_checked": false
+  },
+  "checks": {
+    "backend_unit": {
+      "total": 92,
+      "passed": 92,
+      "suites": 7
+    },
+    "backend_e2e": {
+      "total": 1,
+      "passed": 1,
+      "scope": "GET /"
+    },
+    "frontend_dates": {
+      "total": 9,
+      "passed": 9
+    },
+    "assignment_migration": {
+      "total": 15,
+      "passed": 15
+    },
+    "api_core": {
+      "total": 231,
+      "passed": 231,
+      "http": 219
+    },
+    "api_extra": {
+      "total": 116,
+      "passed": 116,
+      "http": 77
+    },
+    "api_combined": {
+      "total": 347,
+      "passed": 347,
+      "http": 296,
+      "assertions": 51
+    },
+    "routes": {
+      "total": 70,
+      "covered": 70,
+      "missing": []
+    },
+    "browser": {
+      "total": 48,
+      "passed": 48,
+      "http_responses": 137,
+      "api_5xx": 0,
+      "javascript_errors": [],
+      "viewports": [
+        {
+          "page": "/con_cua_toi",
+          "width": 390,
+          "scrollWidth": 390,
+          "mainWidth": 390,
+          "horizontalOverflow": false
+        }
+      ]
+    },
+    "backend_lint": {
+      "errors": 0,
+      "warnings": 3
+    },
+    "frontend_lint": {
+      "errors": 0,
+      "warnings": 0
+    },
+    "backend_build": "passed",
+    "frontend_build": "passed",
+    "prisma_validate": "passed",
+    "prisma_generate": "passed"
+  },
+  "dependencies": [
+    {
+      "project": "backend",
+      "scope": "all",
+      "vulnerabilities": {
+        "info": 0,
+        "low": 2,
+        "moderate": 2,
+        "high": 7,
+        "critical": 0,
+        "total": 11
+      }
+    },
+    {
+      "project": "backend",
+      "scope": "production",
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 1,
+        "high": 5,
+        "critical": 0,
+        "total": 6
+      }
+    },
+    {
+      "project": "frontend",
+      "scope": "all",
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      }
+    },
+    {
+      "project": "frontend",
+      "scope": "production",
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      }
+    }
+  ],
+  "fixes": [
+    "Ngày local/ngày nghiệp vụ Việt Nam trước 07:00",
+    "Giới hạn tuổi khi trừ 18 năm từ ngày nhuận",
+    "Layout điện thoại bị sidebar ép hẹp",
+    "Phản hồi khởi tạo cũ ghi đè lựa chọn phụ huynh"
+  ],
+  "before_fixes": [
+    {
+      "source_commit": "1a11e2acaa487bb8dfaceb7568932543fc79ed5a",
+      "run_id": 37194067091,
+      "file": "ci-browser-before-mobile-fix.json",
+      "issue": "Sidebar ép hẹp và tràn ngang",
+      "viewport": [
+        {
+          "page": "/con_cua_toi",
+          "width": 390,
+          "scrollWidth": 397,
+          "horizontalOverflow": true
+        }
+      ]
+    },
+    {
+      "source_commit": "6218b73c3c2a71192b5054ccd6415f80165b76fe",
+      "run_id": 37194289042,
+      "file": "ci-browser-before-initialization-fix.json",
+      "issue": "Phản hồi khởi tạo cũ đổi con đã chọn"
+    }
+  ],
+  "limits": [
+    "Database Windows và phục hồi backup chưa kiểm chứng",
+    "Chưa kiểm thử tải lớn, mọi cập nhật đồng thời, thiết bị thật, Safari/Firefox",
+    "Chưa xác nhận đầy đủ công thức/biểu mẫu luận văn",
+    "Backend còn 11 cảnh báo npm audit, gồm 6 trong phạm vi --omit=dev",
+    "Chưa triển khai gửi mail/link đặt lại mật khẩu",
+    "Còn API chưa có thao tác frontend; chưa có seed và migration triển khai đầy đủ"
+  ]
+}

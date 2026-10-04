@@ -1,0 +1,860 @@
+{
+  "thoi_diem": "2026-10-04T10:23:03.121Z",
+  "database": "audit_school_ci",
+  "loai_du_lieu": "Giả trên MySQL CI riêng",
+  "tong": 116,
+  "dat": 116,
+  "khong_dat": 0,
+  "http": 77,
+  "ket_qua": [
+    {
+      "ten": "Bộ API core đã đạt",
+      "dat": true
+    },
+    {
+      "ten": "Đăng nhập ADMIN",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "vai_tro": "KHACH",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Token ADMIN",
+      "dat": true
+    },
+    {
+      "ten": "Tạo giáo viên riêng",
+      "method": "POST",
+      "endpoint": "/giao_vien",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Đăng nhập GIAO_VIEN",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "vai_tro": "KHACH",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Token GIAO_VIEN",
+      "dat": true
+    },
+    {
+      "ten": "Đổi mật khẩu GIAO_VIEN",
+      "method": "POST",
+      "endpoint": "/auth/doi-mat-khau",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Tạo lớp riêng",
+      "method": "POST",
+      "endpoint": "/to_chuc_lop_hoc/lop_hoc",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Tạo môn riêng",
+      "method": "POST",
+      "endpoint": "/phan_cong_giang_day/mon_hoc",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Cấu hình môn GVCN",
+      "method": "POST",
+      "endpoint": "/phan_cong_giang_day/mon_hoc_khoi",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Phân công lớp riêng",
+      "method": "POST",
+      "endpoint": "/phan_cong_giang_day/phan_cong/gvcn",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Tạo học sinh chưa cấp TK phụ huynh",
+      "method": "POST",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Cấp tài khoản phụ huynh đã có hồ sơ",
+      "method": "POST",
+      "endpoint": "/ho_so_hoc_sinh/phu_huynh/3/tao_tai_khoan",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Cấp tài khoản không lộ hash",
+      "dat": true
+    },
+    {
+      "ten": "Không cấp trùng tài khoản PH",
+      "method": "POST",
+      "endpoint": "/ho_so_hoc_sinh/phu_huynh/3/tao_tai_khoan",
+      "vai_tro": "ADMIN",
+      "mong_doi": 409,
+      "thuc_te": 409,
+      "dat": true
+    },
+    {
+      "ten": "Đăng nhập PHU_HUYNH",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "vai_tro": "KHACH",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Token PHU_HUYNH",
+      "dat": true
+    },
+    {
+      "ten": "PH phải đổi mật khẩu",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/phu_huynh/me",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Đổi mật khẩu PHU_HUYNH",
+      "method": "POST",
+      "endpoint": "/auth/doi-mat-khau",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Xếp lớp riêng",
+      "method": "POST",
+      "endpoint": "/to_chuc_lop_hoc/xep_lop",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Cập nhật xếp lớp",
+      "method": "PATCH",
+      "endpoint": "/to_chuc_lop_hoc/xep_lop/3",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Ghi chú xếp lớp được lưu",
+      "dat": true
+    },
+    {
+      "ten": "Cập nhật trạng thái học sinh",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/trang_thai",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Cập nhật sức khỏe",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/suc_khoe",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Chặn sức khỏe âm",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/suc_khoe",
+      "vai_tro": "ADMIN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Thêm phụ huynh thứ hai",
+      "method": "POST",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/phu_huynh",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Chi tiết học sinh ADMIN",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Chi tiết đúng học sinh/sức khỏe ADMIN",
+      "dat": true
+    },
+    {
+      "ten": "Chi tiết giới hạn phụ huynh ADMIN",
+      "dat": true
+    },
+    {
+      "ten": "Chi tiết không lộ hash ADMIN",
+      "dat": true
+    },
+    {
+      "ten": "Chi tiết học sinh GIAO_VIEN",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Chi tiết đúng học sinh/sức khỏe GIAO_VIEN",
+      "dat": true
+    },
+    {
+      "ten": "Chi tiết giới hạn phụ huynh GIAO_VIEN",
+      "dat": true
+    },
+    {
+      "ten": "Chi tiết không lộ hash GIAO_VIEN",
+      "dat": true
+    },
+    {
+      "ten": "Chi tiết học sinh PHU_HUYNH",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Chi tiết đúng học sinh/sức khỏe PHU_HUYNH",
+      "dat": true
+    },
+    {
+      "ten": "Chi tiết giới hạn phụ huynh PHU_HUYNH",
+      "dat": true
+    },
+    {
+      "ten": "Chi tiết không lộ hash PHU_HUYNH",
+      "dat": true
+    },
+    {
+      "ten": "Tìm PH",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/phu_huynh?tu_khoa=0960000003",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Chi tiết PH",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/phu_huynh/3",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "PH trả đúng hồ sơ",
+      "dat": true
+    },
+    {
+      "ten": "Cập nhật PH",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/phu_huynh/3",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Nghề PH được lưu",
+      "dat": true
+    },
+    {
+      "ten": "Sửa mối quan hệ PH thứ hai",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/phu_huynh/4/moi_quan_he",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Hủy liên kết PH thứ hai",
+      "method": "DELETE",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/phu_huynh/4",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Hủy liên kết giữ hồ sơ PH",
+      "dat": true
+    },
+    {
+      "ten": "Không hủy PH cuối cùng",
+      "method": "DELETE",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/phu_huynh/3",
+      "vai_tro": "ADMIN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Cấp lại mật khẩu PH",
+      "method": "POST",
+      "endpoint": "/ho_so_hoc_sinh/phu_huynh/3/cap_lai_mat_khau",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Token PH cũ hết hiệu lực sau cấp lại",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/phu_huynh/me",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 401,
+      "thuc_te": 401,
+      "dat": true
+    },
+    {
+      "ten": "Hash PH mới đúng",
+      "dat": true
+    },
+    {
+      "ten": "Đăng nhập PHU_HUYNH",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "vai_tro": "KHACH",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Token PHU_HUYNH",
+      "dat": true
+    },
+    {
+      "ten": "Đổi mật khẩu PHU_HUYNH",
+      "method": "POST",
+      "endpoint": "/auth/doi-mat-khau",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Phiên PH được thay",
+      "dat": true
+    },
+    {
+      "ten": "Cấu hình môn lớp riêng",
+      "method": "POST",
+      "endpoint": "/danh_gia_hoc_tap/cau_hinh_danh_gia_mon",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Đọc danh mục ADMIN /danh_gia_hoc_tap/dot_danh_gia?nam_hoc_id=3",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/dot_danh_gia?nam_hoc_id=3",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Danh mục trả mảng ADMIN /danh_gia_hoc_tap/dot_danh_gia?nam_hoc_id=3",
+      "dat": true
+    },
+    {
+      "ten": "Đọc danh mục ADMIN /danh_gia_hoc_tap/cau_hinh_danh_gia_mon?dot_danh_gia_id=1&khoi_id=3",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/cau_hinh_danh_gia_mon?dot_danh_gia_id=1&khoi_id=3",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Danh mục trả mảng ADMIN /danh_gia_hoc_tap/cau_hinh_danh_gia_mon?dot_danh_gia_id=1&khoi_id=3",
+      "dat": true
+    },
+    {
+      "ten": "Đọc danh mục ADMIN /danh_gia_hoc_tap/cau_hinh_diem?dot_danh_gia_id=1",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/cau_hinh_diem?dot_danh_gia_id=1",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Danh mục trả mảng ADMIN /danh_gia_hoc_tap/cau_hinh_diem?dot_danh_gia_id=1",
+      "dat": true
+    },
+    {
+      "ten": "Đọc danh mục ADMIN /danh_gia_hoc_tap/tieu_chi_danh_gia?nhom_danh_gia=NANG_LUC",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/tieu_chi_danh_gia?nhom_danh_gia=NANG_LUC",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Danh mục trả mảng ADMIN /danh_gia_hoc_tap/tieu_chi_danh_gia?nhom_danh_gia=NANG_LUC",
+      "dat": true
+    },
+    {
+      "ten": "Đọc danh mục ADMIN /phan_cong_giang_day/mon_hoc?tu_khoa=CI_TIN",
+      "method": "GET",
+      "endpoint": "/phan_cong_giang_day/mon_hoc?tu_khoa=CI_TIN",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Danh mục trả mảng ADMIN /phan_cong_giang_day/mon_hoc?tu_khoa=CI_TIN",
+      "dat": true
+    },
+    {
+      "ten": "Đọc danh mục GIAO_VIEN /danh_gia_hoc_tap/dot_danh_gia?nam_hoc_id=3",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/dot_danh_gia?nam_hoc_id=3",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Danh mục trả mảng GIAO_VIEN /danh_gia_hoc_tap/dot_danh_gia?nam_hoc_id=3",
+      "dat": true
+    },
+    {
+      "ten": "Đọc danh mục GIAO_VIEN /danh_gia_hoc_tap/cau_hinh_danh_gia_mon?dot_danh_gia_id=1&khoi_id=3",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/cau_hinh_danh_gia_mon?dot_danh_gia_id=1&khoi_id=3",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Danh mục trả mảng GIAO_VIEN /danh_gia_hoc_tap/cau_hinh_danh_gia_mon?dot_danh_gia_id=1&khoi_id=3",
+      "dat": true
+    },
+    {
+      "ten": "Đọc danh mục GIAO_VIEN /danh_gia_hoc_tap/cau_hinh_diem?dot_danh_gia_id=1",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/cau_hinh_diem?dot_danh_gia_id=1",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Danh mục trả mảng GIAO_VIEN /danh_gia_hoc_tap/cau_hinh_diem?dot_danh_gia_id=1",
+      "dat": true
+    },
+    {
+      "ten": "Đọc danh mục GIAO_VIEN /danh_gia_hoc_tap/tieu_chi_danh_gia?nhom_danh_gia=NANG_LUC",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/tieu_chi_danh_gia?nhom_danh_gia=NANG_LUC",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Danh mục trả mảng GIAO_VIEN /danh_gia_hoc_tap/tieu_chi_danh_gia?nhom_danh_gia=NANG_LUC",
+      "dat": true
+    },
+    {
+      "ten": "Đọc danh mục GIAO_VIEN /phan_cong_giang_day/mon_hoc?tu_khoa=CI_TIN",
+      "method": "GET",
+      "endpoint": "/phan_cong_giang_day/mon_hoc?tu_khoa=CI_TIN",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Danh mục trả mảng GIAO_VIEN /phan_cong_giang_day/mon_hoc?tu_khoa=CI_TIN",
+      "dat": true
+    },
+    {
+      "ten": "Đọc danh mục PHU_HUYNH /danh_gia_hoc_tap/dot_danh_gia?nam_hoc_id=3",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/dot_danh_gia?nam_hoc_id=3",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Danh mục trả mảng PHU_HUYNH /danh_gia_hoc_tap/dot_danh_gia?nam_hoc_id=3",
+      "dat": true
+    },
+    {
+      "ten": "Đọc danh mục PHU_HUYNH /danh_gia_hoc_tap/cau_hinh_danh_gia_mon?dot_danh_gia_id=1&khoi_id=3",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/cau_hinh_danh_gia_mon?dot_danh_gia_id=1&khoi_id=3",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Danh mục trả mảng PHU_HUYNH /danh_gia_hoc_tap/cau_hinh_danh_gia_mon?dot_danh_gia_id=1&khoi_id=3",
+      "dat": true
+    },
+    {
+      "ten": "Đọc danh mục PHU_HUYNH /danh_gia_hoc_tap/cau_hinh_diem?dot_danh_gia_id=1",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/cau_hinh_diem?dot_danh_gia_id=1",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Danh mục trả mảng PHU_HUYNH /danh_gia_hoc_tap/cau_hinh_diem?dot_danh_gia_id=1",
+      "dat": true
+    },
+    {
+      "ten": "Đọc danh mục PHU_HUYNH /danh_gia_hoc_tap/tieu_chi_danh_gia?nhom_danh_gia=NANG_LUC",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/tieu_chi_danh_gia?nhom_danh_gia=NANG_LUC",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Danh mục trả mảng PHU_HUYNH /danh_gia_hoc_tap/tieu_chi_danh_gia?nhom_danh_gia=NANG_LUC",
+      "dat": true
+    },
+    {
+      "ten": "Đọc danh mục PHU_HUYNH /phan_cong_giang_day/mon_hoc?tu_khoa=CI_TIN",
+      "method": "GET",
+      "endpoint": "/phan_cong_giang_day/mon_hoc?tu_khoa=CI_TIN",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Danh mục trả mảng PHU_HUYNH /phan_cong_giang_day/mon_hoc?tu_khoa=CI_TIN",
+      "dat": true
+    },
+    {
+      "ten": "Danh mục quản trị /phan_cong_giang_day/mon_hoc_khoi?khoi_id=3",
+      "method": "GET",
+      "endpoint": "/phan_cong_giang_day/mon_hoc_khoi?khoi_id=3",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Chặn danh mục quản trị GIAO_VIEN /phan_cong_giang_day/mon_hoc_khoi?khoi_id=3",
+      "method": "GET",
+      "endpoint": "/phan_cong_giang_day/mon_hoc_khoi?khoi_id=3",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Chặn danh mục quản trị PHU_HUYNH /phan_cong_giang_day/mon_hoc_khoi?khoi_id=3",
+      "method": "GET",
+      "endpoint": "/phan_cong_giang_day/mon_hoc_khoi?khoi_id=3",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Danh mục quản trị /phan_cong_giang_day/phan_cong?lop_hoc_id=5",
+      "method": "GET",
+      "endpoint": "/phan_cong_giang_day/phan_cong?lop_hoc_id=5",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Chặn danh mục quản trị GIAO_VIEN /phan_cong_giang_day/phan_cong?lop_hoc_id=5",
+      "method": "GET",
+      "endpoint": "/phan_cong_giang_day/phan_cong?lop_hoc_id=5",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Chặn danh mục quản trị PHU_HUYNH /phan_cong_giang_day/phan_cong?lop_hoc_id=5",
+      "method": "GET",
+      "endpoint": "/phan_cong_giang_day/phan_cong?lop_hoc_id=5",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Danh mục quản trị /to_chuc_lop_hoc/nam_hoc",
+      "method": "GET",
+      "endpoint": "/to_chuc_lop_hoc/nam_hoc",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Chặn danh mục quản trị GIAO_VIEN /to_chuc_lop_hoc/nam_hoc",
+      "method": "GET",
+      "endpoint": "/to_chuc_lop_hoc/nam_hoc",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Chặn danh mục quản trị PHU_HUYNH /to_chuc_lop_hoc/nam_hoc",
+      "method": "GET",
+      "endpoint": "/to_chuc_lop_hoc/nam_hoc",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Danh mục quản trị /to_chuc_lop_hoc/khoi",
+      "method": "GET",
+      "endpoint": "/to_chuc_lop_hoc/khoi",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Chặn danh mục quản trị GIAO_VIEN /to_chuc_lop_hoc/khoi",
+      "method": "GET",
+      "endpoint": "/to_chuc_lop_hoc/khoi",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Chặn danh mục quản trị PHU_HUYNH /to_chuc_lop_hoc/khoi",
+      "method": "GET",
+      "endpoint": "/to_chuc_lop_hoc/khoi",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Danh mục quản trị /to_chuc_lop_hoc/lop_hoc?nam_hoc_id=3&khoi_id=3",
+      "method": "GET",
+      "endpoint": "/to_chuc_lop_hoc/lop_hoc?nam_hoc_id=3&khoi_id=3",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Chặn danh mục quản trị GIAO_VIEN /to_chuc_lop_hoc/lop_hoc?nam_hoc_id=3&khoi_id=3",
+      "method": "GET",
+      "endpoint": "/to_chuc_lop_hoc/lop_hoc?nam_hoc_id=3&khoi_id=3",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Chặn danh mục quản trị PHU_HUYNH /to_chuc_lop_hoc/lop_hoc?nam_hoc_id=3&khoi_id=3",
+      "method": "GET",
+      "endpoint": "/to_chuc_lop_hoc/lop_hoc?nam_hoc_id=3&khoi_id=3",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Danh mục quản trị /to_chuc_lop_hoc/lop_hoc/5",
+      "method": "GET",
+      "endpoint": "/to_chuc_lop_hoc/lop_hoc/5",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Chặn danh mục quản trị GIAO_VIEN /to_chuc_lop_hoc/lop_hoc/5",
+      "method": "GET",
+      "endpoint": "/to_chuc_lop_hoc/lop_hoc/5",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Chặn danh mục quản trị PHU_HUYNH /to_chuc_lop_hoc/lop_hoc/5",
+      "method": "GET",
+      "endpoint": "/to_chuc_lop_hoc/lop_hoc/5",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Danh mục quản trị /to_chuc_lop_hoc/hoc_sinh_chua_xep_lop",
+      "method": "GET",
+      "endpoint": "/to_chuc_lop_hoc/hoc_sinh_chua_xep_lop",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Chặn danh mục quản trị GIAO_VIEN /to_chuc_lop_hoc/hoc_sinh_chua_xep_lop",
+      "method": "GET",
+      "endpoint": "/to_chuc_lop_hoc/hoc_sinh_chua_xep_lop",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Chặn danh mục quản trị PHU_HUYNH /to_chuc_lop_hoc/hoc_sinh_chua_xep_lop",
+      "method": "GET",
+      "endpoint": "/to_chuc_lop_hoc/hoc_sinh_chua_xep_lop",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Giáo viên đọc lớp chủ nhiệm",
+      "method": "GET",
+      "endpoint": "/diem_danh_nghi_hoc/lop_chu_nhiem_cua_toi",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "PH đọc đơn của mình",
+      "method": "GET",
+      "endpoint": "/diem_danh_nghi_hoc/don_xin_nghi/cua_toi",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Sửa lớp",
+      "method": "PATCH",
+      "endpoint": "/to_chuc_lop_hoc/lop_hoc/5",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Sửa lớp lưu đúng",
+      "dat": true
+    },
+    {
+      "ten": "Tạo năm để sửa",
+      "method": "POST",
+      "endpoint": "/to_chuc_lop_hoc/nam_hoc",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Sửa năm",
+      "method": "PATCH",
+      "endpoint": "/to_chuc_lop_hoc/nam_hoc/4",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Sửa năm lưu đúng",
+      "dat": true
+    },
+    {
+      "ten": "Chặn query ID không hợp lệ",
+      "method": "GET",
+      "endpoint": "/to_chuc_lop_hoc/lop_hoc?nam_hoc_id=x",
+      "vai_tro": "ADMIN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Chặn query đánh giá ID không hợp lệ",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/dot_danh_gia?nam_hoc_id=x",
+      "vai_tro": "ADMIN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Mọi endpoint có happy path thành công",
+      "dat": true
+    }
+  ]
+}
