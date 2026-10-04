@@ -58,8 +58,10 @@
     "file": "src/danh_gia_hoc_tap/danh_gia_hoc_tap.controller.ts",
     "ham": "LayDanhSachDotDanhGia",
     "frontend": [
+      "bang_danh_gia_giao_vien.tsx",
       "con_cua_toi_page.tsx",
-      "danh_gia_page.tsx"
+      "danh_gia_page.tsx",
+      "thong_ke_danh_gia.tsx"
     ]
   },
   {
@@ -145,6 +147,7 @@
     "file": "src/danh_gia_hoc_tap/danh_gia_hoc_tap.controller.ts",
     "ham": "CapNhatKetQuaMonHoc",
     "frontend": [
+      "bang_danh_gia_giao_vien.tsx",
       "danh_gia_page.tsx"
     ]
   },
@@ -156,6 +159,7 @@
     "file": "src/danh_gia_hoc_tap/danh_gia_hoc_tap.controller.ts",
     "ham": "NhapDiemDinhKy",
     "frontend": [
+      "bang_danh_gia_giao_vien.tsx",
       "danh_gia_page.tsx"
     ]
   },
@@ -166,7 +170,9 @@
     "bao_ve": true,
     "file": "src/danh_gia_hoc_tap/danh_gia_hoc_tap.controller.ts",
     "ham": "NhapDiemKiemTraLai",
-    "frontend": []
+    "frontend": [
+      "bang_danh_gia_giao_vien.tsx"
+    ]
   },
   {
     "method": "PUT",
@@ -176,6 +182,7 @@
     "file": "src/danh_gia_hoc_tap/danh_gia_hoc_tap.controller.ts",
     "ham": "CapNhatNangLucPhamChat",
     "frontend": [
+      "bang_danh_gia_giao_vien.tsx",
       "danh_gia_page.tsx"
     ]
   },
@@ -206,6 +213,28 @@
     "ham": "LayKetQuaCuaCon",
     "frontend": [
       "con_cua_toi_page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "/danh_gia_hoc_tap/bang_danh_gia",
+    "vai_tro": "ADMIN, GIAO_VIEN (phạm vi phân công)",
+    "bao_ve": true,
+    "file": "src/danh_gia_hoc_tap/danh_gia_hoc_tap.controller.ts",
+    "ham": "LayBangDanhGia",
+    "frontend": [
+      "bang_danh_gia_giao_vien.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "/danh_gia_hoc_tap/thong_ke_danh_gia",
+    "vai_tro": "ADMIN, GIAO_VIEN (phạm vi phân công)",
+    "bao_ve": true,
+    "file": "src/danh_gia_hoc_tap/danh_gia_hoc_tap.controller.ts",
+    "ham": "LayThongKeDanhGia",
+    "frontend": [
+      "thong_ke_danh_gia.tsx"
     ]
   },
   {
@@ -343,6 +372,41 @@
     ]
   },
   {
+    "method": "DELETE",
+    "endpoint": "/giao_vien/:id",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/giao_vien/giao_vien.controller.ts",
+    "ham": "XoaGiaoVien",
+    "frontend": [
+      "giao_vien_page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "endpoint": "/ho_so_hoc_sinh/danh_muc",
+    "vai_tro": "ADMIN, GIAO_VIEN (phạm vi phân công)",
+    "bao_ve": true,
+    "file": "src/ho_so_hoc_sinh/ho_so_hoc_sinh.controller.ts",
+    "ham": "LayDanhMuc",
+    "frontend": [
+      "bang_danh_gia_giao_vien.tsx",
+      "danh_sach_hoc_sinh.tsx",
+      "thong_ke_danh_gia.tsx"
+    ]
+  },
+  {
+    "method": "DELETE",
+    "endpoint": "/ho_so_hoc_sinh/hoc_sinh/:Id",
+    "vai_tro": "ADMIN",
+    "bao_ve": true,
+    "file": "src/ho_so_hoc_sinh/ho_so_hoc_sinh.controller.ts",
+    "ham": "XoaHocSinh",
+    "frontend": [
+      "danh_sach_hoc_sinh.tsx"
+    ]
+  },
+  {
     "method": "POST",
     "endpoint": "/ho_so_hoc_sinh/hoc_sinh",
     "vai_tro": "ADMIN",
@@ -361,7 +425,7 @@
     "file": "src/ho_so_hoc_sinh/ho_so_hoc_sinh.controller.ts",
     "ham": "LayDanhSachHocSinh",
     "frontend": [
-      "hoc_sinh_page.tsx"
+      "danh_sach_hoc_sinh.tsx"
     ]
   },
   {
@@ -371,35 +435,41 @@
     "bao_ve": true,
     "file": "src/ho_so_hoc_sinh/ho_so_hoc_sinh.controller.ts",
     "ham": "LayChiTietHocSinh",
-    "frontend": []
+    "frontend": [
+      "ho_so_hoc_sinh_chi_tiet.tsx"
+    ]
   },
   {
     "method": "PATCH",
     "endpoint": "/ho_so_hoc_sinh/hoc_sinh/:Id",
-    "vai_tro": "ADMIN",
+    "vai_tro": "ADMIN, GIAO_VIEN (phạm vi phân công)",
     "bao_ve": true,
     "file": "src/ho_so_hoc_sinh/ho_so_hoc_sinh.controller.ts",
     "ham": "CapNhatHocSinh",
-    "frontend": []
+    "frontend": [
+      "ho_so_hoc_sinh_chi_tiet.tsx"
+    ]
   },
   {
     "method": "PATCH",
     "endpoint": "/ho_so_hoc_sinh/hoc_sinh/:Id/trang_thai",
-    "vai_tro": "ADMIN",
+    "vai_tro": "ADMIN, GIAO_VIEN (phạm vi phân công)",
     "bao_ve": true,
     "file": "src/ho_so_hoc_sinh/ho_so_hoc_sinh.controller.ts",
     "ham": "CapNhatTrangThaiHocSinh",
-    "frontend": []
+    "frontend": [
+      "ho_so_hoc_sinh_chi_tiet.tsx"
+    ]
   },
   {
     "method": "PATCH",
     "endpoint": "/ho_so_hoc_sinh/hoc_sinh/:Id/suc_khoe",
-    "vai_tro": "ADMIN",
+    "vai_tro": "ADMIN, GIAO_VIEN (phạm vi phân công)",
     "bao_ve": true,
     "file": "src/ho_so_hoc_sinh/ho_so_hoc_sinh.controller.ts",
     "ham": "CapNhatSucKhoeHocSinh",
     "frontend": [
-      "hoc_sinh_page.tsx"
+      "ho_so_hoc_sinh_chi_tiet.tsx"
     ]
   },
   {
@@ -438,11 +508,13 @@
   {
     "method": "PATCH",
     "endpoint": "/ho_so_hoc_sinh/phu_huynh/:Id",
-    "vai_tro": "ADMIN",
+    "vai_tro": "ADMIN, GIAO_VIEN (phạm vi phân công)",
     "bao_ve": true,
     "file": "src/ho_so_hoc_sinh/ho_so_hoc_sinh.controller.ts",
     "ham": "CapNhatPhuHuynh",
-    "frontend": []
+    "frontend": [
+      "ho_so_hoc_sinh_chi_tiet.tsx"
+    ]
   },
   {
     "method": "POST",
@@ -465,20 +537,24 @@
   {
     "method": "POST",
     "endpoint": "/ho_so_hoc_sinh/hoc_sinh/:Id/phu_huynh",
-    "vai_tro": "ADMIN",
+    "vai_tro": "ADMIN, GIAO_VIEN (phạm vi phân công)",
     "bao_ve": true,
     "file": "src/ho_so_hoc_sinh/ho_so_hoc_sinh.controller.ts",
     "ham": "ThemPhuHuynhVaoHocSinh",
-    "frontend": []
+    "frontend": [
+      "ho_so_hoc_sinh_chi_tiet.tsx"
+    ]
   },
   {
     "method": "PATCH",
     "endpoint": "/ho_so_hoc_sinh/hoc_sinh/:hoc_sinh_id/phu_huynh/:phu_huynh_id/moi_quan_he",
-    "vai_tro": "ADMIN",
+    "vai_tro": "ADMIN, GIAO_VIEN (phạm vi phân công)",
     "bao_ve": true,
     "file": "src/ho_so_hoc_sinh/ho_so_hoc_sinh.controller.ts",
     "ham": "CapNhatMoiQuanHe",
-    "frontend": []
+    "frontend": [
+      "ho_so_hoc_sinh_chi_tiet.tsx"
+    ]
   },
   {
     "method": "DELETE",

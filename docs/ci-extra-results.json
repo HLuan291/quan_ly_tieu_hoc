@@ -1,5 +1,5 @@
 {
-  "thoi_diem": "2026-10-04T10:23:03.121Z",
+  "thoi_diem": "2026-10-04T13:12:46.059Z",
   "database": "audit_school_ci",
   "loai_du_lieu": "Giả trên MySQL CI riêng",
   "tong": 116,
@@ -853,7 +853,7 @@
       "dat": true
     },
     {
-      "ten": "Mọi endpoint có happy path thành công",
+      "ten": "Mọi endpoint cũ có happy path; endpoint hồ sơ mới kiểm tra ở bước tiếp theo",
       "dat": true
     }
   ]

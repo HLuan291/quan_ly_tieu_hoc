@@ -1,9 +1,9 @@
 # Kiểm thử chức năng — 04/10/2026
 
-Báo cáo này thay thế kết quả tạm ở commit `9f81870`. Bản sửa, bộ test và workflow đã có trên nhánh `backend_audit_fix`.
+Báo cáo này cập nhật lượt kiểm thử sau khi bổ sung hồ sơ học sinh/phụ huynh, bảng đánh giá và thống kê theo phạm vi giáo viên. Bản sửa, bộ test và workflow đã có trên nhánh `backend_audit_fix`.
 
-**Mã đã kiểm thử:** d9aceb33b591fdaf36f899dc15df9b46b709cc2c  
-**Lượt CI:** [Functional checks](https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37195130671)
+**Mã đã kiểm thử:** 0eda31779399e69fd8b153637784e21c60d33d0a  
+**Lượt CI:** [Functional checks](https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37204738578)
 
 Kiểm thử chạy trên GitHub Actions với Node.js 24, MySQL 8 và Chromium thật. Database CI riêng chỉ có dữ liệu giả, không kết nối database trên máy Windows `C:\LuanVan`.
 
@@ -11,23 +11,24 @@ Kiểm thử chạy trên GitHub Actions với Node.js 24, MySQL 8 và Chromium 
 
 | Kiểm tra | Kết quả | Phạm vi |
 |---|---:|---|
-| Backend unit | 92/92, 7 suite | Gồm 23 regression test ngày/tuổi |
+| Backend unit | 95/95, 8 suite | Gồm regression ngày/tuổi và 3 test thống kê nghỉ |
 | E2E hiện có | 1/1 | Chỉ `GET /` |
-| API core | 231/231 | 219 HTTP và 12 assertion |
+| API core | 236/236 | 224 HTTP và 12 assertion |
 | API bổ sung | 116/116 | 77 HTTP và 39 assertion |
-| Tổng hai bộ API | **347/347** | **296 HTTP và 51 assertion** |
-| Route có luồng thành công | **70/70** | Khớp route tĩnh trước route tham số |
+| API hồ sơ/phân quyền mới | 125/125 | 85 HTTP và 40 assertion |
+| Tổng ba bộ API | **477/477** | **386 HTTP và 91 assertion** |
+| Route có luồng thành công | **75/75** | Khớp route tĩnh trước route tham số |
 | Chuyển CHECK phân công | 15/15 | MySQL thử nghiệm với ràng buộc cũ và mới |
 | Ngày frontend | 9/9 | Biên ngày, tháng, năm, năm nhuận, Việt Nam và Los Angeles |
-| Chromium | **48/48** | Ba vai trò; 137 phản hồi HTTP; đối chiếu MySQL |
+| Chromium | **58/58** | Ba vai trò; 185 phản hồi HTTP; đối chiếu MySQL |
 | Prisma validate/generate | Đạt | Schema 23 model |
 | Backend/frontend lint và build | Đạt | Còn cảnh báo nêu bên dưới |
 
-Không cộng các số trên thành một tổng HTTP: unit/assertion khác request, và bộ chuyển CHECK sử dụng lại API core. 70/70 chỉ là độ phủ đường chạy thành công của route, không chứng minh mọi nhánh nghiệp vụ đã được thử.
+Không cộng các số trên thành một tổng HTTP: unit/assertion khác request, và bộ chuyển CHECK sử dụng lại API core. 75/75 chỉ là độ phủ đường chạy thành công của route, không chứng minh mọi nhánh nghiệp vụ đã được thử.
 
 ### API và phân quyền
 
-Đã chạy đăng nhập đúng/sai; đổi và cấp lại mật khẩu; token không hợp lệ/hết hiệu lực; bắt buộc đổi mật khẩu; quyền ADMIN/GIAO_VIEN/PHU_HUYNH; giới hạn dữ liệu theo phân công và quan hệ phụ huynh–học sinh. Bộ core kiểm tra không token ở 68 route được bảo vệ.
+Đã chạy đăng nhập đúng/sai; đổi và cấp lại mật khẩu; token không hợp lệ/hết hiệu lực; bắt buộc đổi mật khẩu; quyền ADMIN/GIAO_VIEN/PHU_HUYNH; giới hạn dữ liệu theo phân công và quan hệ phụ huynh–học sinh. Bộ core kiểm tra không token ở 73 route được bảo vệ.
 
 Ba luồng đọc chi tiết học sinh cho ADMIN/GV/PH đã chạy thành công, có assertion về học sinh, sức khỏe, xếp lớp, phạm vi liên kết và không trả hash. Bộ bổ sung kiểm tra tài khoản phụ huynh, liên kết/đổi quan hệ, thay số điện thoại, cấp lại mật khẩu và thu hồi hiệu lực phiên trong các tình huống của script.
 
@@ -35,23 +36,29 @@ Ba luồng đọc chi tiết học sinh cho ADMIN/GV/PH đã chạy thành công
 |---|---:|
 | Trang gốc/kiểm tra DB | 2/2 |
 | Xác thực | 2/2 |
-| Giáo viên | 4/4 |
-| Hồ sơ học sinh/phụ huynh | 15/15 |
+| Giáo viên | 5/5 |
+| Hồ sơ học sinh/phụ huynh | 17/17 |
 | Tổ chức lớp học | 12/12 |
 | Phân công giảng dạy | 11/11 |
 | Điểm danh/đơn nghỉ | 8/8 |
-| Đánh giá học tập | 16/16 |
+| Đánh giá học tập | 18/18 |
+
+Bộ hồ sơ mới kiểm tra sửa thông tin cá nhân/liên hệ/địa chỉ/ghi chú/sức khỏe/trạng thái; cập nhật phụ huynh và quan hệ; hai buổi vắng cùng ngày chỉ tính một ngày. Kiểm tra âm gồm giáo viên không phân công, phân công hết hạn/chưa bắt đầu, lớp khác, phụ huynh khác, quyền tạo/xóa và cấp tài khoản, hồ sơ đã xóa, GVBM không ghi năng lực/phẩm chất, đợt sai năm, môn chưa cấu hình và bộ lọc sai. Thống kê môn chỉ tính sĩ số ở khối được cấu hình môn.
 
 ### Trình duyệt thật
 
-48 ca Chromium bao gồm:
+58 ca Chromium bao gồm:
 
 - Khách, đăng nhập sai/đúng, menu và route theo quyền, đăng xuất, token hết hạn/sai định dạng.
 - Tạo/sửa giáo viên; mật khẩu ban đầu, cấp lại, clipboard native, ẩn thông tin; đổi mật khẩu bắt buộc và đối chiếu Argon2 trong MySQL.
-- Tạo học sinh và phụ huynh; cập nhật sức khỏe bằng prompt native; tạo năm/lớp và xếp lớp.
+- Tạo học sinh và phụ huynh; mở hồ sơ và cập nhật sức khỏe bằng form; tạo năm/lớp và xếp lớp.
 - Tạo môn, gắn môn vào khối, phân công GVCN/GVBM, môn GVCN tự động và kết thúc phân công.
 - ADMIN tạo đợt, cấu hình môn/điểm và tiêu chí đánh giá.
-- Giáo viên xem dữ liệu đúng phạm vi; tải/lưu điểm danh; native validation chặn thiếu trạng thái; nhập điểm, nhận xét môn và đánh giá năng lực.
+- Giáo viên chỉ thấy lớp được phân công, sửa đủ thông tin học sinh/phụ huynh và bổ sung người giám hộ. Không có nút tạo/xóa học sinh hoặc menu phân công; đường dẫn phân công cũng chặn giáo viên.
+- Bảng đánh giá nhập mức/nhận xét từng dòng, lưu điểm và kiểm tra lại, năng lực/phẩm chất theo tiêu chí, nạp lại dữ liệu đã lưu. Lưu nhiều dòng có phần thiếu mức đánh giá báo lỗi đúng dòng và không ghi nhầm học sinh.
+- ADMIN lọc danh sách theo năm/khối/lớp, mở hồ sơ và xóa học sinh/giáo viên; đối chiếu trạng thái lưu giữ hồ sơ và khóa tài khoản trong MySQL.
+- Giáo viên xem thống kê đúng lớp, sĩ số và tỷ lệ. Danh sách/bảng đánh giá không làm tràn trang ở viewport điện thoại.
+- Tải/lưu điểm danh và native validation chặn thiếu trạng thái; assertion đối chiếu đúng ngày/buổi.
 - Phụ huynh chỉ chọn con được liên kết; xem điểm danh/kết quả; gửi đơn và GVCN duyệt; kiểm tra `CHO_DUYET`, `DA_DUYET` và `giao_vien_duyet_id` trong MySQL.
 - Hai ca cố ý giữ phản hồi khởi tạo cũ đến sau khi phụ huynh chọn con/đợt hoặc học sinh trong đơn nghỉ; phản hồi được lấy từ backend thật và giữ nguyên body.
 - Mất mạng hiển thị lỗi và phục hồi sau nối lại; viewport 390×844; không có lỗi JavaScript hay phản hồi API 5xx trong các ca đã chạy.
@@ -68,7 +75,12 @@ Trace browser của lượt cuối ghi vai trò trong token tại thời điểm
 
 4. **Khởi tạo bất đồng bộ ghi đè lựa chọn phụ huynh.** Phản hồi cũ có thể trả học sinh về con đầu tiên, làm xem/gửi đơn cho nhầm con. Khởi tạo bỏ phản hồi sau cleanup, giá trị mặc định chỉ đặt khi chưa chọn; danh sách đơn theo lớp bỏ phản hồi của lượt tải cũ. Hai regression Chromium trì hoãn phản hồi thật để xác nhận giữ đúng lựa chọn.
 
-Giữ schema, tên trường API/DB và route hiện có. Package lock không thay đổi trong các bản sửa này.
+5. **Giáo viên bị chặn sửa hồ sơ học sinh/phụ huynh.** API bổ sung quyền cập nhật theo lớp đang được phân công, chặn sửa ngoài phạm vi ngay tại backend. Giáo viên được bổ sung phụ huynh mới; việc gắn hồ sơ có sẵn theo ID và cấp/reset tài khoản vẫn thuộc ADMIN.
+6. **Thiếu danh sách/hồ sơ chi tiết và đánh giá theo bảng.** Có bộ lọc năm/khối/lớp, phân trang, hồ sơ đầy đủ, sức khỏe, phụ huynh, lịch sử lớp và thống kê nghỉ. Bảng đánh giá có nhận xét từng học sinh, điểm/kiểm tra lại, năng lực/phẩm chất và thống kê môn.
+7. **Xóa giáo viên có thể giữ chỗ phân công cũ.** Xóa lưu giữ lịch sử, khóa tài khoản và kết thúc phân công hiện tại; kiểm tra trùng không để giáo viên đã xóa giữ chỗ. Có ca thay GVCN cùng ngày sau khi xóa giáo viên cũ.
+8. **Tải lại bảng khi đổi môn/tiêu chí dễ làm mất phần đang nhập.** Dữ liệu lớp/đợt nạp một lần, môn/tiêu chí lọc trên dữ liệu đã nạp; phản hồi cũ bị bỏ và đổi bộ lọc có xác nhận khi còn nhận xét chưa lưu.
+
+Giữ Prisma schema và tên trường API/DB hiện có; bổ sung 5 route. Package lock không thay đổi trong các bản sửa này. Chi tiết sử dụng: [Hồ sơ và bảng đánh giá](STUDENT_PROFILE_ASSESSMENT.md).
 
 ## Dependency và cảnh báo còn tồn tại
 
@@ -93,6 +105,7 @@ JSON chính xác từ lượt CI đã lưu trong:
 
 - `docs/ci-core-results.json`
 - `docs/ci-extra-results.json`
+- `docs/ci-profile-results.json`
 - `docs/ci-route-coverage.json`
 - `docs/ci-browser-results.json`
 - `docs/ci-browser-before-mobile-fix.json`
@@ -120,7 +133,7 @@ Runtime audit tạo dữ liệu giả; chỉ chạy với database thử nghiệ
 - Database Windows hiện có, toàn bộ trigger/ràng buộc cũ, backup/phục hồi và chuyển CHECK trên bản sao dữ liệu thật.
 - Tải lớn, mọi tình huống cập nhật đồng thời, Safari/Firefox, thiết bị thật và mọi trạng thái giao diện.
 - Tính đúng đầy đủ công thức/biểu mẫu theo yêu cầu luận văn; chưa xác nhận quy trình vận hành cho trường.
-- Các thao tác backend chưa có UI, như sửa lớp/năm, lịch sử/kết thúc xếp lớp, quản lý liên kết phụ huynh, kiểm tra lại và tổng kết giáo dục. Độ phủ API không bổ sung các màn hình này.
+- Các thao tác backend chưa có UI, như sửa lớp/năm, sửa/kết thúc lượt xếp lớp, gắn hồ sơ phụ huynh có sẵn, cấp lại mật khẩu phụ huynh và tổng kết giáo dục. Hồ sơ hiển thị lịch sử lớp, hỗ trợ bổ sung/sửa phụ huynh mới và bảng đã có kiểm tra lại.
 - Gửi mail/link đặt lại mật khẩu chưa được triển khai; cơ chế hiện có là ADMIN cấp mật khẩu và bắt buộc đổi.
 - Chưa có seed và chuỗi migration chính thức đầy đủ để dựng/triển khai mới.
 

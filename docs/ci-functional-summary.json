@@ -1,87 +1,78 @@
 {
-  "thoi_diem": "2026-10-04T10:23:49.905Z",
-  "source_commit": "d9aceb33b591fdaf36f899dc15df9b46b709cc2c",
-  "branch": "backend_audit_fix",
-  "run_id": 37195130671,
-  "job_id": 111415303612,
-  "run_url": "https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37195130671",
-  "workflow_conclusion": "success",
-  "environment": {
-    "execution": "GitHub Actions Ubuntu 24.04",
-    "node": "24",
-    "mysql": "8.0",
-    "browser": "Chromium, Playwright 1.56.1",
-    "data": "Giả, database CI riêng",
-    "windows_database_checked": false
+  "source_commit": "0eda31779399e69fd8b153637784e21c60d33d0a",
+  "workflow_run": 37204738578,
+  "workflow_url": "https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37204738578",
+  "conclusion": "success",
+  "data": "Dữ liệu giả trên MySQL CI riêng; không kết nối database Windows",
+  "backend_unit": {
+    "passed": 95,
+    "total": 95,
+    "suites": 8
   },
-  "checks": {
-    "backend_unit": {
-      "total": 92,
-      "passed": 92,
-      "suites": 7
-    },
-    "backend_e2e": {
-      "total": 1,
-      "passed": 1,
-      "scope": "GET /"
-    },
-    "frontend_dates": {
-      "total": 9,
-      "passed": 9
-    },
-    "assignment_migration": {
-      "total": 15,
-      "passed": 15
-    },
-    "api_core": {
-      "total": 231,
-      "passed": 231,
-      "http": 219
-    },
-    "api_extra": {
-      "total": 116,
-      "passed": 116,
-      "http": 77
-    },
-    "api_combined": {
-      "total": 347,
-      "passed": 347,
-      "http": 296,
-      "assertions": 51
-    },
-    "routes": {
-      "total": 70,
-      "covered": 70,
-      "missing": []
-    },
-    "browser": {
-      "total": 48,
-      "passed": 48,
-      "http_responses": 137,
-      "api_5xx": 0,
-      "javascript_errors": [],
-      "viewports": [
-        {
-          "page": "/con_cua_toi",
-          "width": 390,
-          "scrollWidth": 390,
-          "mainWidth": 390,
-          "horizontalOverflow": false
-        }
-      ]
-    },
-    "backend_lint": {
-      "errors": 0,
-      "warnings": 3
-    },
-    "frontend_lint": {
-      "errors": 0,
-      "warnings": 0
-    },
-    "backend_build": "passed",
-    "frontend_build": "passed",
-    "prisma_validate": "passed",
-    "prisma_generate": "passed"
+  "e2e": {
+    "passed": 1,
+    "total": 1,
+    "scope": "GET /"
+  },
+  "api": {
+    "passed": 477,
+    "total": 477,
+    "http": 386,
+    "assertions": 91,
+    "core": 236,
+    "extra": 116,
+    "profiles": 125
+  },
+  "route_coverage": {
+    "total": 75,
+    "covered": 75,
+    "missing": []
+  },
+  "protected_routes_without_token": 73,
+  "mysql_constraints": {
+    "passed": 15,
+    "total": 15
+  },
+  "frontend_dates": {
+    "passed": 9,
+    "total": 9
+  },
+  "browser": {
+    "passed": 58,
+    "total": 58,
+    "http": 185,
+    "http_5xx": 0,
+    "javascript_errors": 0,
+    "screenshots": [
+      "admin-student-directory.png",
+      "teacher-student-profile.png",
+      "teacher-assessment-table.png",
+      "teacher-assessment-statistics.png",
+      "teacher-student-mobile.png",
+      "teacher-assessment-mobile.png",
+      "parent-desktop.png",
+      "parent-mobile.png"
+    ],
+    "viewport": [
+      {
+        "page": "/con_cua_toi",
+        "width": 390,
+        "scrollWidth": 390,
+        "mainWidth": 390,
+        "horizontalOverflow": false
+      }
+    ]
+  },
+  "lint": {
+    "backend_warnings": 3,
+    "frontend_warnings": 0,
+    "errors": 0
+  },
+  "build": {
+    "backend": "success",
+    "frontend": "success",
+    "prisma": "success",
+    "frontend_bundle_warning": true
   },
   "dependencies": [
     {
@@ -133,40 +124,15 @@
       }
     }
   ],
-  "fixes": [
-    "Ngày local/ngày nghiệp vụ Việt Nam trước 07:00",
-    "Giới hạn tuổi khi trừ 18 năm từ ngày nhuận",
-    "Layout điện thoại bị sidebar ép hẹp",
-    "Phản hồi khởi tạo cũ ghi đè lựa chọn phụ huynh"
-  ],
-  "before_fixes": [
-    {
-      "source_commit": "1a11e2acaa487bb8dfaceb7568932543fc79ed5a",
-      "run_id": 37194067091,
-      "file": "ci-browser-before-mobile-fix.json",
-      "issue": "Sidebar ép hẹp và tràn ngang",
-      "viewport": [
-        {
-          "page": "/con_cua_toi",
-          "width": 390,
-          "scrollWidth": 397,
-          "horizontalOverflow": true
-        }
-      ]
-    },
-    {
-      "source_commit": "6218b73c3c2a71192b5054ccd6415f80165b76fe",
-      "run_id": 37194289042,
-      "file": "ci-browser-before-initialization-fix.json",
-      "issue": "Phản hồi khởi tạo cũ đổi con đã chọn"
-    }
-  ],
+  "artifact": {
+    "id": 11304481829,
+    "url": "https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37204738578/artifacts/11304481829",
+    "expires_at": "2026-10-18T13:13:42Z"
+  },
   "limits": [
-    "Database Windows và phục hồi backup chưa kiểm chứng",
-    "Chưa kiểm thử tải lớn, mọi cập nhật đồng thời, thiết bị thật, Safari/Firefox",
-    "Chưa xác nhận đầy đủ công thức/biểu mẫu luận văn",
-    "Backend còn 11 cảnh báo npm audit, gồm 6 trong phạm vi --omit=dev",
-    "Chưa triển khai gửi mail/link đặt lại mật khẩu",
-    "Còn API chưa có thao tác frontend; chưa có seed và migration triển khai đầy đủ"
+    "Không kiểm thử DB Windows hiện có",
+    "Chromium headless; viewport điện thoại giả lập",
+    "Không xác nhận mọi nhánh nghiệp vụ hoặc biểu mẫu theo quy định",
+    "Dependency audit vẫn có package bị đánh dấu; chưa nâng version"
   ]
 }

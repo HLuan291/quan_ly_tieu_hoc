@@ -1,0 +1,936 @@
+{
+  "thoi_diem": "2026-10-04T13:12:48.483Z",
+  "database": "audit_school_ci",
+  "loai_du_lieu": "Giả trên MySQL CI riêng",
+  "tong": 125,
+  "dat": 125,
+  "khong_dat": 0,
+  "http": 85,
+  "ket_qua": [
+    {
+      "ten": "Đăng nhập ADMIN",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "vai_tro": "KHACH",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Token ADMIN",
+      "dat": true
+    },
+    {
+      "ten": "Đăng nhập GIAO_VIEN",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "vai_tro": "KHACH",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Token GIAO_VIEN",
+      "dat": true
+    },
+    {
+      "ten": "Đăng nhập PHU_HUYNH",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "vai_tro": "KHACH",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Token PHU_HUYNH",
+      "dat": true
+    },
+    {
+      "ten": "GV đọc danh mục lớp được phân công",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/danh_muc",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Danh mục GV chỉ gồm lớp được phân công",
+      "dat": true
+    },
+    {
+      "ten": "ADMIN đọc danh mục toàn trường",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/danh_muc",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Danh mục ADMIN bao gồm các lớp ngoài phạm vi GV",
+      "dat": true
+    },
+    {
+      "ten": "PH không đọc danh mục lớp",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/danh_muc",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Tạo lớp ngoài phân công",
+      "method": "POST",
+      "endpoint": "/to_chuc_lop_hoc/lop_hoc",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "ADMIN tạo học sinh lớp khác",
+      "method": "POST",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Xếp lớp ngoài phân công",
+      "method": "POST",
+      "endpoint": "/to_chuc_lop_hoc/xep_lop",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Lọc lớp đúng ADMIN",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh?nam_hoc_id=3&khoi_id=3&lop_hoc_id=5",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Lọc lớp trả học sinh và tên lớp ADMIN",
+      "dat": true
+    },
+    {
+      "ten": "Lọc khối ADMIN",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh?khoi_id=3",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Lọc khối không mở rộng phạm vi ADMIN",
+      "dat": true
+    },
+    {
+      "ten": "Lọc lớp đúng GIAO_VIEN",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh?nam_hoc_id=3&khoi_id=3&lop_hoc_id=5",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Lọc lớp trả học sinh và tên lớp GIAO_VIEN",
+      "dat": true
+    },
+    {
+      "ten": "Lọc khối GIAO_VIEN",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh?khoi_id=3",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Lọc khối không mở rộng phạm vi GIAO_VIEN",
+      "dat": true
+    },
+    {
+      "ten": "GV lọc lớp ngoài quyền",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh?lop_hoc_id=6",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Lọc lớp khác không lộ học sinh",
+      "dat": true
+    },
+    {
+      "ten": "Chặn bộ lọc sai nam_hoc_id=x",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh?nam_hoc_id=x",
+      "vai_tro": "ADMIN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Chặn bộ lọc sai khoi_id=0",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh?khoi_id=0",
+      "vai_tro": "ADMIN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Chặn bộ lọc sai lop_hoc_id=-1",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh?lop_hoc_id=-1",
+      "vai_tro": "ADMIN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Chặn bộ lọc sai lop_hoc_id=1.5",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh?lop_hoc_id=1.5",
+      "vai_tro": "ADMIN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "GV bổ sung đầy đủ hồ sơ học sinh",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Địa chỉ và ghi chú được ghi vào MySQL",
+      "dat": true
+    },
+    {
+      "ten": "GV sửa sức khỏe trong phạm vi",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/suc_khoe",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "GV sửa trạng thái trong phạm vi",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/trang_thai",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Không dùng sửa trạng thái để xóa",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/trang_thai",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "GV sửa phụ huynh liên kết trong phạm vi",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/phu_huynh/3",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Nghề nghiệp phụ huynh được lưu",
+      "dat": true
+    },
+    {
+      "ten": "GV bổ sung người giám hộ mới",
+      "method": "POST",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/phu_huynh",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Bổ sung thông tin không tự cấp tài khoản",
+      "dat": true
+    },
+    {
+      "ten": "GV sửa mối quan hệ",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/phu_huynh/6/moi_quan_he",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Không tạo HS trái vai trò GIAO_VIEN",
+      "method": "POST",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Không tạo GV trái vai trò GIAO_VIEN",
+      "method": "POST",
+      "endpoint": "/giao_vien",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Không xóa HS trái vai trò GIAO_VIEN",
+      "method": "DELETE",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Không xóa GV trái vai trò GIAO_VIEN",
+      "method": "DELETE",
+      "endpoint": "/giao_vien/6",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Không tạo HS trái vai trò PHU_HUYNH",
+      "method": "POST",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Không tạo GV trái vai trò PHU_HUYNH",
+      "method": "POST",
+      "endpoint": "/giao_vien",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Không xóa HS trái vai trò PHU_HUYNH",
+      "method": "DELETE",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Không xóa GV trái vai trò PHU_HUYNH",
+      "method": "DELETE",
+      "endpoint": "/giao_vien/6",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "PH không sửa hồ sơ con",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "PH không sửa hồ sơ phụ huynh qua API nhân viên",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/phu_huynh/3",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "GV bị chặn ngoài phạm vi GET /ho_so_hoc_sinh/hoc_sinh/4",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/4",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "GV bị chặn ngoài phạm vi PATCH /ho_so_hoc_sinh/hoc_sinh/4",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/4",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "GV bị chặn ngoài phạm vi PATCH /ho_so_hoc_sinh/hoc_sinh/4/suc_khoe",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/4/suc_khoe",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "GV bị chặn ngoài phạm vi PATCH /ho_so_hoc_sinh/hoc_sinh/4/trang_thai",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/4/trang_thai",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "GV bị chặn ngoài phạm vi PATCH /ho_so_hoc_sinh/phu_huynh/5",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/phu_huynh/5",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "GV bị chặn ngoài phạm vi POST /ho_so_hoc_sinh/hoc_sinh/4/phu_huynh",
+      "method": "POST",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/4/phu_huynh",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "GV bị chặn ngoài phạm vi PATCH /ho_so_hoc_sinh/hoc_sinh/4/phu_huynh/5/moi_quan_he",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/4/phu_huynh/5/moi_quan_he",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Hồ sơ ngoài phạm vi không đổi",
+      "dat": true
+    },
+    {
+      "ten": "GV không gắn phụ huynh có sẵn theo ID",
+      "method": "POST",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/phu_huynh",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "GV không cấp TK khi bổ sung phụ huynh",
+      "method": "POST",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3/phu_huynh",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "GV không cấp lại mật khẩu PH",
+      "method": "POST",
+      "endpoint": "/ho_so_hoc_sinh/phu_huynh/3/cap_lai_mat_khau",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "GV không duyệt danh mục toàn bộ phụ huynh",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/phu_huynh",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Ghi vắng SANG",
+      "method": "POST",
+      "endpoint": "/diem_danh_nghi_hoc/diem_danh",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Ghi vắng CHIEU",
+      "method": "POST",
+      "endpoint": "/diem_danh_nghi_hoc/diem_danh",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Hồ sơ đầy đủ và thống kê nghỉ ADMIN",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Đếm 1 ngày, 2 buổi vắng ADMIN",
+      "dat": true
+    },
+    {
+      "ten": "Chi tiết có tên lớp/khối/năm ADMIN",
+      "dat": true
+    },
+    {
+      "ten": "Không lộ hash trong hồ sơ ADMIN",
+      "dat": true
+    },
+    {
+      "ten": "Hồ sơ đầy đủ và thống kê nghỉ GIAO_VIEN",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Đếm 1 ngày, 2 buổi vắng GIAO_VIEN",
+      "dat": true
+    },
+    {
+      "ten": "Chi tiết có tên lớp/khối/năm GIAO_VIEN",
+      "dat": true
+    },
+    {
+      "ten": "Không lộ hash trong hồ sơ GIAO_VIEN",
+      "dat": true
+    },
+    {
+      "ten": "Hồ sơ đầy đủ và thống kê nghỉ PHU_HUYNH",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Đếm 1 ngày, 2 buổi vắng PHU_HUYNH",
+      "dat": true
+    },
+    {
+      "ten": "Chi tiết có tên lớp/khối/năm PHU_HUYNH",
+      "dat": true
+    },
+    {
+      "ten": "Không lộ hash trong hồ sơ PHU_HUYNH",
+      "dat": true
+    },
+    {
+      "ten": "PH chỉ thấy hồ sơ PH của mình",
+      "dat": true
+    },
+    {
+      "ten": "GV nhập một học sinh trong bảng",
+      "method": "PUT",
+      "endpoint": "/danh_gia_hoc_tap/ket_qua_mon_hoc",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Đọc bảng đánh giá ADMIN",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/bang_danh_gia?lop_hoc_id=5&dot_danh_gia_id=1&mon_hoc_id=5",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Bảng đúng học sinh, nạp lại nhận xét ADMIN",
+      "dat": true
+    },
+    {
+      "ten": "Cờ quyền nhập đúng vai trò ADMIN",
+      "dat": true
+    },
+    {
+      "ten": "Đọc bảng đánh giá GIAO_VIEN",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/bang_danh_gia?lop_hoc_id=5&dot_danh_gia_id=1&mon_hoc_id=5",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Bảng đúng học sinh, nạp lại nhận xét GIAO_VIEN",
+      "dat": true
+    },
+    {
+      "ten": "Cờ quyền nhập đúng vai trò GIAO_VIEN",
+      "dat": true
+    },
+    {
+      "ten": "PH không đọc bảng nhân viên",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/bang_danh_gia?lop_hoc_id=5&dot_danh_gia_id=1&mon_hoc_id=5",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "GV không đọc bảng lớp khác",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/bang_danh_gia?lop_hoc_id=6&dot_danh_gia_id=1",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Không trộn đợt năm khác vào lớp",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/bang_danh_gia?lop_hoc_id=5&dot_danh_gia_id=2",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Không dùng môn chưa cấu hình",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/bang_danh_gia?lop_hoc_id=5&dot_danh_gia_id=1&mon_hoc_id=999999",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Thiếu tham số bảng",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/bang_danh_gia",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "ID bảng sai",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/bang_danh_gia?lop_hoc_id=x&dot_danh_gia_id=1",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "GV xem thống kê phạm vi phân công",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/thong_ke_danh_gia?dot_danh_gia_id=1",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Thống kê GV không chứa lớp khác",
+      "dat": true
+    },
+    {
+      "ten": "Thống kê đúng số lượng và tỷ lệ",
+      "dat": true
+    },
+    {
+      "ten": "ADMIN xem thống kê toàn trường",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/thong_ke_danh_gia?dot_danh_gia_id=1",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Thống kê môn không dùng sĩ số của khối chưa cấu hình môn",
+      "dat": true
+    },
+    {
+      "ten": "PH không xem thống kê trường",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/thong_ke_danh_gia?dot_danh_gia_id=1",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "GV không dùng thống kê lớp khác",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/thong_ke_danh_gia?dot_danh_gia_id=1&lop_hoc_id=6",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Thống kê thiếu đợt",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/thong_ke_danh_gia",
+      "vai_tro": "ADMIN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Tạo GV chưa phân công",
+      "method": "POST",
+      "endpoint": "/giao_vien",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Đăng nhập GV_KHONG_PHAN_CONG",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "vai_tro": "KHACH",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Token GV_KHONG_PHAN_CONG",
+      "dat": true
+    },
+    {
+      "ten": "Đổi mật khẩu GV_KHONG_PHAN_CONG",
+      "method": "POST",
+      "endpoint": "/auth/doi-mat-khau",
+      "vai_tro": "GV_KHONG_PHAN_CONG",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "GV chưa phân công có danh mục rỗng",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/danh_muc",
+      "vai_tro": "GV_KHONG_PHAN_CONG",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Không tự thấy toàn trường khi chưa phân công",
+      "dat": true
+    },
+    {
+      "ten": "GV chưa phân công không sửa HS",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3",
+      "vai_tro": "GV_KHONG_PHAN_CONG",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "GVBM đọc bảng trong lớp được phân công",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/bang_danh_gia?lop_hoc_id=5&dot_danh_gia_id=1&mon_hoc_id=5",
+      "vai_tro": "GV_KHONG_PHAN_CONG",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "GVBM nhập môn của mình và chỉ xem năng lực/phẩm chất",
+      "dat": true
+    },
+    {
+      "ten": "GVBM không nhập năng lực/phẩm chất",
+      "method": "PUT",
+      "endpoint": "/danh_gia_hoc_tap/nang_luc_pham_chat",
+      "vai_tro": "GV_KHONG_PHAN_CONG",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Phân công hết hạn không cho sửa PH",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/phu_huynh/3",
+      "vai_tro": "GV_KHONG_PHAN_CONG",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Phân công hết hạn không xem bảng",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/bang_danh_gia?lop_hoc_id=5&dot_danh_gia_id=1&mon_hoc_id=5",
+      "vai_tro": "GV_KHONG_PHAN_CONG",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Phân công hết hạn không xem kết quả qua endpoint cũ",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/hoc_sinh/3/dot/1",
+      "vai_tro": "GV_KHONG_PHAN_CONG",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Phân công chưa bắt đầu không sửa HS",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3",
+      "vai_tro": "GV_KHONG_PHAN_CONG",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "ADMIN xóa HS, lưu lịch sử",
+      "method": "DELETE",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/4",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Xóa HS giữ lịch sử và kết thúc xếp lớp",
+      "dat": true
+    },
+    {
+      "ten": "Danh sách sau khi xóa HS",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "HS đã xóa không còn trong danh sách mặc định",
+      "dat": true
+    },
+    {
+      "ten": "Không cập nhật hồ sơ đã xóa",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/4",
+      "vai_tro": "ADMIN",
+      "mong_doi": 409,
+      "thuc_te": 409,
+      "dat": true
+    },
+    {
+      "ten": "Phân công GVCN trước khi xóa GV",
+      "method": "POST",
+      "endpoint": "/phan_cong_giang_day/phan_cong/gvcn",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "ADMIN xóa GV, khóa tài khoản",
+      "method": "DELETE",
+      "endpoint": "/giao_vien/7",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Hồ sơ GV vẫn được giữ",
+      "dat": true
+    },
+    {
+      "ten": "Phiên GV đã xóa bị khóa",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh",
+      "vai_tro": "GV_KHONG_PHAN_CONG",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Không cấp lại mật khẩu GV đã xóa",
+      "method": "POST",
+      "endpoint": "/giao_vien/7/cap_lai_mat_khau",
+      "vai_tro": "ADMIN",
+      "mong_doi": 409,
+      "thuc_te": 409,
+      "dat": true
+    },
+    {
+      "ten": "Phân công hiện tại được kết thúc và lịch sử giữ lại",
+      "dat": true
+    },
+    {
+      "ten": "Thay GVCN cùng ngày sau khi xóa GV cũ",
+      "method": "POST",
+      "endpoint": "/phan_cong_giang_day/phan_cong/gvcn",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Danh sách GV sau xóa",
+      "method": "GET",
+      "endpoint": "/giao_vien",
+      "vai_tro": "ADMIN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "GV đã xóa không còn trong danh sách mặc định",
+      "dat": true
+    },
+    {
+      "ten": "Mọi endpoint có happy path thành công",
+      "dat": true
+    }
+  ]
+}

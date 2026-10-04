@@ -1,9 +1,9 @@
 {
-  "thoi_diem": "2026-10-04T10:23:00.848Z",
+  "thoi_diem": "2026-10-04T13:12:43.385Z",
   "database": "audit_school_ci",
   "loai_du_lieu": "Dữ liệu giả; DB được tạo từ Prisma schema, không phải DB của người dùng",
-  "tong": 231,
-  "dat": 231,
+  "tong": 236,
+  "dat": 236,
   "khong_dat": 0,
   "ket_qua": [
     {
@@ -986,6 +986,24 @@
       "dat": true
     },
     {
+      "ten": "Không token: GET /danh_gia_hoc_tap/bang_danh_gia",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/bang_danh_gia",
+      "vai_tro": "KHACH",
+      "mong_doi": 401,
+      "thuc_te": 401,
+      "dat": true
+    },
+    {
+      "ten": "Không token: GET /danh_gia_hoc_tap/thong_ke_danh_gia",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/thong_ke_danh_gia",
+      "vai_tro": "KHACH",
+      "mong_doi": 401,
+      "thuc_te": 401,
+      "dat": true
+    },
+    {
       "ten": "Không token: GET /diem_danh_nghi_hoc/lop_chu_nhiem_cua_toi",
       "method": "GET",
       "endpoint": "/diem_danh_nghi_hoc/lop_chu_nhiem_cua_toi",
@@ -1088,6 +1106,33 @@
       "ten": "Không token: POST /giao_vien/:id/cap_lai_mat_khau",
       "method": "POST",
       "endpoint": "/giao_vien/1/cap_lai_mat_khau",
+      "vai_tro": "KHACH",
+      "mong_doi": 401,
+      "thuc_te": 401,
+      "dat": true
+    },
+    {
+      "ten": "Không token: DELETE /giao_vien/:id",
+      "method": "DELETE",
+      "endpoint": "/giao_vien/1",
+      "vai_tro": "KHACH",
+      "mong_doi": 401,
+      "thuc_te": 401,
+      "dat": true
+    },
+    {
+      "ten": "Không token: GET /ho_so_hoc_sinh/danh_muc",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/danh_muc",
+      "vai_tro": "KHACH",
+      "mong_doi": 401,
+      "thuc_te": 401,
+      "dat": true
+    },
+    {
+      "ten": "Không token: DELETE /ho_so_hoc_sinh/hoc_sinh/:Id",
+      "method": "DELETE",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/1",
       "vai_tro": "KHACH",
       "mong_doi": 401,
       "thuc_te": 401,
@@ -1701,7 +1746,7 @@
       "dat": true
     },
     {
-      "ten": "ĐỒNG THỜI: tạo giáo viên 2",
+      "ten": "ĐỒNG THỜI: tạo giáo viên 1",
       "method": "POST",
       "endpoint": "/giao_vien",
       "vai_tro": "ADMIN",
@@ -1710,7 +1755,7 @@
       "dat": true
     },
     {
-      "ten": "ĐỒNG THỜI: tạo giáo viên 1",
+      "ten": "ĐỒNG THỜI: tạo giáo viên 2",
       "method": "POST",
       "endpoint": "/giao_vien",
       "vai_tro": "ADMIN",
