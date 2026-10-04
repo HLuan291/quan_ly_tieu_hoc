@@ -39,7 +39,7 @@ jobs:
       DATABASE_URL: mysql://audit:audit-test-only@127.0.0.1:3306/audit_school_ci
       JWT_SECRET: test-only-ci-secret-with-enough-characters-2026
       AUDIT_ALLOW_TEST_DATA: '1'
-      AUDIT_FIXTURE_FILE: ${{ runner.temp }}/functional-fixture.json
+      AUDIT_FIXTURE_FILE: /tmp/school-functional-fixture.json
       AUDIT_REPORT_FILE: ${{ github.workspace }}/docs/ci-core-results.json
       FRONTEND_ORIGIN: http://localhost:5173
       TZ: Asia/Ho_Chi_Minh
