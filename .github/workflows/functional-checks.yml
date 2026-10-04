@@ -84,6 +84,15 @@ jobs:
           npm run test:dates
           npm run lint
           npm run build
+      - name: Install Chromium test tools
+        run: |
+          npm install --prefix "$RUNNER_TEMP/browser-tools" --no-audit --no-fund --ignore-scripts playwright@1.56.1
+          "$RUNNER_TEMP/browser-tools/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Chromium functional forms
+        working-directory: backend
+        env:
+          AUDIT_BROWSER_MODULES: ${{ runner.temp }}/browser-tools/node_modules
+        run: node scripts/browser-functional-audit.cjs
       - name: Upload test evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -94,5 +103,6 @@ jobs:
             docs/assignment-constraint-audit-results.json
             docs/runtime-server.log
             docs/ci-extra-server.log
+            docs/ci-browser/
           if-no-files-found: warn
           retention-days: 14
