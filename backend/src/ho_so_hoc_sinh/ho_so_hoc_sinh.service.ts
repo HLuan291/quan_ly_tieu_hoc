@@ -1132,6 +1132,7 @@ export class HoSoHocSinhService {
       }
       if (DuLieu.hoc_sinh) await this.CapNhatHocSinh(Id, DuLieu.hoc_sinh, Tx);
       if (DuLieu.suc_khoe) await this.CapNhatSucKhoeHocSinh(Id, DuLieu.suc_khoe, Tx);
+      else if (DuLieu.suc_khoe === null) await Tx.hoc_sinh.update({ where: { id: Id }, data: { chieu_cao_cm: null, can_nang_kg: null, ngay_do: null } });
       if (DuLieu.trang_thai !== undefined) await this.CapNhatTrangThaiHocSinh(Id, { trang_thai: DuLieu.trang_thai }, Tx);
       for (const PH of DuLieu.phu_huynh ?? []) {
         const { id, moi_quan_he, ...ThongTin } = PH;

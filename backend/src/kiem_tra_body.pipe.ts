@@ -38,7 +38,7 @@ const TruongChuoi = new Set([
   'ma_tieu_chi', 'ten_tieu_chi', 'nhom_danh_gia', 'muc_danh_gia', 'nhan_xet', 'ly_do_kiem_tra_lai',
   'muc_ket_qua_giao_duc', 'ket_qua_hoan_thanh_lop',
 ]);
-const TruongCoTheNull = new Set(['ghi_chu', 'nghe_nghiep', 'nam_sinh', 'ngay_ket_thuc', 'nhan_xet', 'ly_do_tu_choi', 'ly_do_kiem_tra_lai', 'muc_ket_qua_giao_duc', 'ket_qua_hoan_thanh_lop']);
+const TruongCoTheNull = new Set(['ghi_chu', 'nghe_nghiep', 'nam_sinh', 'ngay_ket_thuc', 'nhan_xet', 'ly_do_tu_choi', 'ly_do_kiem_tra_lai', 'muc_ket_qua_giao_duc', 'ket_qua_hoan_thanh_lop', 'suc_khoe']);
 const TruongBoolean = new Set(['tao_tai_khoan', 'mac_dinh_gvcn', 'bat_buoc']);
 const TruongSo = new Set(['nam_sinh', 'thu_tu', 'thu_tu_hien_thi', 'diem', 'chieu_cao_cm', 'can_nang_kg']);
 

@@ -26,6 +26,7 @@ export default function HoSoHocSinhChiTiet({ Id, LaAdmin, Dong, CapNhat }: { Id:
   const [DaSua, SetDaSua] = useState(false);
   const [PhienForm, SetPhienForm] = useState(0);
   const LanYeuCau = useRef(0);
+  const HuyYeuCau = useCallback(() => { LanYeuCau.current++; }, []);
   const Tai = useCallback(async () => {
     const Lan = ++LanYeuCau.current;
     try {
@@ -36,8 +37,8 @@ export default function HoSoHocSinhChiTiet({ Id, LaAdmin, Dong, CapNhat }: { Id:
   useEffect(() => {
     let Huy = false;
     void Promise.resolve().then(() => { if (!Huy) void Tai(); });
-    return () => { Huy = true; LanYeuCau.current++; };
-  }, [Tai]);
+    return () => { Huy = true; HuyYeuCau(); };
+  }, [Tai, HuyYeuCau]);
   useEffect(() => {
     const CanhBao = (E: BeforeUnloadEvent) => { if (DaSua) { E.preventDefault(); E.returnValue = ''; } };
     window.addEventListener('beforeunload', CanhBao);
@@ -67,6 +68,8 @@ export default function HoSoHocSinhChiTiet({ Id, LaAdmin, Dong, CapNhat }: { Id:
     if (SucKhoe.some(Key => Lay(Key))) {
       if (!SucKhoe.every(Key => Lay(Key))) { SetLoi('Vui lòng điền đủ chiều cao, cân nặng và ngày đo, hoặc để trống cả ba.'); return; }
       Data.suc_khoe = { chieu_cao_cm: Number(Lay('chieu_cao_cm')), can_nang_kg: Number(Lay('can_nang_kg')), ngay_do: Lay('ngay_do') };
+    } else if (HS.chieu_cao_cm !== null || HS.can_nang_kg !== null || HS.ngay_do !== null) {
+      Data.suc_khoe = null;
     }
     const GiamHo = ['ho_ten', 'nam_sinh', 'so_dien_thoai', 'nghe_nghiep'];
     if (GiamHo.some(Key => Lay('giam_ho_' + Key))) {

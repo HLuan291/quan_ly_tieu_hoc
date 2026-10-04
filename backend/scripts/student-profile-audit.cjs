@@ -203,6 +203,10 @@ async function Main() {
   Check('HS và sức khỏe giữ nguyên sau tất cả lỗi', RolledBack.ghi_chu === 'Lưu toàn bộ hồ sơ' && Number(RolledBack.chieu_cao_cm) === 137 && RolledBack.trang_thai === 'DANG_HOC');
   Check('PH và tài khoản giữ nguyên sau tất cả lỗi', (await Prisma.phu_huynh.findUniqueOrThrow({ where: { id: Parent.id } })).nghe_nghiep === 'Lưu chung với học sinh' && (await Prisma.tai_khoan.findUniqueOrThrow({ where: { id: Parent.tai_khoan_id } })).so_dien_thoai === Parent.so_dien_thoai);
 
+  await Call('Lưu chung xóa dữ liệu sức khỏe tùy chọn', 'PATCH', Own + '/ho_so', 'GIAO_VIEN', { suc_khoe: null });
+  const EmptyHealth = await Prisma.hoc_sinh.findUniqueOrThrow({ where: { id: F.student_id } });
+  Check('Xóa sức khỏe không tạo số đo 0 hoặc để lại ngày đo cũ', EmptyHealth.chieu_cao_cm === null && EmptyHealth.can_nang_kg === null && EmptyHealth.ngay_do === null);
+  await Call('Nhập lại sức khỏe qua lần lưu chung', 'PATCH', Own + '/ho_so', 'GIAO_VIEN', { suc_khoe: { chieu_cao_cm: 137, can_nang_kg: 34, ngay_do: F.today } });
   const AbsenceDate = F.attendance_day;
   for (const [Buoi, TrangThai] of [['SANG', 'VANG_CO_PHEP'], ['CHIEU', 'VANG_KHONG_PHEP']]) {
     await Call('Ghi vắng ' + Buoi, 'POST', '/diem_danh_nghi_hoc/diem_danh', 'GIAO_VIEN', {

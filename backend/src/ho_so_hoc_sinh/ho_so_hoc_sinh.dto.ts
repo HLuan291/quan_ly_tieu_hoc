@@ -99,7 +99,7 @@ export class NguoiGiamHoMoiDto {
 // Một lần lưu cho các phần của hồ sơ; không cấp tài khoản hoặc đổi liên kết theo ID.
 export class CapNhatHoSoHocSinhDto {
   hoc_sinh?: CapNhatHocSinhDto;
-  suc_khoe?: CapNhatSucKhoeHocSinhDto;
+  suc_khoe?: CapNhatSucKhoeHocSinhDto | null;
   trang_thai?: string;
   phu_huynh?: PhuHuynhTrongHoSoDto[];
   nguoi_giam_ho?: NguoiGiamHoMoiDto;
