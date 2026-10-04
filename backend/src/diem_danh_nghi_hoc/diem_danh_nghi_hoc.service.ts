@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 
 import { PrismaService } from '../prisma.service';
+import { LayNgayNghiepVu } from '../ngay_nghiep_vu';
 import { KiemTraGiaTriQuyUoc, QuyUoc } from '../quy_uoc_nghiep_vu';
 
 import {
@@ -183,12 +184,7 @@ export class DiemDanhNghiHocService {
       );
 
     const HomNay =
-      this.ChuyenNgay(
-        new Date()
-          .toISOString()
-          .slice(0, 10),
-        'Ngày hiện tại',
-      );
+      LayNgayNghiepVu();
 
     return this.Prisma
       .phan_cong_giao_vien
@@ -923,12 +919,7 @@ export class DiemDanhNghiHocService {
       );
 
     const HomNay =
-      this.ChuyenNgay(
-        new Date()
-          .toISOString()
-          .slice(0, 10),
-        'Ngày hiện tại',
-      );
+      LayNgayNghiepVu();
 
     await this.KiemTraGvcn(
       GiaoVien.id,

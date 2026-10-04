@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 
 import { PrismaService } from '../prisma.service';
+import { LayNgayNghiepVu } from '../ngay_nghiep_vu';
 import { KiemTraGiaTriQuyUoc, QuyUoc } from '../quy_uoc_nghiep_vu';
 
 import {
@@ -28,8 +29,7 @@ export class DanhGiaHocTapService {
   ) {}
 
   private DieuKienPhanCongHienTai() {
-    const HomNay = new Date();
-    HomNay.setUTCHours(0, 0, 0, 0);
+    const HomNay = LayNgayNghiepVu();
     return {
       ngay_bat_dau: { lte: HomNay },
       OR: [{ ngay_ket_thuc: null }, { ngay_ket_thuc: { gte: HomNay } }],

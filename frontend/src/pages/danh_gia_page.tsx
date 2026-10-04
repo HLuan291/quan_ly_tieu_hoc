@@ -10,6 +10,7 @@ import type {
 } from 'react';
 
 import Api from '../api/api';
+import { LayNgayHomNay } from '../utils/ngay_local';
 import { QuyUoc } from '../utils/quy_uoc_nghiep_vu';
 
 import {
@@ -187,9 +188,7 @@ export default function DanhGiaPage() {
     NgayKiemTra,
     SetNgayKiemTra,
   ] = useState(
-    new Date()
-      .toISOString()
-      .slice(0, 10),
+    LayNgayHomNay(),
   );
 
   const [
@@ -352,7 +351,7 @@ export default function DanhGiaPage() {
 
             SetPhanCong(
               Response.data.phan_cong.filter((Item) => {
-                const HomNay = new Date().toISOString().slice(0, 10);
+                const HomNay = LayNgayHomNay();
                 return Item.ngay_bat_dau.slice(0, 10) <= HomNay && (!Item.ngay_ket_thuc || Item.ngay_ket_thuc.slice(0, 10) >= HomNay);
               }),
             );
@@ -1679,9 +1678,7 @@ export default function DanhGiaPage() {
                 )
             }
             max={
-              new Date()
-                .toISOString()
-                .slice(0, 10)
+              LayNgayHomNay()
             }
             required
             className="mt-1 w-full rounded-lg border px-3 py-2"

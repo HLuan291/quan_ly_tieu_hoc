@@ -77,6 +77,7 @@ jobs:
       - name: Frontend lint and build
         working-directory: frontend
         run: |
+          npm run test:dates
           npm run lint
           npm run build
       - name: Upload test evidence

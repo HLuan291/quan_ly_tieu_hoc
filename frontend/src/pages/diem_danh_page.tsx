@@ -8,6 +8,7 @@ import type {
 } from 'react';
 
 import Api from '../api/api';
+import { LayNgayHomNay } from '../utils/ngay_local';
 import { QuyUoc } from '../utils/quy_uoc_nghiep_vu';
 
 import {
@@ -66,9 +67,7 @@ export default function DiemDanhPage() {
     NgayHoc,
     SetNgayHoc,
   ] = useState(
-    new Date()
-      .toISOString()
-      .slice(0, 10),
+    LayNgayHomNay(),
   );
 
   const [
@@ -332,9 +331,7 @@ export default function DiemDanhPage() {
                 )
             }
             max={
-              new Date()
-                .toISOString()
-                .slice(0, 10)
+              LayNgayHomNay()
             }
             className="w-full rounded-lg border border-slate-300 px-3 py-2"
           />

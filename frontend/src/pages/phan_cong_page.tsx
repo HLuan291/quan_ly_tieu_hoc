@@ -10,6 +10,7 @@ import type {
 } from 'react';
 
 import Api from '../api/api';
+import { LayNgayHomNay } from '../utils/ngay_local';
 
 import {
   DocJwt,
@@ -74,12 +75,6 @@ interface PhanCong {
 interface PhanCongCuaToiResponse {
   giao_vien: GiaoVien;
   phan_cong: PhanCong[];
-}
-
-function LayNgayHomNay() {
-  return new Date()
-    .toISOString()
-    .slice(0, 10);
 }
 
 export default function PhanCongPage() {

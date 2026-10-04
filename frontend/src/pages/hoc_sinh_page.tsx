@@ -10,6 +10,7 @@ import type {
 } from 'react';
 
 import Api from '../api/api';
+import { LayNgayHomNay } from '../utils/ngay_local';
 
 import {
   DocJwt,
@@ -103,12 +104,6 @@ const DanhSachDanToc = [
   'H\'Mông',
   'Dao',
 ] as const;
-
-function LayNgayHomNay() {
-  return new Date()
-    .toISOString()
-    .slice(0, 10);
-}
 
 function LayNamPhuHuynhToiDa() {
   return (

@@ -8,6 +8,7 @@ import type {
 } from 'react';
 
 import Api from '../api/api';
+import { LayNgayHomNay } from '../utils/ngay_local';
 
 import {
   DocJwt,
@@ -56,12 +57,6 @@ interface LopChuNhiem {
       ten_nam_hoc: string;
     };
   };
-}
-
-function LayNgayHomNay() {
-  return new Date()
-    .toISOString()
-    .slice(0, 10);
 }
 
 export default function DonXinNghiPage() {

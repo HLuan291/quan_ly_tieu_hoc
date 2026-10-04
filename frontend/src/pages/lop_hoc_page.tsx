@@ -9,6 +9,7 @@ import type {
 } from 'react';
 
 import Api from '../api/api';
+import { LayNgayHomNay } from '../utils/ngay_local';
 
 import {
   LayThongBaoLoi,
@@ -44,12 +45,6 @@ interface HocSinhChuaXep {
   id: number;
   ma_hoc_sinh: string;
   ho_ten: string;
-}
-
-function LayNgayHomNay() {
-  return new Date()
-    .toISOString()
-    .slice(0, 10);
 }
 
 export default function LopHocPage() {

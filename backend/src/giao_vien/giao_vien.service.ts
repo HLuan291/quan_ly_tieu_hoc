@@ -7,6 +7,7 @@ import {
 import { randomBytes } from 'crypto';
 import * as argon2 from 'argon2';
 import { PrismaService } from '../prisma.service';
+import { LayNgayNghiepVu } from '../ngay_nghiep_vu';
 
 export interface DuLieuTaoGiaoVien {
   ho_ten: string;
@@ -146,14 +147,7 @@ export class GiaoVienService {
       );
 
     const NgayLonNhat =
-      new Date();
-
-    NgayLonNhat.setUTCHours(
-      0,
-      0,
-      0,
-      0,
-    );
+      LayNgayNghiepVu();
 
     NgayLonNhat.setUTCFullYear(
       NgayLonNhat.getUTCFullYear() - 18,
@@ -174,14 +168,7 @@ export class GiaoVienService {
     NgayVaoTruong: Date,
   ) {
     const HomNay =
-      new Date();
-
-    HomNay.setUTCHours(
-      0,
-      0,
-      0,
-      0,
-    );
+      LayNgayNghiepVu();
 
     const NgayDu18Tuoi =
       new Date(

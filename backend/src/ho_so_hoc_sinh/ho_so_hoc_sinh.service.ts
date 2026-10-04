@@ -10,6 +10,7 @@ import { randomBytes } from 'crypto';
 import * as argon2 from 'argon2';
 
 import { PrismaService } from '../prisma.service';
+import { LayNgayNghiepVu } from '../ngay_nghiep_vu';
 
 import {
   CapNhatHocSinhDto,
@@ -42,17 +43,7 @@ export class HoSoHocSinhService {
   // ==================================================
 
   private HomNay(): Date {
-
-    const Ngay = new Date();
-
-    Ngay.setUTCHours(
-      0,
-      0,
-      0,
-      0,
-    );
-
-    return Ngay;
+    return LayNgayNghiepVu();
   }
 
 
@@ -146,7 +137,7 @@ export class HoSoHocSinhService {
     }
 
     const NamHienTai =
-      new Date().getUTCFullYear();
+      LayNgayNghiepVu().getUTCFullYear();
 
     const NamLonNhat =
       NamHienTai - 18;

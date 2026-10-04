@@ -12,6 +12,7 @@ import type {
 import axios from 'axios';
 
 import Api from '../api/api';
+import { DinhDangNgayLocal, LayNgayHomNay } from '../utils/ngay_local';
 
 interface TaiKhoanGiaoVien {
   ten_dang_nhap: string;
@@ -93,12 +94,6 @@ function LayNgayInput(
     : '';
 }
 
-function LayNgayHomNay() {
-  return new Date()
-    .toISOString()
-    .slice(0, 10);
-}
-
 function LayNgaySinhToiDa() {
   const Ngay =
     new Date();
@@ -107,9 +102,7 @@ function LayNgaySinhToiDa() {
     Ngay.getFullYear() - 18,
   );
 
-  return Ngay
-    .toISOString()
-    .slice(0, 10);
+  return DinhDangNgayLocal(Ngay);
 }
 
 function LayNgayDu18Tuoi(

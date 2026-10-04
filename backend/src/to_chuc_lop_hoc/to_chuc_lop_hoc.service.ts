@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 
 import { PrismaService } from '../prisma.service';
+import { LayNgayNghiepVu } from '../ngay_nghiep_vu';
 
 import {
   CapNhatLopHocDto,
@@ -53,16 +54,7 @@ export class ToChucLopHocService {
   }
 
   private HomNay(): Date {
-    const Ngay = new Date();
-
-    Ngay.setUTCHours(
-      0,
-      0,
-      0,
-      0,
-    );
-
-    return Ngay;
+    return LayNgayNghiepVu();
   }
 
   private KiemTraTenNamHoc(
