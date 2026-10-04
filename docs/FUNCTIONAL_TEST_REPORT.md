@@ -1,9 +1,9 @@
-# Kiểm thử chức năng — 04/10/2026
+# Kiểm thử chức năng — 05/10/2026
 
-Lượt này kiểm thử lưu chung hồ sơ học sinh/phụ huynh/người giám hộ, một nút Đóng, trạng thái chỉ ADMIN sửa và hồ sơ cá nhân giáo viên. Các ca điểm danh/ngày/buổi/Đi trễ/Chủ nhật và phạm vi GVCN/GVBM tiếp tục chạy. Mã, test và workflow nằm trên nhánh `backend_audit_fix`.
+Lượt này kiểm thử trang Phân công giảng dạy: chức năng mở bằng nút khi cần, GVCN hiện dòng chủ nhiệm chính và cấu hình mỗi khối có một nhãn GVCN. Các ca hồ sơ/lưu chung, trạng thái ADMIN, hồ sơ giáo viên, điểm danh và phạm vi GVCN/GVBM tiếp tục chạy. Mã, test và workflow nằm trên nhánh `backend_audit_fix`.
 
-**Mã đã kiểm thử:** `c967dafc3377fc705f2d0c185a70d426dc924b62`  
-**CI:** [Functional checks](https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37216358087) — **success**
+**Mã đã kiểm thử:** `d7816ab99e88d31c67165d9b462a232190b41e22`  
+**CI:** [Functional checks](https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37222525284) — **success**
 
 GitHub Actions chạy Node.js 24, MySQL 8 và Chromium thật. Database CI riêng chỉ có dữ liệu giả; không kết nối database Windows `C:\LuanVan`.
 
@@ -21,13 +21,17 @@ GitHub Actions chạy Node.js 24, MySQL 8 và Chromium thật. Database CI riên
 | Route có luồng thành công | **78/78** | Core kiểm tra không token ở 76 route bảo vệ |
 | MySQL CHECK phân công | 15/15 | Ràng buộc cũ/mới trên MySQL thử nghiệm |
 | Ngày frontend | 16/16 | Múi giờ, biên tháng/năm, năm nhuận, Chủ nhật |
-| Chromium | **68/68** | **234 phản hồi HTTP**, 0 lỗi JavaScript, 0 API 5xx |
+| Chromium | **72/72** | **248 phản hồi HTTP**, 0 lỗi JavaScript, 0 API 5xx |
 | Prisma validate/generate | Đạt | Giữ schema hiện có |
 | Backend/frontend lint, build | Đạt | Backend còn 3 cảnh báo spread; frontend lint 0 cảnh báo |
 
 Không cộng các hàng thành một tổng HTTP: unit/assertion khác request và bộ CHECK chạy lại API core. Độ phủ 78/78 route không chứng minh mọi nhánh nghiệp vụ đã được thử.
 
 ## Thay đổi và kiểm thử tương ứng
+
+- **Phân công mở khi cần:** mặc định chỉ có danh sách và bốn nút Tạo môn học, Gắn môn cho khối, Tạo phân công, Cấu hình môn theo khối. Các nút mở hộp thoại riêng; Chromium xác nhận ban đầu không có form/config, dialog thật, một nút Đóng, Escape, giữ bản nhập môn khi đóng/mở lại và viewport điện thoại.
+- **GVCN một dòng:** bảng chỉ hiện phân công chủ nhiệm chính, không liệt kê các môn GVCN. GVBM vẫn theo từng môn. MySQL xác nhận môn tự động vẫn còn; nhấn Kết thúc trên dòng chủ nhiệm gọi đúng ID chính và kết thúc các môn GVCN đi kèm. Lịch sử các đợt chủ nhiệm vẫn có các dòng theo khoảng ngày.
+- **Cấu hình theo khối:** chỉ mở khi bấm nút; mỗi khối có một nhãn GVCN, môn bộ môn hiển thị riêng; có lọc khối. Chromium xác nhận môn mặc định không lặp thành nhiều nhãn GVCN.
 
 - **Hộp thoại:** thêm học sinh/phụ huynh, mở hồ sơ, thêm/sửa giáo viên và cấp lại mật khẩu. Mỗi hộp thoại có một nút Đóng trên đầu; bỏ Đóng/Hủy trùng trong form. Chromium kiểm tra dialog thật, focus/khóa cuộn nền và Escape.
 - **Một lần lưu hồ sơ:** một nút Lưu thay đổi ghi học sinh, sức khỏe, các phụ huynh/quan hệ và người giám hộ mới bằng một PATCH trong cùng transaction. Kiểm thử MySQL xác nhận lỗi điện thoại/quan hệ/giám hộ không ghi một phần; Chromium xác nhận bản nhập còn trên form sau lỗi.
@@ -64,7 +68,10 @@ Báo cáo JSON của chính lượt CI này đã lưu trong Git:
 - `ci-browser-results.json`, `ci-route-coverage.json`, `endpoint-map.json`
 - `ci-dependency-results.json`
 
-[Artifact functional-evidence](https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37216358087/artifacts/11308572379) chứa log, bằng chứng CHECK và 13 ảnh:
+[Artifact functional-evidence](https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37222525284/artifacts/11310379484) chứa log, bằng chứng CHECK và 16 ảnh:
+- `assignment-configuration.png`
+- `assignment-mobile.png`
+- `assignment-compact.png`
 - `admin-student-directory.png`
 - `teacher-self-profile.png`
 - `teacher-student-profile.png`
@@ -79,7 +86,7 @@ Báo cáo JSON của chính lượt CI này đã lưu trong Git:
 - `parent-desktop.png`
 - `parent-mobile.png`
 
-Artifact giữ đến 2026-10-18T16:22:39Z; các JSON và báo cáo trong Git không phụ thuộc thời hạn artifact.
+Artifact giữ đến 2026-10-18T18:00:03Z; các JSON và báo cáo trong Git không phụ thuộc thời hạn artifact.
 
 ## Cảnh báo và giới hạn còn lại
 
@@ -96,6 +103,6 @@ Chưa kiểm thử database Windows hiện có, mọi trigger/ràng buộc cũ, 
 
 ## Cập nhật và chạy lại
 
-Xem [hướng dẫn giao diện/điểm danh/phạm vi giáo viên](UI_ATTENDANCE_TEACHER_SCOPE.md). Pull nhánh rồi khởi động lại backend/frontend. Không reset database; schema và package lock giữ nguyên. Stash local `backup-local-before-audit` không bị áp dụng/xóa.
+Xem [hướng dẫn phân công](ASSIGNMENT_ON_DEMAND.md) và [hướng dẫn giao diện/điểm danh/phạm vi giáo viên](UI_ATTENDANCE_TEACHER_SCOPE.md). Pull nhánh rồi khởi động lại backend/frontend. Không reset database; schema và package lock giữ nguyên. Stash local `backup-local-before-audit` không bị áp dụng/xóa.
 
 Có thể chạy lại workflow Functional checks. Runtime audit tạo dữ liệu giả, chỉ dùng database thử nghiệm riêng với `AUDIT_ALLOW_TEST_DATA=1`; workflow dùng db push trên database CI mới, không dùng bước này với database thật.

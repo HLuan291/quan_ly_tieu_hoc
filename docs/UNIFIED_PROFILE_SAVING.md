@@ -1,7 +1,7 @@
 # Lưu chung hồ sơ và thông tin cá nhân giáo viên
 
-Nhánh `backend_audit_fix`; mã kiểm thử `c967dafc3377fc705f2d0c185a70d426dc924b62`.
-[Functional checks](https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37216358087) thành công với dữ liệu giả trên MySQL CI riêng.
+Nhánh `backend_audit_fix`; mã kiểm thử `d7816ab99e88d31c67165d9b462a232190b41e22`.
+[Functional checks](https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37222525284) thành công với dữ liệu giả trên MySQL CI riêng.
 
 ## Hồ sơ học sinh
 
@@ -39,7 +39,7 @@ Lần lưu chung chấp nhận `hoc_sinh`, `suc_khoe`, `phu_huynh`, `nguoi_giam_
 
 ## Kiểm thử và cập nhật
 
-599/599 ca API, 78/78 route có luồng thành công, 96/96 unit backend, E2E GET / 1/1, ngày frontend 16/16, CHECK MySQL 15/15, Chromium 68/68. Chromium ghi 234 phản hồi HTTP, không lỗi JavaScript hoặc API 5xx trong các ca đã chạy. Có ca lỗi điện thoại/quan hệ/giám hộ xác nhận rollback, bản nhập sau lỗi, trạng thái ADMIN/GV và reload hồ sơ cá nhân.
+599/599 ca API, 78/78 route có luồng thành công, 96/96 unit backend, E2E GET / 1/1, ngày frontend 16/16, CHECK MySQL 15/15, Chromium 72/72. Chromium ghi 248 phản hồi HTTP, không lỗi JavaScript hoặc API 5xx trong các ca đã chạy. Có ca lỗi điện thoại/quan hệ/giám hộ xác nhận rollback, bản nhập sau lỗi, trạng thái ADMIN/GV và reload hồ sơ cá nhân.
 
 Bằng chứng: [FUNCTIONAL_TEST_REPORT.md](FUNCTIONAL_TEST_REPORT.md).
 Chưa kiểm thử database Windows hiện có hoặc mọi nhánh nghiệp vụ.

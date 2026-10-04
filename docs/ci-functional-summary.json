@@ -1,7 +1,7 @@
 {
-  "source_commit": "c967dafc3377fc705f2d0c185a70d426dc924b62",
-  "workflow_run": 37216358087,
-  "workflow_url": "https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37216358087",
+  "source_commit": "d7816ab99e88d31c67165d9b462a232190b41e22",
+  "workflow_run": 37222525284,
+  "workflow_url": "https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37222525284",
   "conclusion": "success",
   "data": "Dữ liệu giả trên MySQL CI riêng; không kết nối database Windows",
   "backend_unit": {
@@ -39,12 +39,15 @@
     "total": 16
   },
   "browser": {
-    "passed": 68,
-    "total": 68,
-    "http": 234,
+    "passed": 72,
+    "total": 72,
+    "http": 248,
     "http_5xx": 0,
     "javascript_errors": 0,
     "screenshots": [
+      "assignment-configuration.png",
+      "assignment-mobile.png",
+      "assignment-compact.png",
       "admin-student-directory.png",
       "teacher-self-profile.png",
       "teacher-student-profile.png",
@@ -131,9 +134,9 @@
     }
   ],
   "artifact": {
-    "id": 11308572379,
-    "url": "https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37216358087/artifacts/11308572379",
-    "expires_at": "2026-10-18T16:22:39Z"
+    "id": 11310379484,
+    "url": "https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37222525284/artifacts/11310379484",
+    "expires_at": "2026-10-18T18:00:03Z"
   },
   "features": {
     "modals": true,
@@ -148,7 +151,10 @@
     "single_close_per_dialog": true,
     "admin_only_student_status": true,
     "inline_optional_guardian": true,
-    "teacher_self_profile": true
+    "teacher_self_profile": true,
+    "assignment_tools_open_on_demand": true,
+    "one_homeroom_row": true,
+    "one_homeroom_configuration_badge_per_grade": true
   },
   "limits": [
     "Không kiểm thử DB Windows hiện có",

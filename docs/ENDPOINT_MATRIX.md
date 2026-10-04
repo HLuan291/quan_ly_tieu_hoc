@@ -68,7 +68,7 @@ Vai trò theo kiểm tra trong controller/service; đây là đối chiếu mã 
 | POST | `/phan_cong_giang_day/phan_cong/gvcn` | ADMIN | phan_cong_page.tsx |
 | POST | `/phan_cong_giang_day/phan_cong/mon_hoc` | ADMIN | phan_cong_page.tsx |
 | GET | `/phan_cong_giang_day/phan_cong` | ADMIN | phan_cong_page.tsx |
-| GET | `/phan_cong_giang_day/phan_cong/cua_toi` | GIAO_VIEN | danh_gia_page.tsx, phan_cong_page.tsx |
+| GET | `/phan_cong_giang_day/phan_cong/cua_toi` | GIAO_VIEN | danh_gia_page.tsx |
 | PATCH | `/phan_cong_giang_day/phan_cong/:Id/ket_thuc` | ADMIN | phan_cong_page.tsx |
 | POST | `/to_chuc_lop_hoc/nam_hoc` | ADMIN | lop_hoc_page.tsx |
 | GET | `/to_chuc_lop_hoc/nam_hoc` | ADMIN | danh_gia_page.tsx, lop_hoc_page.tsx |

@@ -9,6 +9,10 @@ Phạm vi: nhánh `backend_audit_fix`. Giao diện tham khảo thanh đầu tran
 - Hộp thoại giữ focus bên trong, khóa cuộn nền, có một nút Đóng trên đầu và phím Escape. Hồ sơ đang sửa chưa lưu yêu cầu xác nhận trước khi đóng.
 - Thông tin đăng nhập vừa tạo/cấp được hiển thị để bàn giao một lần; mật khẩu đã lưu không được đọc lại.
 
+## Phân công giảng dạy (ADMIN)
+
+Trang mặc định chỉ hiện danh sách và bốn nút mở form/cấu hình khi cần. GVCN hiển thị dòng chủ nhiệm chính; các môn GVCN không lặp trong bảng. Cấu hình mỗi khối có một nhãn GVCN; giáo viên bộ môn vẫn hiển thị theo môn. Xem [ASSIGNMENT_ON_DEMAND.md](ASSIGNMENT_ON_DEMAND.md).
+
 ## Phạm vi giáo viên
 
 | Tài khoản | Học sinh và đánh giá | Năm học | Điểm danh |

@@ -691,8 +691,7 @@
     "file": "src/phan_cong_giang_day/phan_cong_giang_day.controller.ts",
     "ham": "LayPhanCongCuaToi",
     "frontend": [
-      "danh_gia_page.tsx",
-      "phan_cong_page.tsx"
+      "danh_gia_page.tsx"
     ]
   },
   {

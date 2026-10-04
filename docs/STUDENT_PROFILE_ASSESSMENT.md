@@ -28,8 +28,8 @@ Hướng dẫn điểm danh nhanh, hộp thoại và phạm vi: [UI_ATTENDANCE_T
 
 ## Kiểm thử
 
-**Mã:** `c967dafc3377fc705f2d0c185a70d426dc924b62`  
-**CI:** [Functional checks](https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37216358087) — thành công.
+**Mã:** `d7816ab99e88d31c67165d9b462a232190b41e22`  
+**CI:** [Functional checks](https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37222525284) — thành công.
 
 | Bộ | Đạt |
 |---|---:|
@@ -39,9 +39,9 @@ Hướng dẫn điểm danh nhanh, hộp thoại và phạm vi: [UI_ATTENDANCE_T
 | Route có luồng thành công | 78/78 |
 | MySQL CHECK | 15/15 |
 | Ngày frontend | 16/16 |
-| Chromium | 68/68 |
+| Chromium | 72/72 |
 
-Chromium có 234 phản hồi HTTP, không lỗi JavaScript hay API 5xx trong các ca đã chạy. Dữ liệu giả nằm trong MySQL CI riêng; chưa xác nhận DB Windows hoặc mọi nhánh nghiệp vụ.
+Chromium có 248 phản hồi HTTP, không lỗi JavaScript hay API 5xx trong các ca đã chạy. Dữ liệu giả nằm trong MySQL CI riêng; chưa xác nhận DB Windows hoặc mọi nhánh nghiệp vụ.
 
 Báo cáo/bằng chứng: [FUNCTIONAL_TEST_REPORT.md](FUNCTIONAL_TEST_REPORT.md).
 
