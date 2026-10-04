@@ -30,6 +30,7 @@ export default function DiemDanhPage() {
   const [Loi, SetLoi] = useState('');
   const [Tin, SetTin] = useState('');
   const Lan = useRef(0);
+  const HuyYeuCau = useCallback(() => { Lan.current++; }, []);
   const Lop = PhamVi?.lop_hoc.find(L => L.id === PhamVi.lop_chu_nhiem_id);
   const LopId = Lop?.id;
   const ChuNhat = LaChuNhat(Ngay);
@@ -64,8 +65,8 @@ export default function DiemDanhPage() {
   useEffect(() => {
     let Huy = false;
     void Promise.resolve().then(() => { if (!Huy) return Tai(); });
-    return () => { Huy = true; Lan.current++; };
-  }, [Tai]);
+    return () => { Huy = true; HuyYeuCau(); };
+  }, [Tai, HuyYeuCau]);
   useEffect(() => {
     const CanhBao = (E: BeforeUnloadEvent) => { if (DaSua) { E.preventDefault(); E.returnValue = ''; } };
     window.addEventListener('beforeunload', CanhBao);

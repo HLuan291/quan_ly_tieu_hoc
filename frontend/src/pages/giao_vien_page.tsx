@@ -1037,7 +1037,7 @@ export default function GiaoVienPage() {
             </button>
             <button type="button" disabled={DangCapMatKhau} onClick={DongFormCapMatKhau} className="rounded-lg border border-slate-300 px-4 py-2 disabled:opacity-50">Hủy</button>
           </div>
-        </form>
+        </form></HopThoai>
       )}
 
       <div className="mt-6 rounded-xl bg-white p-5 shadow-sm">

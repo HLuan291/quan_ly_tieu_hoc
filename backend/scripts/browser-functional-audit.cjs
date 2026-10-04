@@ -477,6 +477,13 @@ async function Main() {
     await HttpAction('PATCH', '/ho_so_hoc_sinh/phu_huynh/' + Parent.id, () => Form.getByRole('button', { name: 'Lưu phụ huynh', exact: true }).click());
     Assert.equal((await Prisma.phu_huynh.findUniqueOrThrow({ where: { id: Parent.id } })).nghe_nghiep, 'Nghề bổ sung từ Chromium');
     await Page.getByRole('button', { name: 'Bổ sung phụ huynh', exact: true }).click();
+    const Popup = Page.getByRole('dialog', { name: 'Bổ sung phụ huynh', exact: true }); await Popup.waitFor();
+    Assert(await Popup.evaluate(E => E.open && E.matches(':modal')));
+    Assert.equal(await Page.locator('dialog[open]').count(), 2);
+    await Page.keyboard.press('Escape'); await Popup.waitFor({ state: 'hidden' });
+    Assert.equal(await Page.locator('dialog[open]').count(), 1);
+    Assert(await Page.evaluate(() => document.body.style.overflow === 'hidden'));
+    await Page.getByRole('button', { name: 'Bổ sung phụ huynh', exact: true }).click();
     const New = Page.getByRole('form', { name: 'Bổ sung phụ huynh', exact: true });
     await New.locator('input[name="ho_ten"]').fill('Trần Thị Giám Hộ');
     await New.locator('input[name="so_dien_thoai"]').fill('0950000003');
