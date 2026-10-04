@@ -675,7 +675,7 @@ async function Main() {
     Assert.equal(await Page.evaluate(() => document.body.style.overflow), '');
 
     await Go('/danh_gia', 'Đánh giá học tập');
-    await Page.getByRole('combobox', { name: 'Lớp đánh giá', exact: true }).selectOption(String(BrowserClass.id));
+    Assert.equal(await Page.getByRole('combobox', { name: 'Lớp đánh giá', exact: true }).count(), 0);
     await Page.getByTestId('danh-gia-hs-' + Student.id).waitFor();
     Assert(await Page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
     await Shot('teacher-assessment-mobile');
