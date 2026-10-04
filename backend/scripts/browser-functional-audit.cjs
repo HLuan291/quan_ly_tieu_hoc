@@ -449,8 +449,14 @@ async function Main() {
   await Case('Viewport điện thoại thao tác được form', async () => {
     await Page.setViewportSize({ width: 390, height: 844 }); await SelectValue('Chọn học sinh', Student.id);
     await HttpAction('GET', '/diem_danh_nghi_hoc/diem_danh/con/' + Student.id, () => Page.getByRole('button', { name: 'Xem điểm danh', exact: true }).click());
-    const Metrics = await Page.evaluate(() => ({ width: innerWidth, scrollWidth: document.documentElement.scrollWidth }));
-    Viewports.push({ page: '/con_cua_toi', ...Metrics, horizontalOverflow: Metrics.scrollWidth > Metrics.width + 1 }); await Shot('parent-mobile');
+    const Metrics = await Page.evaluate(() => ({
+      width: innerWidth, scrollWidth: document.documentElement.scrollWidth,
+      mainWidth: document.querySelector('main').getBoundingClientRect().width,
+    }));
+    Viewports.push({ page: '/con_cua_toi', ...Metrics, horizontalOverflow: Metrics.scrollWidth > Metrics.width + 1 });
+    await Shot('parent-mobile');
+    Assert(Metrics.scrollWidth <= Metrics.width + 1, 'Không tràn ngang ở viewport điện thoại');
+    Assert(Metrics.mainWidth >= Metrics.width - 1, 'Nội dung dùng đủ chiều rộng ở màn hình nhỏ');
   });
   await Case('Đăng xuất xóa token', async () => {
     await Page.getByRole('button', { name: 'Đăng xuất', exact: true }).click(); await Page.waitForURL('**/dang_nhap');

@@ -113,13 +113,17 @@ export default function MainLayout() {
     <div
       className="
         flex
+        flex-col
+        md:flex-row
         min-h-screen
         bg-slate-100
       "
     >
       <aside
         className="
-          w-64
+          w-full
+          md:w-64
+          shrink-0
           bg-slate-900
           text-white
         "
@@ -150,7 +154,7 @@ export default function MainLayout() {
           </p>
         </div>
 
-        <nav className="p-3">
+        <nav className="flex gap-2 overflow-x-auto p-3 md:block">
           {MenuHienThi.map(
             (Item) => (
               <NavLink
@@ -162,7 +166,9 @@ export default function MainLayout() {
                 }
                 className={({ isActive: IsActive }) =>
                   `
-                    mb-1
+                    shrink-0
+                    whitespace-nowrap
+                    md:mb-1
                     block
                     rounded-lg
                     px-4
@@ -194,16 +200,24 @@ export default function MainLayout() {
         <header
           className="
             flex
-            h-16
+            min-h-16
+            flex-wrap
+            gap-3
             items-center
             justify-between
             border-b
             bg-white
-            px-6
+            px-4
+            py-3
+            md:px-6
           "
         >
           <span
             className="
+              min-w-0
+              flex-1
+              text-sm
+              md:text-base
               font-semibold
               text-slate-700
             "
@@ -216,6 +230,7 @@ export default function MainLayout() {
               XuLyDangXuat
             }
             className="
+              shrink-0
               rounded-lg
               border
               border-slate-300
@@ -229,7 +244,7 @@ export default function MainLayout() {
           </button>
         </header>
 
-        <main className="flex-1 p-6">
+        <main className="min-w-0 flex-1 p-4 md:p-6">
           <Outlet />
         </main>
       </div>
