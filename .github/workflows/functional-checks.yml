@@ -1,0 +1,92 @@
+name: Functional checks
+
+on:
+  push:
+    branches: [backend_audit_fix]
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - '.github/workflows/functional-checks.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: functional-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: audit-root-only
+          MYSQL_DATABASE: audit_school_ci
+          MYSQL_USER: audit
+          MYSQL_PASSWORD: audit-test-only
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -paudit-root-only"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
+    env:
+      DATABASE_URL: mysql://audit:audit-test-only@127.0.0.1:3306/audit_school_ci
+      JWT_SECRET: test-only-ci-secret-with-enough-characters-2026
+      AUDIT_ALLOW_TEST_DATA: '1'
+      AUDIT_FIXTURE_FILE: ${{ runner.temp }}/functional-fixture.json
+      AUDIT_REPORT_FILE: ${{ github.workspace }}/docs/ci-core-results.json
+      FRONTEND_ORIGIN: http://localhost:5173
+      TZ: Asia/Ho_Chi_Minh
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+      - name: Install backend
+        run: npm ci --include=dev
+        working-directory: backend
+      - name: Generate and validate Prisma
+        working-directory: backend
+        run: |
+          npm run prisma:validate
+          npm run prisma:generate
+          npx prisma db push --config prisma7.config.ts
+      - name: Backend lint, build, unit and E2E
+        working-directory: backend
+        run: |
+          npm run lint
+          npm run build
+          npm run test -- --runInBand
+          npm run test:e2e -- --runInBand
+      - name: MySQL constraint and API regression
+        working-directory: backend
+        run: node scripts/assignment-constraint-audit.cjs
+      - name: Install frontend
+        run: npm ci --include=dev
+        working-directory: frontend
+      - name: Frontend lint and build
+        working-directory: frontend
+        run: |
+          npm run lint
+          npm run build
+      - name: Upload test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: functional-evidence
+          path: |
+            docs/ci-*.json
+            docs/assignment-constraint-audit-results.json
+            docs/runtime-server.log
+          if-no-files-found: warn
+          retention-days: 14
