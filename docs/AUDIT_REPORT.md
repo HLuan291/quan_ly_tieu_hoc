@@ -1,3 +1,5 @@
+> Kết quả phiên kiểm thử chức năng ngày 04/10/2026 và trạng thái bản sửa: [FUNCTIONAL_TEST_REPORT.md](FUNCTIONAL_TEST_REPORT.md). Báo cáo bên dưới là kết quả lịch sử ngày 02/10/2026.
+
 # Báo cáo kiểm tra quan_ly_tieu_hoc
 
 Ngày kiểm tra: 02/10/2026. Repository: https://github.com/HLuan291/quan_ly_tieu_hoc
