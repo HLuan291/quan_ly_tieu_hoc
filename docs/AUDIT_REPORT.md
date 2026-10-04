@@ -1,4 +1,4 @@
-> Kết quả phiên kiểm thử chức năng ngày 04/10/2026 và trạng thái bản sửa: [FUNCTIONAL_TEST_REPORT.md](FUNCTIONAL_TEST_REPORT.md). Báo cáo bên dưới là kết quả lịch sử ngày 02/10/2026.
+> Kết quả kiểm thử chức năng ngày 04/10/2026: [FUNCTIONAL_TEST_REPORT.md](FUNCTIONAL_TEST_REPORT.md). Hộp thoại, điểm danh nhanh và lớp gắn với giáo viên: [UI_ATTENDANCE_TEACHER_SCOPE.md](UI_ATTENDANCE_TEACHER_SCOPE.md). Báo cáo bên dưới là kết quả lịch sử ngày 02/10/2026.
 
 # Báo cáo kiểm tra quan_ly_tieu_hoc
 

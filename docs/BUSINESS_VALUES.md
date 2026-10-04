@@ -7,6 +7,7 @@ Một danh mục chung tại `backend/src/danh_muc_quy_uoc.json` được dùng 
 | Điểm danh | `CO_MAT` | Có mặt |
 | Điểm danh | `VANG_CO_PHEP` | Vắng có phép |
 | Điểm danh | `VANG_KHONG_PHEP` | Vắng không phép |
+| Điểm danh | `DI_TRE` | Đi trễ |
 | Môn học | `HOAN_THANH_TOT` | Hoàn thành tốt |
 | Môn học | `HOAN_THANH` | Hoàn thành |
 | Môn học | `CHUA_HOAN_THANH` | Chưa hoàn thành |
@@ -20,8 +21,10 @@ Một danh mục chung tại `backend/src/danh_muc_quy_uoc.json` được dùng 
 | Hoàn thành lớp | `HOAN_THANH` | Hoàn thành |
 | Hoàn thành lớp | `CHUA_HOAN_THANH` | Chưa hoàn thành |
 
-Các mức môn học và năng lực/phẩm chất đối chiếu Điều 7, tổng kết Điều 9 trong [bản ký Thông tư 27/2020/TT-BGDĐT](https://datafiles.chinhphu.vn/cpp/files/vbpq/2020/09/27-bgddt.signed.pdf), được công bố trên [Cổng thông tin Chính phủ](https://chinhphu.vn/default.aspx?docid=201006&pageid=27160). Cách mã hóa chữ hoa là quy ước của dự án. Ba trạng thái điểm danh là lựa chọn triển khai của dự án, không phải danh sách enum do thông tư này quy định.
+Các mức môn học và năng lực/phẩm chất đối chiếu Điều 7, tổng kết Điều 9 trong [bản ký Thông tư 27/2020/TT-BGDĐT](https://datafiles.chinhphu.vn/cpp/files/vbpq/2020/09/27-bgddt.signed.pdf), được công bố trên [Cổng thông tin Chính phủ](https://chinhphu.vn/default.aspx?docid=201006&pageid=27160). Cách mã hóa chữ hoa là quy ước của dự án. Bốn trạng thái điểm danh là lựa chọn triển khai của dự án, không phải danh sách enum do thông tư này quy định.
 
 Không dùng `HOAN_THANH_XUAT_SAC` cho từng môn, hoặc `HOAN_THANH` cho năng lực/phẩm chất. Tổng kết vẫn hỗ trợ trường tùy chọn/null như API cũ. Việc xét mức vẫn do giáo viên nhập; bản sửa này chưa tự suy ra kết quả hay chứng nhận toàn bộ công thức tính điểm phù hợp quy định.
 
 Dữ liệu cũ ngoài danh mục chưa tự chuyển đổi. Trước khi dùng trên DB thật, thống kê các mã cũ và thống nhất cách chuyển; không mặc định đổi mọi `VANG` thành vắng không phép. Màn hình điểm danh hiện nhắc chọn lại khi gặp mã cũ.
+
+Điểm danh lớp không được đọc/ghi vào Chủ nhật hoặc ngày tương lai. Giao diện tải theo ngày và buổi, nút Điểm danh tất cả đánh dấu Có mặt trong bản nháp; nút Lưu mới ghi database. `DI_TRE` không cộng vào số ngày/buổi vắng.

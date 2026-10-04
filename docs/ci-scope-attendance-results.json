@@ -1,0 +1,535 @@
+{
+  "thoi_diem": "2026-10-04T15:10:35.275Z",
+  "database": "audit_school_ci",
+  "loai_du_lieu": "Giả trên MySQL CI riêng",
+  "tong": 71,
+  "dat": 71,
+  "khong_dat": 0,
+  "http": 48,
+  "ket_qua": [
+    {
+      "ten": "Đăng nhập ADMIN",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "vai_tro": "KHACH",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Token ADMIN",
+      "dat": true
+    },
+    {
+      "ten": "Đăng nhập GIAO_VIEN",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "vai_tro": "KHACH",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Token GIAO_VIEN",
+      "dat": true
+    },
+    {
+      "ten": "Đăng nhập PHU_HUYNH",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "vai_tro": "KHACH",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Token PHU_HUYNH",
+      "dat": true
+    },
+    {
+      "ten": "GVCN tự gắn lớp qua danh mục",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/danh_muc",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "GVCN chỉ có một lớp cố định",
+      "dat": true
+    },
+    {
+      "ten": "Tạo lớp khối khác",
+      "method": "POST",
+      "endpoint": "/to_chuc_lop_hoc/lop_hoc",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Chặn một GVCN chủ nhiệm thêm lớp đồng thời",
+      "method": "POST",
+      "endpoint": "/phan_cong_giang_day/phan_cong/gvcn",
+      "vai_tro": "ADMIN",
+      "mong_doi": 409,
+      "thuc_te": 409,
+      "dat": true
+    },
+    {
+      "ten": "Từ chối không tạo phân công dư",
+      "dat": true
+    },
+    {
+      "ten": "GVCN có dòng bộ môn cũ vẫn chỉ gắn lớp chủ nhiệm",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/danh_muc",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Phạm vi ưu tiên lớp chủ nhiệm",
+      "dat": true
+    },
+    {
+      "ten": "GVCN không mở bảng lớp khác bằng query",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/bang_danh_gia?lop_hoc_id=7&dot_danh_gia_id=1",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "GVCN không gọi danh sách đánh giá cũ cho lớp khác",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/lop/7/hoc_sinh",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Tạo GVCN để thử hai phân công đồng thời",
+      "method": "POST",
+      "endpoint": "/giao_vien",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Tạo lớp thứ hai cho ca đồng thời",
+      "method": "POST",
+      "endpoint": "/to_chuc_lop_hoc/lop_hoc",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "GVCN đồng thời lớp 8",
+      "method": "POST",
+      "endpoint": "/phan_cong_giang_day/phan_cong/gvcn",
+      "vai_tro": "ADMIN",
+      "mong_doi": "201 hoặc 409; đúng một yêu cầu được tạo",
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "GVCN đồng thời lớp 7",
+      "method": "POST",
+      "endpoint": "/phan_cong_giang_day/phan_cong/gvcn",
+      "vai_tro": "ADMIN",
+      "mong_doi": "201 hoặc 409; đúng một yêu cầu được tạo",
+      "thuc_te": 409,
+      "dat": true
+    },
+    {
+      "ten": "Hai yêu cầu chỉ tạo một phân công GVCN",
+      "dat": true
+    },
+    {
+      "ten": "MySQL chỉ lưu một lớp chủ nhiệm sau ca đồng thời",
+      "dat": true
+    },
+    {
+      "ten": "Tạo tài khoản GVBM",
+      "method": "POST",
+      "endpoint": "/giao_vien",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Đăng nhập GVBM",
+      "method": "POST",
+      "endpoint": "/auth/login",
+      "vai_tro": "KHACH",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Token GVBM",
+      "dat": true
+    },
+    {
+      "ten": "Đổi mật khẩu GVBM",
+      "method": "POST",
+      "endpoint": "/auth/doi-mat-khau",
+      "vai_tro": "GVBM",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "GV chưa phân công chưa có lớp mặc định",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/danh_muc",
+      "vai_tro": "GVBM",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Không tự gắn lớp của giáo viên khác",
+      "dat": true
+    },
+    {
+      "ten": "Tạo môn GVBM",
+      "method": "POST",
+      "endpoint": "/phan_cong_giang_day/mon_hoc",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Cấu hình môn bộ môn khối 3",
+      "method": "POST",
+      "endpoint": "/phan_cong_giang_day/mon_hoc_khoi",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Cấu hình đánh giá môn bộ môn khối 3",
+      "method": "POST",
+      "endpoint": "/danh_gia_hoc_tap/cau_hinh_danh_gia_mon",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Cấu hình môn bộ môn khối 4",
+      "method": "POST",
+      "endpoint": "/phan_cong_giang_day/mon_hoc_khoi",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Cấu hình đánh giá môn bộ môn khối 4",
+      "method": "POST",
+      "endpoint": "/danh_gia_hoc_tap/cau_hinh_danh_gia_mon",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Phân công GVBM lớp 5",
+      "method": "POST",
+      "endpoint": "/phan_cong_giang_day/phan_cong/mon_hoc",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Phân công GVBM lớp 7",
+      "method": "POST",
+      "endpoint": "/phan_cong_giang_day/phan_cong/mon_hoc",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Tạo học sinh lớp khối 4",
+      "method": "POST",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Xếp lớp khối 4",
+      "method": "POST",
+      "endpoint": "/to_chuc_lop_hoc/xep_lop",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "GVBM có hai lớp thuộc hai khối",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/danh_muc",
+      "vai_tro": "GVBM",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "GVBM chọn được đúng lớp và khối được giao",
+      "dat": true
+    },
+    {
+      "ten": "GVBM xem học sinh trong tất cả lớp được giao",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh",
+      "vai_tro": "GVBM",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Danh sách GVBM gồm học sinh cả hai lớp",
+      "dat": true
+    },
+    {
+      "ten": "GVBM sửa học sinh khối 4",
+      "method": "PATCH",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/5",
+      "vai_tro": "GVBM",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "GVCN không xem hồ sơ ngoài lớp chủ nhiệm dù có phân công bộ môn",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/5",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "GVBM xem bảng lớp 5",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/bang_danh_gia?lop_hoc_id=5&dot_danh_gia_id=1",
+      "vai_tro": "GVBM",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "GVBM nhập đúng môn, năng lực chỉ xem lớp 5",
+      "dat": true
+    },
+    {
+      "ten": "GVBM xem bảng lớp 7",
+      "method": "GET",
+      "endpoint": "/danh_gia_hoc_tap/bang_danh_gia?lop_hoc_id=7&dot_danh_gia_id=1",
+      "vai_tro": "GVBM",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "GVBM nhập đúng môn, năng lực chỉ xem lớp 7",
+      "dat": true
+    },
+    {
+      "ten": "GVBM đánh giá lớp khối 4",
+      "method": "PUT",
+      "endpoint": "/danh_gia_hoc_tap/ket_qua_mon_hoc",
+      "vai_tro": "GVBM",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "GVBM không điểm danh",
+      "method": "POST",
+      "endpoint": "/diem_danh_nghi_hoc/diem_danh",
+      "vai_tro": "GVBM",
+      "mong_doi": 403,
+      "thuc_te": 403,
+      "dat": true
+    },
+    {
+      "ten": "Chặn lưu Chủ nhật buổi SANG",
+      "method": "POST",
+      "endpoint": "/diem_danh_nghi_hoc/diem_danh",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Chặn mở điểm danh Chủ nhật buổi SANG",
+      "method": "GET",
+      "endpoint": "/diem_danh_nghi_hoc/diem_danh?lop_hoc_id=5&ngay_hoc=2026-10-04&buoi_hoc=SANG",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Chặn lưu Chủ nhật buổi CHIEU",
+      "method": "POST",
+      "endpoint": "/diem_danh_nghi_hoc/diem_danh",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Chặn mở điểm danh Chủ nhật buổi CHIEU",
+      "method": "GET",
+      "endpoint": "/diem_danh_nghi_hoc/diem_danh?lop_hoc_id=5&ngay_hoc=2026-10-04&buoi_hoc=CHIEU",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Không phát sinh điểm danh Chủ nhật",
+      "dat": true
+    },
+    {
+      "ten": "Chặn điểm danh tương lai",
+      "method": "POST",
+      "endpoint": "/diem_danh_nghi_hoc/diem_danh",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 400,
+      "thuc_te": 400,
+      "dat": true
+    },
+    {
+      "ten": "Ghi và sửa trạng thái CO_MAT",
+      "method": "POST",
+      "endpoint": "/diem_danh_nghi_hoc/diem_danh",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Lưu một bản ghi đúng trạng thái CO_MAT",
+      "dat": true
+    },
+    {
+      "ten": "Ghi và sửa trạng thái VANG_CO_PHEP",
+      "method": "POST",
+      "endpoint": "/diem_danh_nghi_hoc/diem_danh",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Lưu một bản ghi đúng trạng thái VANG_CO_PHEP",
+      "dat": true
+    },
+    {
+      "ten": "Ghi và sửa trạng thái VANG_KHONG_PHEP",
+      "method": "POST",
+      "endpoint": "/diem_danh_nghi_hoc/diem_danh",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Lưu một bản ghi đúng trạng thái VANG_KHONG_PHEP",
+      "dat": true
+    },
+    {
+      "ten": "Ghi và sửa trạng thái DI_TRE",
+      "method": "POST",
+      "endpoint": "/diem_danh_nghi_hoc/diem_danh",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Lưu một bản ghi đúng trạng thái DI_TRE",
+      "dat": true
+    },
+    {
+      "ten": "Lưu chiều độc lập với sáng",
+      "method": "POST",
+      "endpoint": "/diem_danh_nghi_hoc/diem_danh",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 201,
+      "thuc_te": 201,
+      "dat": true
+    },
+    {
+      "ten": "Đọc sáng tự động trả trạng thái đi trễ",
+      "method": "GET",
+      "endpoint": "/diem_danh_nghi_hoc/diem_danh?lop_hoc_id=5&ngay_hoc=2026-10-03&buoi_hoc=SANG",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Đọc đúng ngày và buổi sáng",
+      "dat": true
+    },
+    {
+      "ten": "Đọc chiều độc lập",
+      "method": "GET",
+      "endpoint": "/diem_danh_nghi_hoc/diem_danh?lop_hoc_id=5&ngay_hoc=2026-10-03&buoi_hoc=CHIEU",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Đọc đúng buổi chiều",
+      "dat": true
+    },
+    {
+      "ten": "Đi trễ không tính là ngày vắng",
+      "method": "GET",
+      "endpoint": "/ho_so_hoc_sinh/hoc_sinh/3",
+      "vai_tro": "GIAO_VIEN",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "Tổng nghỉ bỏ qua Đi trễ và Có mặt",
+      "dat": true
+    },
+    {
+      "ten": "PH xem được trạng thái đi trễ",
+      "method": "GET",
+      "endpoint": "/diem_danh_nghi_hoc/diem_danh/con/3",
+      "vai_tro": "PHU_HUYNH",
+      "mong_doi": 200,
+      "thuc_te": 200,
+      "dat": true
+    },
+    {
+      "ten": "PH thấy DI_TRE của đúng con",
+      "dat": true
+    }
+  ]
+}

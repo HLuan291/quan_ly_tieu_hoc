@@ -1,11 +1,11 @@
 {
-  "thoi_diem": "2026-10-04T13:12:48.483Z",
+  "thoi_diem": "2026-10-04T15:10:32.936Z",
   "database": "audit_school_ci",
   "loai_du_lieu": "Giả trên MySQL CI riêng",
-  "tong": 125,
-  "dat": 125,
+  "tong": 126,
+  "dat": 126,
   "khong_dat": 0,
-  "http": 85,
+  "http": 86,
   "ket_qua": [
     {
       "ten": "Đăng nhập ADMIN",
@@ -904,6 +904,15 @@
     },
     {
       "ten": "Phân công hiện tại được kết thúc và lịch sử giữ lại",
+      "dat": true
+    },
+    {
+      "ten": "Tạo GVCN thay thế chưa chủ nhiệm lớp khác",
+      "method": "POST",
+      "endpoint": "/giao_vien",
+      "vai_tro": "ADMIN",
+      "mong_doi": 201,
+      "thuc_te": 201,
       "dat": true
     },
     {

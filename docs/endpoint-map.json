@@ -245,7 +245,6 @@
     "file": "src/diem_danh_nghi_hoc/diem_danh_nghi_hoc.controller.ts",
     "ham": "LayLopChuNhiemCuaToi",
     "frontend": [
-      "diem_danh_page.tsx",
       "don_xin_nghi_page.tsx"
     ]
   },
@@ -392,6 +391,7 @@
     "frontend": [
       "bang_danh_gia_giao_vien.tsx",
       "danh_sach_hoc_sinh.tsx",
+      "diem_danh_page.tsx",
       "thong_ke_danh_gia.tsx"
     ]
   },

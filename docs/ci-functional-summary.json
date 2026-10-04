@@ -1,12 +1,12 @@
 {
-  "source_commit": "0eda31779399e69fd8b153637784e21c60d33d0a",
-  "workflow_run": 37204738578,
-  "workflow_url": "https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37204738578",
+  "source_commit": "9e925695677472a07cef76cd6baf82c8ed2fc9d8",
+  "workflow_run": 37211940169,
+  "workflow_url": "https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37211940169",
   "conclusion": "success",
   "data": "Dữ liệu giả trên MySQL CI riêng; không kết nối database Windows",
   "backend_unit": {
-    "passed": 95,
-    "total": 95,
+    "passed": 96,
+    "total": 96,
     "suites": 8
   },
   "e2e": {
@@ -15,13 +15,14 @@
     "scope": "GET /"
   },
   "api": {
-    "passed": 477,
-    "total": 477,
-    "http": 386,
-    "assertions": 91,
+    "passed": 549,
+    "total": 549,
+    "http": 435,
+    "assertions": 114,
     "core": 236,
     "extra": 116,
-    "profiles": 125
+    "profiles": 126,
+    "attendance_teacher_scope": 71
   },
   "route_coverage": {
     "total": 75,
@@ -34,22 +35,25 @@
     "total": 15
   },
   "frontend_dates": {
-    "passed": 9,
-    "total": 9
+    "passed": 16,
+    "total": 16
   },
   "browser": {
-    "passed": 58,
-    "total": 58,
-    "http": 185,
+    "passed": 65,
+    "total": 65,
+    "http": 218,
     "http_5xx": 0,
     "javascript_errors": 0,
     "screenshots": [
       "admin-student-directory.png",
       "teacher-student-profile.png",
+      "attendance-quick.png",
       "teacher-assessment-table.png",
       "teacher-assessment-statistics.png",
       "teacher-student-mobile.png",
+      "student-modal-mobile.png",
       "teacher-assessment-mobile.png",
+      "subject-teacher-assessment.png",
       "parent-desktop.png",
       "parent-mobile.png"
     ],
@@ -125,14 +129,24 @@
     }
   ],
   "artifact": {
-    "id": 11304481829,
-    "url": "https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37204738578/artifacts/11304481829",
-    "expires_at": "2026-10-18T13:13:42Z"
+    "id": 11307405006,
+    "url": "https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37211940169/artifacts/11307405006",
+    "expires_at": "2026-10-18T15:11:33Z"
+  },
+  "features": {
+    "modals": true,
+    "automatic_attendance": true,
+    "all_present_button": true,
+    "late_status": "DI_TRE",
+    "sunday_attendance_blocked": true,
+    "homeroom_auto_class": true,
+    "subject_teacher_assigned_choices": true
   },
   "limits": [
     "Không kiểm thử DB Windows hiện có",
+    "Trang C1 yêu cầu xác minh; bố cục dựa trên ảnh người dùng",
     "Chromium headless; viewport điện thoại giả lập",
-    "Không xác nhận mọi nhánh nghiệp vụ hoặc biểu mẫu theo quy định",
-    "Dependency audit vẫn có package bị đánh dấu; chưa nâng version"
+    "Độ phủ route không xác nhận mọi nhánh nghiệp vụ",
+    "Dependency audit còn package bị đánh dấu; chưa nâng version"
   ]
 }

@@ -1,6 +1,6 @@
 # Ma trận endpoint và giao diện
 
-Vai trò theo kiểm tra trong controller/service; độ phủ luồng thành công của lượt CI cuối là 75/75, không đại diện cho mọi nhánh nghiệp vụ. Endpoint chưa có frontend vẫn có thể gọi qua API.
+Vai trò theo kiểm tra trong controller/service. Lượt CI 37211940169 đã chạy luồng thành công cho 75/75 route; con số này không đại diện cho mọi nhánh nghiệp vụ. Phạm vi lớp GVCN/GVBM được kiểm tra tại service.
 
 | Method | Endpoint | Vai trò | Frontend |
 |---|---|---|---|
@@ -26,7 +26,7 @@ Vai trò theo kiểm tra trong controller/service; độ phủ luồng thành c�
 | GET | `/danh_gia_hoc_tap/con/:hoc_sinh_id/dot/:dot_danh_gia_id` | PHU_HUYNH | con_cua_toi_page.tsx |
 | GET | `/danh_gia_hoc_tap/bang_danh_gia` | ADMIN, GIAO_VIEN (phạm vi phân công) | bang_danh_gia_giao_vien.tsx |
 | GET | `/danh_gia_hoc_tap/thong_ke_danh_gia` | ADMIN, GIAO_VIEN (phạm vi phân công) | thong_ke_danh_gia.tsx |
-| GET | `/diem_danh_nghi_hoc/lop_chu_nhiem_cua_toi` | GIAO_VIEN | diem_danh_page.tsx, don_xin_nghi_page.tsx |
+| GET | `/diem_danh_nghi_hoc/lop_chu_nhiem_cua_toi` | GIAO_VIEN | don_xin_nghi_page.tsx |
 | GET | `/diem_danh_nghi_hoc/diem_danh` | ADMIN, GIAO_VIEN (phạm vi phân công) | diem_danh_page.tsx |
 | POST | `/diem_danh_nghi_hoc/diem_danh` | GIAO_VIEN | diem_danh_page.tsx |
 | GET | `/diem_danh_nghi_hoc/diem_danh/con/:hoc_sinh_id` | PHU_HUYNH | con_cua_toi_page.tsx |
@@ -39,7 +39,7 @@ Vai trò theo kiểm tra trong controller/service; độ phủ luồng thành c�
 | PATCH | `/giao_vien/:id` | ADMIN | giao_vien_page.tsx |
 | POST | `/giao_vien/:id/cap_lai_mat_khau` | ADMIN | giao_vien_page.tsx |
 | DELETE | `/giao_vien/:id` | ADMIN | giao_vien_page.tsx |
-| GET | `/ho_so_hoc_sinh/danh_muc` | ADMIN, GIAO_VIEN (phạm vi phân công) | bang_danh_gia_giao_vien.tsx, danh_sach_hoc_sinh.tsx, thong_ke_danh_gia.tsx |
+| GET | `/ho_so_hoc_sinh/danh_muc` | ADMIN, GIAO_VIEN (phạm vi phân công) | bang_danh_gia_giao_vien.tsx, danh_sach_hoc_sinh.tsx, diem_danh_page.tsx, thong_ke_danh_gia.tsx |
 | DELETE | `/ho_so_hoc_sinh/hoc_sinh/:Id` | ADMIN | danh_sach_hoc_sinh.tsx |
 | POST | `/ho_so_hoc_sinh/hoc_sinh` | ADMIN | hoc_sinh_page.tsx |
 | GET | `/ho_so_hoc_sinh/hoc_sinh` | ADMIN, GIAO_VIEN, PHU_HUYNH (có thể giới hạn dữ liệu theo vai trò) | danh_sach_hoc_sinh.tsx |
