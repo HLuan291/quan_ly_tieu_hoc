@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useRef,
   useState,
 } from 'react';
 
@@ -60,6 +61,7 @@ interface LopChuNhiem {
 }
 
 export default function DonXinNghiPage() {
+  const LanTaiDon = useRef(0);
   const NguoiDung =
     DocJwt();
 
@@ -127,6 +129,7 @@ export default function DonXinNghiPage() {
 
   useEffect(
     () => {
+      let DaHuy = false;
       async function KhoiTao() {
         try {
           SetLoi('');
@@ -145,6 +148,7 @@ export default function DonXinNghiPage() {
                   '/diem_danh_nghi_hoc/don_xin_nghi/cua_toi',
                 ),
               ]);
+            if (DaHuy) return;
 
             const DanhSachCon =
               PhuHuynhResponse.data
@@ -161,11 +165,7 @@ export default function DonXinNghiPage() {
             if (
               DanhSachCon[0]
             ) {
-              SetHocSinhId(
-                String(
-                  DanhSachCon[0].id,
-                ),
-              );
+              SetHocSinhId((GiaTriCu) => GiaTriCu || String(DanhSachCon[0].id));
             }
 
             SetDon(
@@ -178,6 +178,7 @@ export default function DonXinNghiPage() {
               await Api.get<LopChuNhiem[]>(
                 '/diem_danh_nghi_hoc/lop_chu_nhiem_cua_toi',
               );
+            if (DaHuy) return;
 
             SetLop(
               Response.data,
@@ -192,9 +193,7 @@ export default function DonXinNghiPage() {
                     .lop_hoc_id,
                 );
 
-              SetLopHocId(
-                Id,
-              );
+              SetLopHocId((GiaTriCu) => GiaTriCu || Id);
 
               await TaiDonCuaLop(
                 Id,
@@ -202,6 +201,7 @@ export default function DonXinNghiPage() {
             }
           }
         } catch (Error: unknown) {
+          if (DaHuy) return;
           SetLoi(
             LayThongBaoLoi(
               Error,
@@ -211,6 +211,7 @@ export default function DonXinNghiPage() {
       }
 
       void KhoiTao();
+      return () => { DaHuy = true; LanTaiDon.current++; };
     },
     [
       LaGiaoVien,
@@ -221,6 +222,7 @@ export default function DonXinNghiPage() {
   async function TaiDonCuaLop(
     Id: string,
   ) {
+    const LanTai = ++LanTaiDon.current;
     if (!Id) {
       SetDon([]);
       return;
@@ -231,11 +233,13 @@ export default function DonXinNghiPage() {
         await Api.get<DonXinNghi[]>(
           `/diem_danh_nghi_hoc/don_xin_nghi/lop/${Id}`,
         );
+      if (LanTai !== LanTaiDon.current) return;
 
       SetDon(
         Response.data,
       );
     } catch (Error: unknown) {
+      if (LanTai !== LanTaiDon.current) return;
       SetLoi(
         LayThongBaoLoi(
           Error,

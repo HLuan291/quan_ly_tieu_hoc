@@ -137,6 +137,7 @@ export default function ConCuaToiPage() {
 
   useEffect(
     () => {
+      let DaHuy = false;
       async function TaiDuLieu() {
         try {
           SetLoi('');
@@ -154,6 +155,7 @@ export default function ConCuaToiPage() {
                 '/danh_gia_hoc_tap/dot_danh_gia',
               ),
             ]);
+          if (DaHuy) return;
 
           SetPhuHuynh(
             PhuHuynhResponse.data,
@@ -169,23 +171,16 @@ export default function ConCuaToiPage() {
               ?.hoc_sinh;
 
           if (ConDau) {
-            SetHocSinhId(
-              String(
-                ConDau.id,
-              ),
-            );
+            SetHocSinhId((GiaTriCu) => GiaTriCu || String(ConDau.id));
           }
 
           if (
             DotResponse.data[0]
           ) {
-            SetDotDanhGiaId(
-              String(
-                DotResponse.data[0].id,
-              ),
-            );
+            SetDotDanhGiaId((GiaTriCu) => GiaTriCu || String(DotResponse.data[0].id));
           }
         } catch (Error: unknown) {
+          if (DaHuy) return;
           SetLoi(
             LayThongBaoLoi(
               Error,
@@ -195,6 +190,7 @@ export default function ConCuaToiPage() {
       }
 
       void TaiDuLieu();
+      return () => { DaHuy = true; };
     },
     [],
   );

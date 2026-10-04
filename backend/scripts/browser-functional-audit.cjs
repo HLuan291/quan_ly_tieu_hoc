@@ -90,6 +90,42 @@ async function Shot(Name) {
   Screens.push(Name + '.png');
   if (Name === 'parent-mobile') console.log('CI_SCREENSHOT_MOBILE ' + Bytes.toString('base64'));
 }
+
+function WithDeadline(PromiseValue) {
+  let Timer;
+  return Promise.race([
+    PromiseValue,
+    new Promise((_, Reject) => { Timer = setTimeout(() => Reject(new Error('Không nhận được phản hồi khởi tạo đang trì hoãn')), 10000); }),
+  ]).finally(() => clearTimeout(Timer));
+}
+async function ChooseWhileInitialResponseIsLate(Route, Heading, WithDot = false) {
+  let Release, FirstHeld, FirstDone, Count = 0;
+  const Gate = new Promise(Resolve => { Release = Resolve; });
+  const Held = new Promise(Resolve => { FirstHeld = Resolve; });
+  const Done = new Promise(Resolve => { FirstDone = Resolve; });
+  const Pattern = '**/ho_so_hoc_sinh/phu_huynh/me';
+  const Handler = async Intercepted => {
+    const NumberRequest = ++Count;
+    const Response = await Intercepted.fetch(); // Gọi backend thật; giữ nguyên status/body/header.
+    if (NumberRequest === 1) { FirstHeld(); await Gate; }
+    await Intercepted.fulfill({ response: Response });
+    if (NumberRequest === 1) FirstDone();
+  };
+  await Page.route(Pattern, Handler);
+  try {
+    await Go(Route, Heading);
+    await SelectValue('Chọn học sinh', Student.id);
+    if (WithDot) await SelectValue('Chọn đợt đánh giá', EvaluationDot);
+    await WithDeadline(Held); Release(); await WithDeadline(Done);
+    await Page.waitForTimeout(200);
+    Assert.equal(await SelectWithPlaceholder('Chọn học sinh').inputValue(), String(Student.id), 'Phản hồi cũ không đổi học sinh đã chọn');
+    if (WithDot) Assert.equal(await SelectWithPlaceholder('Chọn đợt đánh giá').inputValue(), String(EvaluationDot), 'Phản hồi cũ không đổi đợt đã chọn');
+    Assert(Count >= 2, 'Đã thử phản hồi muộn của hai lượt khởi tạo StrictMode');
+  } finally {
+    Release(); await Page.unroute(Pattern, Handler);
+  }
+}
+
 async function Main() {
   BrowserClass = await Prisma.lop_hoc.create({ data: { nam_hoc_id: Fixture.year_id, khoi_id: Fixture.grade_id, ten_lop: '5 Browser' } });
   const LastStudent = await Prisma.hoc_sinh.findFirst({ orderBy: { id: 'desc' }, select: { ma_hoc_sinh: true } });
@@ -405,6 +441,9 @@ async function Main() {
     await Login(Fixture.parent, Fixture.password, 'PHU_HUYNH'); await Page.getByRole('link', { name: 'Con của tôi', exact: true }).waitFor();
     Assert.equal(await Page.getByRole('link', { name: 'Giáo viên', exact: true }).count(), 0);
   });
+  await Case('PH giữ lựa chọn con và đợt khi phản hồi khởi tạo đến muộn', async () => {
+    await ChooseWhileInitialResponseIsLate('/con_cua_toi', 'Con của tôi', true);
+  });
   await Case('PH chỉ chọn con được liên kết', async () => {
     await Go('/con_cua_toi', 'Con của tôi'); await SelectValue('Chọn học sinh', Student.id);
     const Ids = await SelectWithPlaceholder('Chọn học sinh').locator('option').evaluateAll(Options => Options.filter(Option => Option.value).map(Option => Number(Option.value)));
@@ -419,6 +458,9 @@ async function Main() {
     await HttpAction('GET', '/danh_gia_hoc_tap/con/' + Student.id + '/dot/' + EvaluationDot, () => Page.getByRole('button', { name: 'Xem kết quả', exact: true }).click());
     await Page.getByText('Nhận xét từ Chromium', { exact: false }).waitFor(); await Shot('parent-desktop');
   });
+  await Case('PH giữ học sinh trong đơn nghỉ khi phản hồi khởi tạo đến muộn', async () => {
+    await ChooseWhileInitialResponseIsLate('/don_xin_nghi', 'Đơn xin nghỉ');
+  });
   await Case('Ngày đơn nghỉ đúng trước 07:00', async () => {
     await Go('/don_xin_nghi', 'Đơn xin nghỉ');
     const Dates = Page.locator('input[type="date"]');
@@ -429,7 +471,7 @@ async function Main() {
     await SelectValue('Chọn học sinh', Student.id);
     await Page.getByPlaceholder('VD: Học sinh bị sốt, cần nghỉ để theo dõi sức khỏe', { exact: true }).fill('Đơn từ Chromium');
     const Data = await HttpAction('POST', '/diem_danh_nghi_hoc/don_xin_nghi', () => Page.getByRole('button', { name: 'Gửi đơn', exact: true }).click(), 201);
-    Leave = Data.don_xin_nghi; Assert.equal((await Prisma.don_xin_nghi.findUniqueOrThrow({ where: { id: Leave.id } })).trang_thai, 'CHO_DUYET');
+    Leave = Data.don_xin_nghi; Assert.equal(Leave.hoc_sinh_id, Student.id); Assert.equal((await Prisma.don_xin_nghi.findUniqueOrThrow({ where: { id: Leave.id } })).trang_thai, 'CHO_DUYET');
   });
   await Case('GVCN duyệt đơn từ form', async () => {
     await Login(Teacher.tai_khoan.ten_dang_nhap, ChangedPassword, 'GIAO_VIEN'); await Go('/don_xin_nghi', 'Đơn xin nghỉ');
