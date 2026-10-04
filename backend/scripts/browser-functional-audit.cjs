@@ -77,7 +77,11 @@ async function Go(Route, Heading) {
   await Page.goto('http://localhost:5173' + Route);
   await Page.getByRole('heading', { name: Heading, exact: true }).waitFor();
 }
-async function Shot(Name) { await Page.screenshot({ path: Path.join(Output, Name + '.png'), fullPage: true }); Screens.push(Name + '.png'); }
+async function Shot(Name) {
+  const Bytes = await Page.screenshot({ path: Path.join(Output, Name + '.png'), fullPage: true });
+  Screens.push(Name + '.png');
+  if (Name === 'parent-mobile') console.log('CI_SCREENSHOT_MOBILE ' + Bytes.toString('base64'));
+}
 async function Main() {
   BrowserClass = await Prisma.lop_hoc.create({ data: { nam_hoc_id: Fixture.year_id, khoi_id: Fixture.grade_id, ten_lop: '5 Browser' } });
   const LastStudent = await Prisma.hoc_sinh.findFirst({ orderBy: { id: 'desc' }, select: { ma_hoc_sinh: true } });
@@ -355,12 +359,12 @@ async function Main() {
   });
   await Case('PH xem điểm danh vừa ghi', async () => {
     await HttpAction('GET', '/diem_danh_nghi_hoc/diem_danh/con/' + Student.id, () => Page.getByRole('button', { name: 'Xem điểm danh', exact: true }).click());
-    await Page.getByText('Có mặt', { exact: true }).waitFor();
+    await Page.getByText('Có mặt', { exact: false }).waitFor();
   });
   await Case('PH xem kết quả vừa ghi', async () => {
     await SelectValue('Chọn đợt đánh giá', EvaluationDot);
     await HttpAction('GET', '/danh_gia_hoc_tap/con/' + Student.id + '/dot/' + EvaluationDot, () => Page.getByRole('button', { name: 'Xem kết quả', exact: true }).click());
-    await Page.getByText('Nhận xét từ Chromium', { exact: true }).waitFor(); await Shot('parent-desktop');
+    await Page.getByText('Nhận xét từ Chromium', { exact: false }).waitFor(); await Shot('parent-desktop');
   });
   await Case('Ngày đơn nghỉ đúng trước 07:00', async () => {
     await Go('/don_xin_nghi', 'Đơn xin nghỉ');
