@@ -18,6 +18,7 @@ const InitialPassword = 'Browser@Initial123', ResetPassword = 'Browser@Reset123'
 let Browser, Page, Context, Teacher, BrowserClass, Student, Enrollment, Leave, FormStudent, FormClass, ScoreConfig, Criterion;
 let EvaluationDot = Fixture.dot_id;
 let CurrentRole = 'KHACH', Phase = 'normal';
+let PromptValues = [], PromptDateDefault;
 function Redact(Value) {
   let Text = String(Value);
   for (const Secret of [Fixture.password, InitialPassword, ResetPassword, ChangedPassword]) Text = Text.replaceAll(Secret, '[REDACTED]');
@@ -54,8 +55,9 @@ async function HttpAction(Method, Endpoint, Work, Expected = 200) {
   PromiseResponse.catch(() => {});
   await Work();
   const Response = await PromiseResponse;
-  Assert.equal(Response.status(), Expected, 'HTTP ' + Method + ' ' + Endpoint);
-  return Response.json();
+  const Data = await Response.json();
+  Assert.equal(Response.status(), Expected, Redact('HTTP ' + Method + ' ' + Endpoint + ': ' + JSON.stringify(Data)));
+  return Data;
 }
 function SelectWithPlaceholder(Text) {
   const Escaped = Text.replace(/[|\\{}()[\]^$+*?.]/g, '\\$&');
@@ -78,8 +80,12 @@ async function Go(Route, Heading) {
 async function Shot(Name) { await Page.screenshot({ path: Path.join(Output, Name + '.png'), fullPage: true }); Screens.push(Name + '.png'); }
 async function Main() {
   BrowserClass = await Prisma.lop_hoc.create({ data: { nam_hoc_id: Fixture.year_id, khoi_id: Fixture.grade_id, ten_lop: '5 Browser' } });
+  const LastStudent = await Prisma.hoc_sinh.findFirst({ orderBy: { id: 'desc' }, select: { ma_hoc_sinh: true } });
+  const LastCode = LastStudent?.ma_hoc_sinh.match(/^HS(\d+)$/);
+  Assert(LastCode, 'Fixture học sinh phải theo định dạng mã HS đang dùng');
+  const StudentCode = 'HS' + String(Number(LastCode[1]) + 1).padStart(4, '0');
   Student = await Prisma.hoc_sinh.create({ data: {
-    ma_hoc_sinh: 'HS_BROWSER_CI', ho_ten: 'Nguyễn Văn Trình Duyệt', ngay_sinh: new Date('2016-01-01'), gioi_tinh: 'NAM',
+    ma_hoc_sinh: StudentCode, ho_ten: 'Nguyễn Văn Trình Duyệt', ngay_sinh: new Date('2016-01-01'), gioi_tinh: 'NAM',
     dan_toc: 'Kinh', quoc_tich: 'Việt Nam', noi_sinh: 'Địa chỉ giả', so_dien_thoai_lien_he: Fixture.parent,
     dia_chi_thuong_tru: 'Địa chỉ giả', dia_chi_hien_tai: 'Địa chỉ giả', ngay_nhap_hoc: new Date('2022-09-01'),
   } });
@@ -101,7 +107,12 @@ async function Main() {
   }, { Time: Fixture.today + 'T00:30:00+07:00' });
   Page = await Context.newPage(); Page.setDefaultTimeout(20000);
   Page.on('pageerror', Error => PageErrors.push(Redact(Error.message)));
-  Page.on('dialog', Dialog => Dialog.accept());
+  Page.on('dialog', Dialog => {
+    if (Dialog.type() === 'prompt') {
+      if (Dialog.message() === 'Ngày đo (YYYY-MM-DD)') PromptDateDefault = Dialog.defaultValue();
+      void Dialog.accept(PromptValues.shift() ?? Dialog.defaultValue());
+    } else void Dialog.accept();
+  });
   Page.on('response', Response => {
     if (new URL(Response.url()).port !== '3000') return;
     Requests.push({ method: Response.request().method(), endpoint: new URL(Response.url()).pathname, status: Response.status(), vai_tro: CurrentRole, phase: Phase });
@@ -183,6 +194,18 @@ async function Main() {
     Assert.equal((await Prisma.hoc_sinh.findUniqueOrThrow({ where: { id: FormStudent.id } })).ho_ten, 'Nguyễn Văn Giao Diện');
     Assert.equal((await Prisma.phu_huynh.findFirstOrThrow({ where: { so_dien_thoai: '0950000002' } })).tai_khoan_id, null);
   });
+
+  await Case('ADMIN cập nhật sức khỏe qua hộp thoại native', async () => {
+    const Row = Page.locator('tbody tr').filter({ hasText: FormStudent.ho_ten });
+    await Row.waitFor();
+    PromptValues = ['135', '32', Fixture.today];
+    await HttpAction('PATCH', '/ho_so_hoc_sinh/hoc_sinh/' + FormStudent.id + '/suc_khoe',
+      () => Row.getByRole('button', { name: 'Cập nhật sức khỏe', exact: true }).click());
+    const Record = await Prisma.hoc_sinh.findUniqueOrThrow({ where: { id: FormStudent.id } });
+    Assert.equal(Number(Record.chieu_cao_cm), 135); Assert.equal(Number(Record.can_nang_kg), 32);
+    Assert.equal(PromptDateDefault, Fixture.today); Assert.equal(PromptValues.length, 0);
+  });
+
   await Case('ADMIN tạo năm học qua form', async () => {
     await Go('/lop_hoc', 'Tổ chức lớp học');
     const Form = FormWithHeading('Tạo năm học');
@@ -262,6 +285,17 @@ async function Main() {
     Assert.equal(await Page.getByRole('link', { name: 'Giáo viên', exact: true }).count(), 0);
     await Page.goto('http://localhost:5173/giao_vien'); await Page.waitForURL('**/khong_co_quyen');
   });
+
+  await Case('GV xem học sinh và phân công đúng phạm vi', async () => {
+    await Go('/hoc_sinh', 'Quản lý học sinh');
+    await Page.locator('tbody tr').filter({ hasText: Student.ho_ten }).waitFor();
+    Assert.equal(await Page.getByRole('button', { name: 'Thêm học sinh', exact: true }).count(), 0);
+    Assert.equal(await Page.locator('tbody tr').filter({ hasText: FormStudent.ho_ten }).count(), 0);
+    await Go('/phan_cong', 'Phân công giảng dạy');
+    await Page.getByText(BrowserClass.ten_lop, { exact: true }).first().waitFor();
+    Assert.equal(await Page.getByRole('button', { name: 'Phân công', exact: true }).count(), 0);
+  });
+
   await Case('Ngày điểm danh đúng và tải sổ', async () => {
     await Go('/diem_danh', 'Điểm danh');
     Assert.equal(await Page.locator('input[type="date"]').inputValue(), Fixture.today);
