@@ -99,7 +99,7 @@ export default function HoSoHocSinhChiTiet({ Id, LaAdmin, Dong, CapNhat }: { Id:
               {Truong.map(([Key, Ten, Type, Max]) => <label key={Key}>{Ten}<input name={Key} type={Type} required defaultValue={Type === 'date' ? Ngay(HS[Key]) : HS[Key]} max={Type === 'date' ? LayNgayHomNay() : undefined} pattern={Type === 'tel' ? '[0-9]{10}' : undefined} maxLength={Max} className={O} /></label>)}
               <label>Giới tính<select name="gioi_tinh" defaultValue={HS.gioi_tinh} className={O}><option value="NAM">Nam</option><option value="NU">Nữ</option></select></label>
               {LaAdmin ? <label>Trạng thái học sinh<select name="trang_thai" defaultValue={HS.trang_thai} className={O}>{[...new Set([HS.trang_thai, 'DANG_HOC', 'CHUYEN_TRUONG', 'THOI_HOC'])].map(T => <option key={T} value={T}>{TrangThai[T] || T}</option>)}</select></label>
-                : <label>Trạng thái học sinh<input value={TrangThai[HS.trang_thai] || HS.trang_thai} readOnly className={O + ' !bg-slate-100'} /><span className="text-xs text-slate-500">Admin quản lý trạng thái.</span></label>}
+                : <label>Trạng thái học sinh<input aria-label="Trạng thái học sinh" value={TrangThai[HS.trang_thai] || HS.trang_thai} readOnly className={O + ' !bg-slate-100'} /><span className="text-xs text-slate-500">Admin quản lý trạng thái.</span></label>}
               <label className="sm:col-span-2">Ghi chú<textarea name="ghi_chu" defaultValue={HS.ghi_chu || ''} className={O} rows={2} /></label>
             </div>
             <p className="mt-2 text-xs text-slate-500">ID: {HS.id} · Tạo: {HS.ngay_tao} · Cập nhật: {HS.ngay_cap_nhat}</p>

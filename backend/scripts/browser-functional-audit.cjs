@@ -312,6 +312,7 @@ async function Main() {
     const Row = Page.locator('tbody tr').filter({ hasText: FormStudent.ho_ten }); await Row.waitFor();
     await HttpAction('GET', '/ho_so_hoc_sinh/hoc_sinh/' + FormStudent.id, () => Row.getByRole('button', { name: 'Xem / sửa', exact: true }).click());
     const Form = Page.getByRole('form', { name: 'Hồ sơ học sinh', exact: true });
+    await Form.waitFor();
     Assert.equal(await Form.locator('button[type="submit"]').count(), 1);
     await Form.locator('input[name="chieu_cao_cm"]').fill('135');
     await Form.locator('input[name="can_nang_kg"]').fill('32');
@@ -443,6 +444,7 @@ async function Main() {
     await HttpAction('GET', '/giao_vien/me', () => Page.getByRole('link', { name: 'Hồ sơ của tôi', exact: true }).click());
     await Page.getByRole('heading', { name: 'Hồ sơ của tôi', exact: true }).waitFor();
     const Form = Page.getByRole('form', { name: 'Hồ sơ giáo viên của tôi', exact: true });
+    await Form.waitFor();
     Assert.equal(await Form.locator('button[type="submit"]').count(), 1);
     Assert.equal(await Form.locator('select[name="trang_thai"]').count(), 0);
     Assert.equal(await Form.locator('input[name="ho_ten"]').inputValue(), 'Trần Thị Trình Duyệt');
@@ -487,6 +489,7 @@ async function Main() {
       () => Page.locator('tbody tr').filter({ hasText: Student.ho_ten }).getByRole('button', { name: 'Xem / sửa', exact: true }).click());
     Assert.equal(Detail.thong_ke_nghi.so_ngay_co_vang, 1); Assert.equal(Detail.thong_ke_nghi.so_buoi_vang, 2);
     const Form = Page.getByRole('form', { name: 'Hồ sơ học sinh', exact: true });
+    await Form.waitFor();
     Assert.equal(await Form.locator('button[type="submit"]').count(), 1);
     Assert.equal(await Page.getByRole('dialog').getByRole('button', { name: /Đóng|Hủy/ }).count(), 1);
     Assert.equal(await Form.locator('select[name="trang_thai"]').count(), 0);
@@ -503,6 +506,7 @@ async function Main() {
   await Case('GV lưu chung phụ huynh và người giám hộ bằng một nút', async () => {
     const Parent = await Prisma.phu_huynh.findFirstOrThrow({ where: { so_dien_thoai: Fixture.parent } });
     const Form = Page.getByRole('form', { name: 'Hồ sơ học sinh', exact: true });
+    await Form.waitFor();
     const PH = Form.getByRole('group', { name: 'Phụ huynh ' + Parent.id, exact: true });
     Assert.equal(await Page.getByRole('button', { name: 'Bổ sung phụ huynh', exact: true }).count(), 0);
     Assert.equal(await Page.locator('dialog[open]').count(), 1);
@@ -525,6 +529,7 @@ async function Main() {
     const Parent = await Prisma.phu_huynh.findFirstOrThrow({ where: { so_dien_thoai: Fixture.parent } });
     const Before = await Prisma.hoc_sinh.findUniqueOrThrow({ where: { id: Student.id } });
     const Form = Page.getByRole('form', { name: 'Hồ sơ học sinh', exact: true });
+    await Form.waitFor();
     const PH = Form.getByRole('group', { name: 'Phụ huynh ' + Parent.id, exact: true });
     await Form.locator('textarea[name="ghi_chu"]').fill('Bản nhập vẫn được giữ khi lưu lỗi');
     await PH.getByLabel('SĐT phụ huynh', { exact: true }).fill('0950000001');
