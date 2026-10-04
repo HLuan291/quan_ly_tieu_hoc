@@ -94,7 +94,7 @@ async function Main() {
     phu_huynh: [{ ho_ten: 'Nguyễn Văn Phụ Huynh', so_dien_thoai: '0960000003', nam_sinh: 1985, moi_quan_he: 'CHA', tao_tai_khoan: false }],
   }, 201);
   const StudentId = Student.hoc_sinh.id;
-  const Parent = await Prisma.phu_huynh.findUniqueOrThrow({ where: { so_dien_thoai: '0960000003' } });
+  const Parent = await Prisma.phu_huynh.findFirstOrThrow({ where: { so_dien_thoai: '0960000003' } });
   const Account = await Call('Cấp tài khoản phụ huynh đã có hồ sơ', 'POST', '/ho_so_hoc_sinh/phu_huynh/' + Parent.id + '/tao_tai_khoan', 'ADMIN', undefined, 201);
   Check('Cấp tài khoản không lộ hash', !JSON.stringify(Account).includes('mat_khau_bam'));
   await Call('Không cấp trùng tài khoản PH', 'POST', '/ho_so_hoc_sinh/phu_huynh/' + Parent.id + '/tao_tai_khoan', 'ADMIN', undefined, 409);
