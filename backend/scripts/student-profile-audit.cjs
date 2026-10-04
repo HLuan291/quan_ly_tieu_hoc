@@ -108,8 +108,9 @@ async function Main() {
   const Saved = await Prisma.hoc_sinh.findUniqueOrThrow({ where: { id: F.student_id } });
   Check('Địa chỉ và ghi chú được ghi vào MySQL', Saved.noi_sinh === 'Nơi Sinh Kiểm Thử' && Saved.dia_chi_thuong_tru === 'Thường trú đã sửa' && Saved.ghi_chu === 'Hồ sơ cập nhật bởi giáo viên');
   await Call('GV sửa sức khỏe trong phạm vi', 'PATCH', Own + '/suc_khoe', 'GIAO_VIEN', { chieu_cao_cm: 136, can_nang_kg: 33, ngay_do: F.today });
-  await Call('GV sửa trạng thái trong phạm vi', 'PATCH', Own + '/trang_thai', 'GIAO_VIEN', { trang_thai: 'DANG_HOC' });
-  await Call('Không dùng sửa trạng thái để xóa', 'PATCH', Own + '/trang_thai', 'GIAO_VIEN', { trang_thai: 'DA_XOA' }, 400);
+  await Call('GV chỉ xem trạng thái trong phạm vi', 'PATCH', Own + '/trang_thai', 'GIAO_VIEN', { trang_thai: 'DANG_HOC' }, 403);
+  await Call('ADMIN sửa trạng thái học sinh', 'PATCH', Own + '/trang_thai', 'ADMIN', { trang_thai: 'DANG_HOC' });
+  await Call('Không dùng sửa trạng thái để xóa', 'PATCH', Own + '/trang_thai', 'ADMIN', { trang_thai: 'DA_XOA' }, 400);
   await Call('GV sửa phụ huynh liên kết trong phạm vi', 'PATCH', '/ho_so_hoc_sinh/phu_huynh/' + Parent.id, 'GIAO_VIEN', {
     ho_ten: Parent.ho_ten, nam_sinh: 1985, so_dien_thoai: Parent.so_dien_thoai, nghe_nghiep: 'Liên hệ đã cập nhật',
   });
@@ -142,6 +143,66 @@ async function Main() {
   await Call('GV không cấp TK khi bổ sung phụ huynh', 'POST', Own + '/phu_huynh', 'GIAO_VIEN', { ho_ten: 'Trần Thị Cấm', so_dien_thoai: '0940000003', moi_quan_he: 'ME', tao_tai_khoan: true }, 403);
   await Call('GV không cấp lại mật khẩu PH', 'POST', '/ho_so_hoc_sinh/phu_huynh/' + Parent.id + '/cap_lai_mat_khau', 'GIAO_VIEN', undefined, 403);
   await Call('GV không duyệt danh mục toàn bộ phụ huynh', 'GET', '/ho_so_hoc_sinh/phu_huynh', 'GIAO_VIEN', undefined, 403);
+
+  const Self = await Call('GV đọc đúng hồ sơ cá nhân', 'GET', '/giao_vien/me', 'GIAO_VIEN');
+  Check('Hồ sơ me đúng tài khoản và không có mật khẩu', Self.id === F.teacher_id && Self.tai_khoan.ten_dang_nhap === F.teacher && !JSON.stringify(Self).includes('mat_khau'));
+  await Call('GV lưu hồ sơ cá nhân', 'PATCH', '/giao_vien/me', 'GIAO_VIEN', { email: 'self-edit@example.test', dia_chi_lien_he: 'Địa chỉ tự sửa', so_dien_thoai: '0940000081' });
+  const SelfSaved = await Prisma.giao_vien.findUniqueOrThrow({ where: { id: F.teacher_id } });
+  Check('Hồ sơ và điện thoại tài khoản cùng được lưu', SelfSaved.email === 'self-edit@example.test' && (await Prisma.tai_khoan.findUniqueOrThrow({ where: { id: SelfSaved.tai_khoan_id } })).so_dien_thoai === '0940000081');
+  await Call('Đăng nhập GV bằng điện thoại đã cập nhật', 'POST', '/auth/login', 'KHACH', { ten_dang_nhap_hoac_so_dien_thoai: '0940000081', mat_khau: Password }, 201);
+  for (const Role of ['ADMIN', 'PHU_HUYNH']) {
+    await Call(Role + ' không dùng hồ sơ GV me', 'GET', '/giao_vien/me', Role, undefined, 403);
+    await Call(Role + ' không sửa hồ sơ GV me', 'PATCH', '/giao_vien/me', Role, { email: 'blocked@example.test' }, 403);
+  }
+  for (const Data of [{ id: ForeignParent.id }, { tai_khoan_id: Parent.tai_khoan_id }, { trang_thai: 'DA_XOA' }, { vai_tro: 'ADMIN' }, { mat_khau_bam: 'blocked' }]) {
+    await Call('Chặn tự đổi trường hệ thống GV ' + Object.keys(Data)[0], 'PATCH', '/giao_vien/me', 'GIAO_VIEN', { email: 'blocked@example.test', ...Data }, 403);
+  }
+  for (const Data of [{ ngay_sinh: '2020-01-01' }, { so_dien_thoai: '123' }, { email: 'sai' }, { ngay_vao_truong: '1900-01-01' }]) {
+    await Call('Chặn hồ sơ cá nhân sai ' + Object.keys(Data)[0], 'PATCH', '/giao_vien/me', 'GIAO_VIEN', Data, 400);
+  }
+  await Call('Trùng điện thoại khi tự sửa', 'PATCH', '/giao_vien/me', 'GIAO_VIEN', { so_dien_thoai: Parent.so_dien_thoai, email: 'blocked@example.test' }, 409);
+  Check('Lỗi hồ sơ GV không ghi một phần', (await Prisma.giao_vien.findUniqueOrThrow({ where: { id: F.teacher_id } })).email === 'self-edit@example.test');
+  await Call('GV vẫn không sửa giáo viên khác', 'PATCH', '/giao_vien/' + F.teacher_id, 'GIAO_VIEN', { email: 'blocked@example.test' }, 403);
+
+  await Call('Một lần lưu HS, sức khỏe, PH, quan hệ, người giám hộ', 'PATCH', Own + '/ho_so', 'GIAO_VIEN', {
+    hoc_sinh: { ghi_chu: 'Lưu toàn bộ hồ sơ', dia_chi_hien_tai: 'Địa chỉ cùng lần lưu' },
+    suc_khoe: { chieu_cao_cm: 137, can_nang_kg: 34, ngay_do: F.today },
+    phu_huynh: [{ id: Parent.id, nghe_nghiep: 'Lưu chung với học sinh', moi_quan_he: 'CHA' }],
+    nguoi_giam_ho: { ho_ten: 'Trần Thị Giám Hộ Chung', so_dien_thoai: '0940000082', nam_sinh: 1985, nghe_nghiep: 'Nghề Giả' },
+  });
+  const Unified = await Prisma.hoc_sinh.findUniqueOrThrow({ where: { id: F.student_id }, include: { phu_huynh_hoc_sinh: { include: { phu_huynh: true } } } });
+  const Guardian = Unified.phu_huynh_hoc_sinh.find(L => L.phu_huynh.so_dien_thoai === '0940000082');
+  Check('Các phần hồ sơ được lưu cùng một lần', Unified.ghi_chu === 'Lưu toàn bộ hồ sơ' && Number(Unified.chieu_cao_cm) === 137 && Unified.phu_huynh_hoc_sinh.find(L => L.phu_huynh.id === Parent.id).phu_huynh.nghe_nghiep === 'Lưu chung với học sinh' && Guardian.moi_quan_he === 'NGUOI_GIAM_HO' && Guardian.phu_huynh.tai_khoan_id === null);
+  await Call('ADMIN đổi trạng thái trong lần lưu chung', 'PATCH', Own + '/ho_so', 'ADMIN', { trang_thai: 'THOI_HOC', hoc_sinh: { ghi_chu: 'Trạng thái do Admin sửa' } });
+  Check('Trạng thái HS đổi bởi ADMIN', (await Prisma.hoc_sinh.findUniqueOrThrow({ where: { id: F.student_id } })).trang_thai === 'THOI_HOC');
+  await Call('ADMIN đưa HS lại đang học', 'PATCH', Own + '/ho_so', 'ADMIN', { trang_thai: 'DANG_HOC', hoc_sinh: { ghi_chu: 'Lưu toàn bộ hồ sơ' } });
+  await Call('GV không đổi trạng thái trong lần lưu chung', 'PATCH', Own + '/ho_so', 'GIAO_VIEN', { trang_thai: 'THOI_HOC', hoc_sinh: { ghi_chu: 'Không được ghi' } }, 403);
+  await Call('PH không sử dụng API lưu chung', 'PATCH', Own + '/ho_so', 'PHU_HUYNH', { hoc_sinh: { ghi_chu: 'Không được ghi' } }, 403);
+  await Call('GV không lưu chung HS ngoài lớp', 'PATCH', '/ho_so_hoc_sinh/hoc_sinh/' + ForeignId + '/ho_so', 'GIAO_VIEN', { hoc_sinh: { ghi_chu: 'Không được ghi' } }, 403);
+  await Call('Không gắn PH khác qua API lưu chung', 'PATCH', Own + '/ho_so', 'GIAO_VIEN', { hoc_sinh: { ghi_chu: 'Không được ghi' }, phu_huynh: [{ id: ForeignParent.id, ho_ten: 'Trần Thị Cấm' }] }, 403);
+  for (const [Name, Data] of [
+    ['Sức khỏe sai', { hoc_sinh: { ghi_chu: 'Không được ghi' }, suc_khoe: { chieu_cao_cm: -1, can_nang_kg: 20, ngay_do: F.today } }],
+    ['Quan hệ sai', { hoc_sinh: { ghi_chu: 'Không được ghi' }, phu_huynh: [{ id: Parent.id, nghe_nghiep: 'Không được ghi', moi_quan_he: 'KHAC' }] }],
+    ['Lặp ID phụ huynh', { phu_huynh: [{ id: Parent.id, ho_ten: Parent.ho_ten }, { id: Parent.id, ho_ten: Parent.ho_ten }] }],
+    ['Trạng thái trong dữ liệu HS', { hoc_sinh: { ghi_chu: 'Không được ghi', trang_thai: 'THOI_HOC' } }],
+    ['Hồ sơ rỗng', {}],
+    ['Người giám hộ thiếu điện thoại', { nguoi_giam_ho: { ho_ten: 'Trần Thị Cấm' } }],
+    ['Không cấp tài khoản giám hộ', { nguoi_giam_ho: { ho_ten: 'Trần Thị Cấm', so_dien_thoai: '0940000083', tao_tai_khoan: true } }],
+    ['Định dạng sức khỏe sai', { suc_khoe: [] }],
+    ['Định dạng người giám hộ sai', { nguoi_giam_ho: 'Sai' }],
+  ]) await Call('Lưu chung chặn ' + Name, 'PATCH', Own + '/ho_so', 'GIAO_VIEN', Data, 400);
+  await Call('Lỗi điện thoại PH hoàn tác toàn bộ', 'PATCH', Own + '/ho_so', 'GIAO_VIEN', {
+    hoc_sinh: { ghi_chu: 'Không được ghi' }, suc_khoe: { chieu_cao_cm: 140, can_nang_kg: 35, ngay_do: F.today },
+    phu_huynh: [{ id: Parent.id, so_dien_thoai: '0940000081', nghe_nghiep: 'Không được ghi' }],
+  }, 409);
+  await Call('Giám hộ trùng điện thoại hoàn tác toàn bộ', 'PATCH', Own + '/ho_so', 'GIAO_VIEN', {
+    hoc_sinh: { ghi_chu: 'Không được ghi' }, phu_huynh: [{ id: Parent.id, nghe_nghiep: 'Không được ghi' }],
+    nguoi_giam_ho: { ho_ten: 'Trần Thị Cấm', so_dien_thoai: '0940000082' },
+  }, 409);
+  const RolledBack = await Prisma.hoc_sinh.findUniqueOrThrow({ where: { id: F.student_id } });
+  Check('HS và sức khỏe giữ nguyên sau tất cả lỗi', RolledBack.ghi_chu === 'Lưu toàn bộ hồ sơ' && Number(RolledBack.chieu_cao_cm) === 137 && RolledBack.trang_thai === 'DANG_HOC');
+  Check('PH và tài khoản giữ nguyên sau tất cả lỗi', (await Prisma.phu_huynh.findUniqueOrThrow({ where: { id: Parent.id } })).nghe_nghiep === 'Lưu chung với học sinh' && (await Prisma.tai_khoan.findUniqueOrThrow({ where: { id: Parent.tai_khoan_id } })).so_dien_thoai === Parent.so_dien_thoai);
+
   const AbsenceDate = F.attendance_day;
   for (const [Buoi, TrangThai] of [['SANG', 'VANG_CO_PHEP'], ['CHIEU', 'VANG_KHONG_PHEP']]) {
     await Call('Ghi vắng ' + Buoi, 'POST', '/diem_danh_nghi_hoc/diem_danh', 'GIAO_VIEN', {

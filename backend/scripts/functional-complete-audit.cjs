@@ -177,7 +177,8 @@ async function Main() {
   }
   const Missing = Routes.filter(Route => !Covered.has(Route.method + ' ' + Route.endpoint)).map(Route => Route.method + ' ' + Route.endpoint);
   const Moi = new Set(['GET /ho_so_hoc_sinh/danh_muc', 'DELETE /ho_so_hoc_sinh/hoc_sinh/:Id', 'DELETE /giao_vien/:id',
-    'GET /danh_gia_hoc_tap/bang_danh_gia', 'GET /danh_gia_hoc_tap/thong_ke_danh_gia']);
+    'GET /danh_gia_hoc_tap/bang_danh_gia', 'GET /danh_gia_hoc_tap/thong_ke_danh_gia',
+    'GET /giao_vien/me', 'PATCH /giao_vien/me', 'PATCH /ho_so_hoc_sinh/hoc_sinh/:Id/ho_so']);
   Check('Mọi endpoint cũ có happy path; endpoint hồ sơ mới kiểm tra ở bước tiếp theo', Missing.every(Key => Moi.has(Key)));
   Fs.writeFileSync(Path.resolve('../docs/ci-route-coverage.json'), JSON.stringify({ total: Routes.length, covered: Covered.size, missing: Missing }, null, 2) + '\n');
   console.log('CI_BASELINE_ROUTE_COVERAGE ' + JSON.stringify({ total: Routes.length, covered: Covered.size, missing: Missing }));

@@ -102,6 +102,23 @@ export class GiaoVienController {
       );
   }
 
+  private TaiKhoanGiaoVien(Request: RequestCoNguoiDung) {
+    if (Request.nguoi_dung?.vai_tro !== 'GIAO_VIEN') {
+      throw new ForbiddenException('Chỉ giáo viên được sử dụng hồ sơ cá nhân');
+    }
+    return Request.nguoi_dung.sub;
+  }
+
+  @Get('me')
+  LayHoSoCuaToi(@Req() Request: RequestCoNguoiDung) {
+    return this.GiaoVienService.LayHoSoCuaToi(this.TaiKhoanGiaoVien(Request));
+  }
+
+  @Patch('me')
+  CapNhatHoSoCuaToi(@Req() Request: RequestCoNguoiDung, @Body() Body: DuLieuCapNhatGiaoVien) {
+    return this.GiaoVienService.CapNhatHoSoCuaToi(this.TaiKhoanGiaoVien(Request), Body);
+  }
+
   @Patch(':id')
   CapNhatGiaoVien(
     @Req()

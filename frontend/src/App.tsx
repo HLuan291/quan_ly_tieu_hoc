@@ -19,6 +19,8 @@ import DoiMatKhauPage
 import DashboardPage
   from './pages/dashboard_page';
 
+import HoSoGiaoVienPage from './pages/ho_so_giao_vien_page';
+
 import GiaoVienPage
   from './pages/giao_vien_page';
 
@@ -152,6 +154,7 @@ export default function App() {
               />
             }
           >
+            <Route path="/ho_so_cua_toi" element={<HoSoGiaoVienPage />} />
             <Route
               path="/diem_danh"
               element={

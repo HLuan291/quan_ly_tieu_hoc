@@ -9,6 +9,7 @@ import {
 import { randomBytes } from 'crypto';
 import * as argon2 from 'argon2';
 
+import type { Prisma } from '../generated/prisma/client';
 import { PrismaService } from '../prisma.service';
 import { LayPhamViGiaoVien } from '../pham_vi_giao_vien';
 import { LayNgayNghiepVu } from '../ngay_nghiep_vu';
@@ -16,6 +17,7 @@ import { TinhThongKeNghi } from './thong_ke_nghi';
 
 import {
   CapNhatHocSinhDto,
+  CapNhatHoSoHocSinhDto,
   CapNhatMoiQuanHeDto,
   CapNhatPhuHuynhDto,
   CapNhatSucKhoeHocSinhDto,
@@ -1078,13 +1080,86 @@ export class HoSoHocSinhService {
   // 4. ADMIN CẬP NHẬT HỒ SƠ HỌC SINH
   // ==================================================
 
+
+  async CapNhatHoSoHocSinh(NguoiDung: NguoiDungJwt, Id: number, DuLieu: CapNhatHoSoHocSinhDto) {
+    await this.KiemTraQuyenSuaHocSinh(NguoiDung, Id);
+    const KiemTraTruong = (Data: object, Truong: string[]) => {
+      const La = Object.keys(Data).find(Key => !Truong.includes(Key));
+      if (La) throw new BadRequestException('Không được cập nhật trường ' + La);
+      const GioiHan: Record<string, number> = { ho_ten: 100, dan_toc: 50, quoc_tich: 50, noi_sinh: 255, dia_chi_thuong_tru: 255, dia_chi_hien_tai: 255, nghe_nghiep: 100 };
+      for (const [Key, Value] of Object.entries(Data)) {
+        if (typeof Value === 'string' && GioiHan[Key] && Array.from(Value).length > GioiHan[Key]) {
+          throw new BadRequestException('Thông tin ' + Key + ' quá dài');
+        }
+      }
+    };
+    KiemTraTruong(DuLieu, ['hoc_sinh', 'suc_khoe', 'trang_thai', 'phu_huynh', 'nguoi_giam_ho']);
+    if (DuLieu.trang_thai !== undefined && NguoiDung.vai_tro !== 'ADMIN') {
+      throw new ForbiddenException('Chỉ Admin được thay đổi trạng thái học sinh');
+    }
+    if (!Object.keys(DuLieu).length) throw new BadRequestException('Không có dữ liệu cần cập nhật');
+    if (DuLieu.hoc_sinh) KiemTraTruong(DuLieu.hoc_sinh, ['ho_ten', 'ngay_sinh', 'gioi_tinh', 'dan_toc', 'quoc_tich', 'noi_sinh', 'so_dien_thoai_lien_he', 'dia_chi_thuong_tru', 'dia_chi_hien_tai', 'ngay_nhap_hoc', 'ghi_chu']);
+    if (DuLieu.suc_khoe) {
+      KiemTraTruong(DuLieu.suc_khoe, ['chieu_cao_cm', 'can_nang_kg', 'ngay_do']);
+      if (DuLieu.suc_khoe.chieu_cao_cm > 9999.9 || DuLieu.suc_khoe.can_nang_kg > 999.99 ||
+          !DuLieu.suc_khoe.ngay_do || this.ChuyenNgay(DuLieu.suc_khoe.ngay_do, 'Ngày đo') > this.HomNay()) {
+        throw new BadRequestException('Sức khỏe hoặc ngày đo không hợp lệ');
+      }
+    }
+    if (DuLieu.trang_thai !== undefined && !['DANG_HOC', 'CHUYEN_TRUONG', 'THOI_HOC'].includes(DuLieu.trang_thai)) {
+      throw new BadRequestException('Trạng thái học sinh không hợp lệ');
+    }
+    if (DuLieu.phu_huynh && (DuLieu.phu_huynh.length > 20 || new Set(DuLieu.phu_huynh.map(P => P.id)).size !== DuLieu.phu_huynh.length)) {
+      throw new BadRequestException('Danh sách phụ huynh không hợp lệ hoặc bị trùng');
+    }
+    for (const PH of DuLieu.phu_huynh ?? []) KiemTraTruong(PH, ['id', 'ho_ten', 'nam_sinh', 'so_dien_thoai', 'nghe_nghiep', 'moi_quan_he']);
+    const GiamHo = DuLieu.nguoi_giam_ho;
+    if (GiamHo) {
+      KiemTraTruong(GiamHo, ['ho_ten', 'nam_sinh', 'so_dien_thoai', 'nghe_nghiep']);
+      if (!GiamHo.ho_ten?.trim() || !GiamHo.so_dien_thoai?.trim()) throw new BadRequestException('Người giám hộ cần họ tên và số điện thoại');
+      this.KiemTraHoTen(GiamHo.ho_ten);
+      this.KiemTraSoDienThoai(GiamHo.so_dien_thoai.trim());
+      this.KiemTraNamSinhPhuHuynh(GiamHo.nam_sinh);
+    }
+    await this.Prisma.$transaction(async Tx => {
+      await Tx.$queryRaw`SELECT id FROM hoc_sinh WHERE id = ${Id} FOR UPDATE`;
+      const HS = await Tx.hoc_sinh.findUnique({ where: { id: Id } });
+      if (!HS || HS.trang_thai === 'DA_XOA') throw new ConflictException('Hồ sơ học sinh không còn sử dụng');
+      for (const PH of DuLieu.phu_huynh ?? []) {
+        if (!Number.isSafeInteger(PH.id) || PH.id <= 0) throw new BadRequestException('ID phụ huynh không hợp lệ');
+        const LK = await Tx.phu_huynh_hoc_sinh.findUnique({ where: { phu_huynh_id_hoc_sinh_id: { phu_huynh_id: PH.id, hoc_sinh_id: Id } } });
+        if (!LK) throw new ForbiddenException('Phụ huynh chưa liên kết với học sinh này');
+      }
+      if (DuLieu.hoc_sinh) await this.CapNhatHocSinh(Id, DuLieu.hoc_sinh, Tx);
+      if (DuLieu.suc_khoe) await this.CapNhatSucKhoeHocSinh(Id, DuLieu.suc_khoe, Tx);
+      if (DuLieu.trang_thai !== undefined) await this.CapNhatTrangThaiHocSinh(Id, { trang_thai: DuLieu.trang_thai }, Tx);
+      for (const PH of DuLieu.phu_huynh ?? []) {
+        const { id, moi_quan_he, ...ThongTin } = PH;
+        if (Object.keys(ThongTin).length) await this.CapNhatPhuHuynh(id, ThongTin, Tx);
+        if (moi_quan_he !== undefined) await this.CapNhatMoiQuanHe(Id, id, { moi_quan_he }, Tx);
+      }
+      if (GiamHo) {
+        const Trung = await Tx.phu_huynh_hoc_sinh.findFirst({ where: { hoc_sinh_id: Id, phu_huynh: { so_dien_thoai: GiamHo.so_dien_thoai.trim() } } });
+        if (Trung) throw new ConflictException('Số điện thoại đã có trong hồ sơ phụ huynh hoặc người giám hộ');
+        const PH = await Tx.phu_huynh.create({ data: {
+          ho_ten: GiamHo.ho_ten.trim(), so_dien_thoai: GiamHo.so_dien_thoai.trim(),
+          nam_sinh: GiamHo.nam_sinh, nghe_nghiep: GiamHo.nghe_nghiep?.trim() || null,
+        } });
+        await Tx.phu_huynh_hoc_sinh.create({ data: { hoc_sinh_id: Id, phu_huynh_id: PH.id, moi_quan_he: 'NGUOI_GIAM_HO' } });
+      }
+      await Tx.hoc_sinh.update({ where: { id: Id }, data: { ngay_cap_nhat: new Date() } });
+    });
+    return { thong_bao: 'Đã lưu toàn bộ hồ sơ học sinh' };
+  }
+
   async CapNhatHocSinh(
     id: number,
     DuLieu: CapNhatHocSinhDto,
+    Db: Prisma.TransactionClient = this.Prisma,
   ) {
 
     const HocSinh =
-      await this.Prisma.hoc_sinh.findUnique({
+      await Db.hoc_sinh.findUnique({
         where: {
           id,
         },
@@ -1213,7 +1288,7 @@ export class HoSoHocSinhService {
 
 
     const KetQua =
-      await this.Prisma.hoc_sinh.update({
+      await Db.hoc_sinh.update({
         where: {
           id,
         },
@@ -1325,6 +1400,7 @@ export class HoSoHocSinhService {
   async CapNhatTrangThaiHocSinh(
     id: number,
     DuLieu: CapNhatTrangThaiHocSinhDto,
+    Db: Prisma.TransactionClient = this.Prisma,
   ) {
 
     if (
@@ -1337,7 +1413,7 @@ export class HoSoHocSinhService {
 
 
     const HocSinh =
-      await this.Prisma.hoc_sinh.findUnique({
+      await Db.hoc_sinh.findUnique({
         where: {
           id,
         },
@@ -1356,7 +1432,7 @@ export class HoSoHocSinhService {
 
 
     const KetQua =
-      await this.Prisma.hoc_sinh.update({
+      await Db.hoc_sinh.update({
         where: {
           id,
         },
@@ -1385,10 +1461,11 @@ export class HoSoHocSinhService {
   async CapNhatSucKhoeHocSinh(
     id: number,
     DuLieu: CapNhatSucKhoeHocSinhDto,
+    Db: Prisma.TransactionClient = this.Prisma,
   ) {
 
     const HocSinh =
-      await this.Prisma.hoc_sinh.findUnique({
+      await Db.hoc_sinh.findUnique({
         where: {
           id,
         },
@@ -1423,7 +1500,7 @@ export class HoSoHocSinhService {
 
 
     const KetQua =
-      await this.Prisma.hoc_sinh.update({
+      await Db.hoc_sinh.update({
         where: {
           id,
         },
@@ -1703,10 +1780,11 @@ export class HoSoHocSinhService {
   async CapNhatPhuHuynh(
     id: number,
     DuLieu: CapNhatPhuHuynhDto,
+    Db: Prisma.TransactionClient = this.Prisma,
   ) {
 
     const PhuHuynh =
-      await this.Prisma.phu_huynh.findUnique({
+      await Db.phu_huynh.findUnique({
         where: {
           id,
         },
@@ -1780,7 +1858,7 @@ export class HoSoHocSinhService {
       ) {
 
         const TaiKhoanTrung =
-          await this.Prisma
+          await Db
             .tai_khoan
             .findUnique({
               where: {
@@ -1803,9 +1881,7 @@ export class HoSoHocSinhService {
     }
 
 
-    const KetQua =
-      await this.Prisma.$transaction(
-        async (Tx) => {
+    const Ghi = async (Tx: Prisma.TransactionClient) => {
 
           // Đồng bộ SĐT tài khoản
           if (
@@ -1870,8 +1946,8 @@ export class HoSoHocSinhService {
                 : {}),
             },
           });
-        },
-      );
+        };
+    const KetQua = Db === this.Prisma ? await this.Prisma.$transaction(Ghi) : await Ghi(Db);
 
 
     return {
@@ -2368,6 +2444,7 @@ export class HoSoHocSinhService {
     HocSinhId: number,
     PhuHuynhId: number,
     DuLieu: CapNhatMoiQuanHeDto,
+    Db: Prisma.TransactionClient = this.Prisma,
   ) {
 
     this.KiemTraMoiQuanHe(
@@ -2376,7 +2453,7 @@ export class HoSoHocSinhService {
 
 
     const LienKet =
-      await this.Prisma
+      await Db
         .phu_huynh_hoc_sinh
         .findFirst({
           where: {
@@ -2397,7 +2474,7 @@ export class HoSoHocSinhService {
 
 
     const KetQua =
-      await this.Prisma
+      await Db
         .phu_huynh_hoc_sinh
         .update({
           where: {

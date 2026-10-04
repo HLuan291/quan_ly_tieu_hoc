@@ -702,16 +702,6 @@ export default function GiaoVienPage() {
                 : 'Thêm giáo viên'}
             </h2>
 
-            <button
-              type="button"
-              disabled={DangLuu}
-              onClick={
-                DongForm
-              }
-              className="text-sm text-slate-500 hover:text-slate-800"
-            >
-              Đóng
-            </button>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2">
@@ -986,15 +976,6 @@ export default function GiaoVienPage() {
                 : 'Lưu'}
             </button>
 
-            <button
-              type="button"
-              onClick={
-                DongForm
-              }
-              className="rounded-lg border border-slate-300 px-4 py-2"
-            >
-              Hủy
-            </button>
           </div>
         </form></HopThoai>
       )}
@@ -1035,7 +1016,6 @@ export default function GiaoVienPage() {
             <button type="submit" disabled={DangCapMatKhau} className="rounded-lg bg-amber-700 px-4 py-2 font-medium text-white disabled:opacity-50">
               {DangCapMatKhau ? 'Đang cấp mật khẩu...' : 'Cấp mật khẩu mới'}
             </button>
-            <button type="button" disabled={DangCapMatKhau} onClick={DongFormCapMatKhau} className="rounded-lg border border-slate-300 px-4 py-2 disabled:opacity-50">Hủy</button>
           </div>
         </form></HopThoai>
       )}

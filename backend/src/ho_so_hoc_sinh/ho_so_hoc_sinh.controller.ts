@@ -32,6 +32,7 @@ import type {
 
 import {
   CapNhatHocSinhDto,
+  CapNhatHoSoHocSinhDto,
   CapNhatMoiQuanHeDto,
   CapNhatPhuHuynhDto,
   CapNhatSucKhoeHocSinhDto,
@@ -229,6 +230,16 @@ export class HoSoHocSinhController {
   }
 
 
+  @UseGuards(JwtAuthGuard)
+  @Patch('hoc_sinh/:Id/ho_so')
+  CapNhatHoSoHocSinh(
+    @Req() Request: RequestCoNguoiDung,
+    @Param('Id', ParseIntPipe) Id: number,
+    @Body() Body: CapNhatHoSoHocSinhDto,
+  ) {
+    return this.HoSoHocSinhService.CapNhatHoSoHocSinh(this.LayNguoiDung(Request), Id, Body);
+  }
+
   // PATCH /ho_so_hoc_sinh/hoc_sinh/:Id/trang_thai
 
   @UseGuards(JwtAuthGuard)
@@ -249,6 +260,7 @@ export class HoSoHocSinhController {
     Body: CapNhatTrangThaiHocSinhDto,
   ) {
 
+    this.KiemTraAdmin(Request);
     await this.HoSoHocSinhService.KiemTraQuyenSuaHocSinh(this.LayNguoiDung(Request), Id);
 
     return this.HoSoHocSinhService

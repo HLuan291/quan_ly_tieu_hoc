@@ -40,6 +40,12 @@ export default function MainLayout() {
     },
 
     {
+      Ten: 'Hồ sơ của tôi',
+      DuongDan: '/ho_so_cua_toi',
+      VaiTro: ['GIAO_VIEN'],
+    },
+
+    {
       Ten: 'Giáo viên',
       DuongDan: '/giao_vien',
       VaiTro: ['ADMIN'],

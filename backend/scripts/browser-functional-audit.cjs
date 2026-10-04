@@ -214,7 +214,10 @@ async function Main() {
   });
   await Case('Ngày sinh tối đa đúng trước 07:00', async () => {
     Assert.equal(await Page.locator('input[name="ngay_sinh"]').getAttribute('max'), String(Number(Fixture.today.slice(0, 4)) - 18) + Fixture.today.slice(4));
-    await Page.getByRole('button', { name: 'Đóng', exact: true }).click();
+    const Popup = Page.getByRole('dialog', { name: 'Tạo hồ sơ giáo viên', exact: true });
+    Assert.equal(await Popup.getByRole('button', { name: /Đóng|Hủy/ }).count(), 1);
+    Assert.equal(await Popup.locator('button[type="submit"]').count(), 1);
+    await Popup.getByRole('button', { name: /^Đóng hộp thoại/ }).click();
   });
   await Case('Cấp lại mật khẩu qua form', async () => {
     await Page.locator('tbody tr').filter({ hasText: 'Trần Thị Trình Duyệt' }).getByRole('button', { name: /Cấp lại mật khẩu/ }).click();
@@ -308,15 +311,16 @@ async function Main() {
   await Case('ADMIN mở hồ sơ và cập nhật sức khỏe bằng form', async () => {
     const Row = Page.locator('tbody tr').filter({ hasText: FormStudent.ho_ten }); await Row.waitFor();
     await HttpAction('GET', '/ho_so_hoc_sinh/hoc_sinh/' + FormStudent.id, () => Row.getByRole('button', { name: 'Xem / sửa', exact: true }).click());
-    const Form = Page.getByRole('form', { name: 'Sức khỏe học sinh', exact: true });
+    const Form = Page.getByRole('form', { name: 'Hồ sơ học sinh', exact: true });
+    Assert.equal(await Form.locator('button[type="submit"]').count(), 1);
     await Form.locator('input[name="chieu_cao_cm"]').fill('135');
     await Form.locator('input[name="can_nang_kg"]').fill('32');
-    Assert.equal(await Form.locator('input[name="ngay_do"]').inputValue(), Fixture.today);
-    await HttpAction('PATCH', '/ho_so_hoc_sinh/hoc_sinh/' + FormStudent.id + '/suc_khoe',
-      () => Form.getByRole('button', { name: 'Lưu sức khỏe', exact: true }).click());
+    await Form.locator('input[name="ngay_do"]').fill(Fixture.today);
+    await HttpAction('PATCH', '/ho_so_hoc_sinh/hoc_sinh/' + FormStudent.id + '/ho_so',
+      () => Form.getByRole('button', { name: 'Lưu thay đổi', exact: true }).click());
     const Record = await Prisma.hoc_sinh.findUniqueOrThrow({ where: { id: FormStudent.id } });
     Assert.equal(Number(Record.chieu_cao_cm), 135); Assert.equal(Number(Record.can_nang_kg), 32);
-    await Page.getByRole('button', { name: 'Đóng hồ sơ', exact: true }).click();
+    await Page.getByRole('dialog').getByRole('button', { name: /^Đóng hộp thoại/ }).click();
   });
 
   await Case('ADMIN tạo năm học qua form', async () => {
@@ -433,6 +437,28 @@ async function Main() {
     const Record = await Prisma.tai_khoan.findUniqueOrThrow({ where: { ten_dang_nhap: Teacher.tai_khoan.ten_dang_nhap } });
     Assert(!Record.phai_doi_mat_khau && await Argon2.verify(Record.mat_khau_bam, ChangedPassword));
   });
+
+  await Case('GV có trang hồ sơ cá nhân và tự sửa thông tin', async () => {
+    await Page.getByRole('link', { name: 'Hồ sơ của tôi', exact: true }).waitFor();
+    await HttpAction('GET', '/giao_vien/me', () => Page.getByRole('link', { name: 'Hồ sơ của tôi', exact: true }).click());
+    await Page.getByRole('heading', { name: 'Hồ sơ của tôi', exact: true }).waitFor();
+    const Form = Page.getByRole('form', { name: 'Hồ sơ giáo viên của tôi', exact: true });
+    Assert.equal(await Form.locator('button[type="submit"]').count(), 1);
+    Assert.equal(await Form.locator('select[name="trang_thai"]').count(), 0);
+    Assert.equal(await Form.locator('input[name="ho_ten"]').inputValue(), 'Trần Thị Trình Duyệt');
+    await Form.locator('input[name="email"]').fill('self-browser@example.test');
+    await Form.locator('input[name="dia_chi_lien_he"]').fill('Giáo viên tự sửa từ Chromium');
+    await HttpAction('PATCH', '/giao_vien/me', () => Form.getByRole('button', { name: 'Lưu thay đổi', exact: true }).click());
+    await Page.getByRole('status').getByText('Đã lưu thông tin giáo viên.', { exact: true }).waitFor();
+    const Saved = await Prisma.giao_vien.findUniqueOrThrow({ where: { id: Teacher.giao_vien.id } });
+    Assert.equal(Saved.email, 'self-browser@example.test');
+    Assert.equal(Saved.dia_chi_lien_he, 'Giáo viên tự sửa từ Chromium');
+    Assert.equal(Saved.trang_thai, 'HOAT_DONG');
+    await Page.reload(); await Form.locator('input[name="email"]').waitFor();
+    Assert.equal(await Form.locator('input[name="email"]').inputValue(), 'self-browser@example.test');
+    await Shot('teacher-self-profile');
+  });
+
   await Case('Chặn GV vào trang quản trị', async () => {
     Assert.equal(await Page.getByRole('link', { name: 'Giáo viên', exact: true }).count(), 0);
     await Page.goto('http://localhost:5173/giao_vien'); await Page.waitForURL('**/khong_co_quyen');
@@ -460,40 +486,58 @@ async function Main() {
     const Detail = await HttpAction('GET', '/ho_so_hoc_sinh/hoc_sinh/' + Student.id,
       () => Page.locator('tbody tr').filter({ hasText: Student.ho_ten }).getByRole('button', { name: 'Xem / sửa', exact: true }).click());
     Assert.equal(Detail.thong_ke_nghi.so_ngay_co_vang, 1); Assert.equal(Detail.thong_ke_nghi.so_buoi_vang, 2);
-    const Form = Page.getByRole('form', { name: 'Thông tin học sinh', exact: true });
+    const Form = Page.getByRole('form', { name: 'Hồ sơ học sinh', exact: true });
+    Assert.equal(await Form.locator('button[type="submit"]').count(), 1);
+    Assert.equal(await Page.getByRole('dialog').getByRole('button', { name: /Đóng|Hủy/ }).count(), 1);
+    Assert.equal(await Form.locator('select[name="trang_thai"]').count(), 0);
+    Assert(await Form.getByLabel('Trạng thái học sinh', { exact: true }).evaluate(E => E.readOnly));
     for (const [Name, Value] of Object.entries({ noi_sinh: 'Nơi sinh bổ sung', dan_toc: 'Kinh', quoc_tich: 'Việt Nam',
       dia_chi_thuong_tru: 'Thường trú sửa từ Chromium', dia_chi_hien_tai: 'Hiện tại sửa từ Chromium' })) await Form.locator('input[name="' + Name + '"]').fill(Value);
     await Form.locator('textarea[name="ghi_chu"]').fill('Ghi chú bổ sung từ giáo viên');
-    await HttpAction('PATCH', '/ho_so_hoc_sinh/hoc_sinh/' + Student.id, () => Form.getByRole('button', { name: 'Lưu hồ sơ học sinh', exact: true }).click());
+    await HttpAction('PATCH', '/ho_so_hoc_sinh/hoc_sinh/' + Student.id + '/ho_so', () => Form.getByRole('button', { name: 'Lưu thay đổi', exact: true }).click());
     const Record = await Prisma.hoc_sinh.findUniqueOrThrow({ where: { id: Student.id } });
     Assert.equal(Record.dia_chi_hien_tai, 'Hiện tại sửa từ Chromium'); Assert.equal(Record.ghi_chu, 'Ghi chú bổ sung từ giáo viên');
     await Shot('teacher-student-profile');
   });
 
-  await Case('GV sửa phụ huynh và bổ sung người giám hộ qua hồ sơ', async () => {
+  await Case('GV lưu chung phụ huynh và người giám hộ bằng một nút', async () => {
     const Parent = await Prisma.phu_huynh.findFirstOrThrow({ where: { so_dien_thoai: Fixture.parent } });
-    const Form = Page.getByRole('form', { name: 'Thông tin phụ huynh ' + Parent.id, exact: true });
-    await Form.locator('input[name="nghe_nghiep"]').fill('Nghề bổ sung từ Chromium');
-    await HttpAction('PATCH', '/ho_so_hoc_sinh/phu_huynh/' + Parent.id, () => Form.getByRole('button', { name: 'Lưu phụ huynh', exact: true }).click());
-    Assert.equal((await Prisma.phu_huynh.findUniqueOrThrow({ where: { id: Parent.id } })).nghe_nghiep, 'Nghề bổ sung từ Chromium');
-    await Page.getByRole('button', { name: 'Bổ sung phụ huynh', exact: true }).click();
-    const Popup = Page.getByRole('dialog', { name: 'Bổ sung phụ huynh', exact: true }); await Popup.waitFor();
-    Assert(await Popup.evaluate(E => E.open && E.matches(':modal')));
-    Assert.equal(await Page.locator('dialog[open]').count(), 2);
-    await Page.keyboard.press('Escape'); await Popup.waitFor({ state: 'hidden' });
+    const Form = Page.getByRole('form', { name: 'Hồ sơ học sinh', exact: true });
+    const PH = Form.getByRole('group', { name: 'Phụ huynh ' + Parent.id, exact: true });
+    Assert.equal(await Page.getByRole('button', { name: 'Bổ sung phụ huynh', exact: true }).count(), 0);
     Assert.equal(await Page.locator('dialog[open]').count(), 1);
-    Assert(await Page.evaluate(() => document.body.style.overflow === 'hidden'));
-    await Page.getByRole('button', { name: 'Bổ sung phụ huynh', exact: true }).click();
-    const New = Page.getByRole('form', { name: 'Bổ sung phụ huynh', exact: true });
-    await New.locator('input[name="ho_ten"]').fill('Trần Thị Giám Hộ');
-    await New.locator('input[name="so_dien_thoai"]').fill('0950000003');
-    await New.locator('input[name="nam_sinh"]').fill('1985');
-    await New.locator('select[name="moi_quan_he"]').selectOption('NGUOI_GIAM_HO');
-    Assert.equal(await New.locator('input[name="tao_tai_khoan"]').count(), 0);
-    await HttpAction('POST', '/ho_so_hoc_sinh/hoc_sinh/' + Student.id + '/phu_huynh', () => New.getByRole('button', { name: 'Lưu phụ huynh mới', exact: true }).click(), 201);
+    await PH.getByLabel('Nghề nghiệp', { exact: true }).fill('Nghề bổ sung từ Chromium');
+    await Form.locator('input[name="giam_ho_ho_ten"]').fill('Trần Thị Giám Hộ');
+    await Form.locator('input[name="giam_ho_so_dien_thoai"]').fill('0950000003');
+    await Form.locator('input[name="giam_ho_nam_sinh"]').fill('1985');
+    const Before = Requests.filter(R => R.method === 'PATCH').length;
+    await HttpAction('PATCH', '/ho_so_hoc_sinh/hoc_sinh/' + Student.id + '/ho_so', () => Form.getByRole('button', { name: 'Lưu thay đổi', exact: true }).click());
+    await Page.getByRole('status').getByText('Đã lưu toàn bộ hồ sơ học sinh, phụ huynh và người giám hộ.', { exact: true }).waitFor();
+    Assert.equal(Requests.filter(R => R.method === 'PATCH').length - Before, 1);
+    Assert.equal((await Prisma.phu_huynh.findUniqueOrThrow({ where: { id: Parent.id } })).nghe_nghiep, 'Nghề bổ sung từ Chromium');
     const Record = await Prisma.phu_huynh.findFirstOrThrow({ where: { so_dien_thoai: '0950000003' } });
-    Assert.equal(Record.tai_khoan_id, null); Assert(await Prisma.phu_huynh_hoc_sinh.findFirst({ where: { hoc_sinh_id: Student.id, phu_huynh_id: Record.id, moi_quan_he: 'NGUOI_GIAM_HO' } }));
-    await Page.getByRole('button', { name: 'Đóng hồ sơ', exact: true }).click();
+    Assert.equal(Record.tai_khoan_id, null);
+    Assert(await Prisma.phu_huynh_hoc_sinh.findFirst({ where: { hoc_sinh_id: Student.id, phu_huynh_id: Record.id, moi_quan_he: 'NGUOI_GIAM_HO' } }));
+    Assert.equal(await Form.locator('input[name="giam_ho_ho_ten"]').inputValue(), '');
+    Assert.equal(await Form.locator('input[name="giam_ho_so_dien_thoai"]').inputValue(), '');
+  });
+  await Case('Lưu lỗi giữ bản nhập và không ghi một phần vào MySQL', async () => {
+    const Parent = await Prisma.phu_huynh.findFirstOrThrow({ where: { so_dien_thoai: Fixture.parent } });
+    const Before = await Prisma.hoc_sinh.findUniqueOrThrow({ where: { id: Student.id } });
+    const Form = Page.getByRole('form', { name: 'Hồ sơ học sinh', exact: true });
+    const PH = Form.getByRole('group', { name: 'Phụ huynh ' + Parent.id, exact: true });
+    await Form.locator('textarea[name="ghi_chu"]').fill('Bản nhập vẫn được giữ khi lưu lỗi');
+    await PH.getByLabel('SĐT phụ huynh', { exact: true }).fill('0950000001');
+    await HttpAction('PATCH', '/ho_so_hoc_sinh/hoc_sinh/' + Student.id + '/ho_so', () => Form.getByRole('button', { name: 'Lưu thay đổi', exact: true }).click(), 409);
+    await Page.getByRole('alert').waitFor();
+    Assert.equal((await Prisma.hoc_sinh.findUniqueOrThrow({ where: { id: Student.id } })).ghi_chu, Before.ghi_chu);
+    Assert.equal(await Form.locator('textarea[name="ghi_chu"]').inputValue(), 'Bản nhập vẫn được giữ khi lưu lỗi');
+    await PH.getByLabel('SĐT phụ huynh', { exact: true }).fill(Fixture.parent);
+    await HttpAction('PATCH', '/ho_so_hoc_sinh/hoc_sinh/' + Student.id + '/ho_so', () => Form.getByRole('button', { name: 'Lưu thay đổi', exact: true }).click());
+    await Page.getByRole('status').getByText('Đã lưu toàn bộ hồ sơ học sinh, phụ huynh và người giám hộ.', { exact: true }).waitFor();
+    Assert.equal((await Prisma.hoc_sinh.findUniqueOrThrow({ where: { id: Student.id } })).ghi_chu, 'Bản nhập vẫn được giữ khi lưu lỗi');
+    await Shot('student-unified-save');
+    await Page.getByRole('dialog').getByRole('button', { name: /^Đóng hộp thoại/ }).click();
   });
 
   await Case('Ngày điểm danh đúng và danh sách tự tải', async () => {

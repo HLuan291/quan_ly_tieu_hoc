@@ -84,3 +84,23 @@ export class CapNhatPhuHuynhDto {
 export class CapNhatMoiQuanHeDto {
   moi_quan_he!: string;
 }
+export class PhuHuynhTrongHoSoDto extends CapNhatPhuHuynhDto {
+  id!: number;
+  moi_quan_he?: string;
+}
+
+export class NguoiGiamHoMoiDto {
+  ho_ten!: string;
+  nam_sinh?: number | null;
+  so_dien_thoai!: string;
+  nghe_nghiep?: string | null;
+}
+
+// Một lần lưu cho các phần của hồ sơ; không cấp tài khoản hoặc đổi liên kết theo ID.
+export class CapNhatHoSoHocSinhDto {
+  hoc_sinh?: CapNhatHocSinhDto;
+  suc_khoe?: CapNhatSucKhoeHocSinhDto;
+  trang_thai?: string;
+  phu_huynh?: PhuHuynhTrongHoSoDto[];
+  nguoi_giam_ho?: NguoiGiamHoMoiDto;
+}

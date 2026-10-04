@@ -68,7 +68,7 @@ export class KiemTraBodyPipe implements PipeTransform {
       if (Ten === 'phu_huynh' || Ten === 'danh_sach') {
         if (!Array.isArray(GiaTriTruong)) Loi();
         for (const [ViTri, Dong] of (GiaTriTruong as unknown[]).entries()) this.KiemTraDoiTuong(Dong, `${DuongDan}.${Ten}[${ViTri}]`);
-      } else if (Ten === 'hoc_sinh') {
+      } else if (['hoc_sinh', 'suc_khoe', 'nguoi_giam_ho'].includes(Ten)) {
         this.KiemTraDoiTuong(GiaTriTruong, `${DuongDan}.${Ten}`);
       } else if (Ten.endsWith('_id') || Ten === 'id') {
         if (typeof GiaTriTruong !== 'number' || !Number.isSafeInteger(GiaTriTruong) || GiaTriTruong <= 0) Loi();

@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -543,6 +544,30 @@ export class GiaoVienService {
       danh_sach:
         DanhSach,
     };
+  }
+
+
+  async LayHoSoCuaToi(TaiKhoanId: number) {
+    const GV = await this.Prisma.giao_vien.findUnique({
+      where: { tai_khoan_id: TaiKhoanId },
+      include: { tai_khoan: { select: { ten_dang_nhap: true } } },
+    });
+    if (!GV || GV.trang_thai === 'DA_XOA') throw new NotFoundException('Không tìm thấy hồ sơ giáo viên của bạn');
+    return GV;
+  }
+
+  async CapNhatHoSoCuaToi(TaiKhoanId: number, DuLieu: DuLieuCapNhatGiaoVien) {
+    const Truong = ['ho_ten', 'ngay_sinh', 'gioi_tinh', 'so_dien_thoai', 'email', 'dia_chi_lien_he', 'ngay_vao_truong', 'trinh_do_chuyen_mon'];
+    if (Object.keys(DuLieu).some(Key => !Truong.includes(Key))) {
+      throw new ForbiddenException('Chỉ được sửa thông tin cá nhân trong hồ sơ của chính mình');
+    }
+    const GioiHan: Record<string, number> = { ho_ten: 100, email: 100, dia_chi_lien_he: 255, trinh_do_chuyen_mon: 100 };
+    for (const [Key, Value] of Object.entries(DuLieu)) {
+      if (typeof Value === 'string' && GioiHan[Key] && Array.from(Value).length > GioiHan[Key]) throw new BadRequestException('Thông tin ' + Key + ' quá dài');
+    }
+    const GV = await this.LayHoSoCuaToi(TaiKhoanId);
+    await this.CapNhatGiaoVien(GV.id, DuLieu);
+    return { thong_bao: 'Đã lưu hồ sơ của bạn', giao_vien: await this.LayHoSoCuaToi(TaiKhoanId) };
   }
 
   async CapNhatGiaoVien(
