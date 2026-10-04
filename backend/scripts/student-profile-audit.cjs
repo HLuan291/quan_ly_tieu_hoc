@@ -212,12 +212,20 @@ async function Main() {
   const All = await Call('Danh sách sau khi xóa HS', 'GET', '/ho_so_hoc_sinh/hoc_sinh', 'ADMIN');
   Check('HS đã xóa không còn trong danh sách mặc định', !All.danh_sach.some(S => S.id === ForeignId));
   await Call('Không cập nhật hồ sơ đã xóa', 'PATCH', '/ho_so_hoc_sinh/hoc_sinh/' + ForeignId, 'ADMIN', { ghi_chu: 'Không được phép' }, 409);
+  await Call('Phân công GVCN trước khi xóa GV', 'POST', '/phan_cong_giang_day/phan_cong/gvcn', 'ADMIN', {
+    giao_vien_id: NoAssignment.giao_vien.id, lop_hoc_id: ForeignClass.lop_hoc.id, ngay_bat_dau: F.today,
+  }, 201);
   const DeletedTeacherToken = Tokens.GV_KHONG_PHAN_CONG;
   await Call('ADMIN xóa GV, khóa tài khoản', 'DELETE', '/giao_vien/' + NoAssignment.giao_vien.id, 'ADMIN');
   Check('Hồ sơ GV vẫn được giữ', (await Prisma.giao_vien.findUniqueOrThrow({ where: { id: NoAssignment.giao_vien.id } })).trang_thai === 'DA_XOA');
   Tokens.GV_KHONG_PHAN_CONG = DeletedTeacherToken;
   await Call('Phiên GV đã xóa bị khóa', 'GET', '/ho_so_hoc_sinh/hoc_sinh', 'GV_KHONG_PHAN_CONG', undefined, 403);
   await Call('Không cấp lại mật khẩu GV đã xóa', 'POST', '/giao_vien/' + NoAssignment.giao_vien.id + '/cap_lai_mat_khau', 'ADMIN', {}, 409);
+  const ArchivedAssignments = await Prisma.phan_cong_giao_vien.findMany({ where: { giao_vien_id: NoAssignment.giao_vien.id, lop_hoc_id: ForeignClass.lop_hoc.id } });
+  Check('Phân công hiện tại được kết thúc và lịch sử giữ lại', ArchivedAssignments.length >= 2 && ArchivedAssignments.every(PC => PC.ngay_ket_thuc?.toISOString().slice(0, 10) === F.today));
+  await Call('Thay GVCN cùng ngày sau khi xóa GV cũ', 'POST', '/phan_cong_giang_day/phan_cong/gvcn', 'ADMIN', {
+    giao_vien_id: F.teacher_id, lop_hoc_id: ForeignClass.lop_hoc.id, ngay_bat_dau: F.today,
+  }, 201);
   const Teachers = await Call('Danh sách GV sau xóa', 'GET', '/giao_vien', 'ADMIN');
   Check('GV đã xóa không còn trong danh sách mặc định', !Teachers.danh_sach.some(T => T.id === NoAssignment.giao_vien.id));
   const Core = JSON.parse(Fs.readFileSync(Path.resolve('../docs/ci-core-results.json'), 'utf8'));

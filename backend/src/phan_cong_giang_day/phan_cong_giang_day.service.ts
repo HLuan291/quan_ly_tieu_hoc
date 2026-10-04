@@ -590,6 +590,7 @@ export class PhanCongGiangDayService {
         const GvcnTrung =
           await Tx.phan_cong_giao_vien.findFirst({
             where: {
+              giao_vien: { trang_thai: { not: 'DA_XOA' } },
               lop_hoc_id:
                 DuLieu.lop_hoc_id,
 
@@ -641,6 +642,7 @@ export class PhanCongGiangDayService {
           const Trung =
             await Tx.phan_cong_giao_vien.findFirst({
               where: {
+              giao_vien: { trang_thai: { not: 'DA_XOA' } },
                 lop_hoc_id:
                   DuLieu.lop_hoc_id,
 
@@ -992,6 +994,7 @@ export class PhanCongGiangDayService {
         .phan_cong_giao_vien
         .findFirst({
           where: {
+              giao_vien: { trang_thai: { not: 'DA_XOA' } },
             lop_hoc_id:
               DuLieu.lop_hoc_id,
 

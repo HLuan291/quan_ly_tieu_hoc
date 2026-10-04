@@ -500,7 +500,7 @@ async function Main() {
   await Case('Lưu điểm danh từ form', async () => {
     await Page.getByRole('combobox', { name: 'Trạng thái điểm danh ' + Student.ho_ten, exact: true }).selectOption('CO_MAT');
     await HttpAction('POST', '/diem_danh_nghi_hoc/diem_danh', () => Page.getByRole('button', { name: 'Lưu điểm danh', exact: true }).click(), 201);
-    Assert.equal((await Prisma.diem_danh.findFirstOrThrow({ where: { xep_lop_id: Enrollment.id } })).trang_thai, 'CO_MAT');
+    Assert.equal((await Prisma.diem_danh.findFirstOrThrow({ where: { xep_lop_id: Enrollment.id, ngay_hoc: new Date(Fixture.today), buoi_hoc: 'SANG' } })).trang_thai, 'CO_MAT');
   });
   await Case('Lưu nhận xét môn trên bảng danh sách học sinh', async () => {
     await Go('/danh_gia', 'Đánh giá học tập');

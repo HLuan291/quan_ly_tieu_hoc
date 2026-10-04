@@ -69,6 +69,7 @@ export default function HoSoHocSinhChiTiet({ Id, LaAdmin, Dong, CapNhat }: { Id:
   const [MatKhauMoi, SetMatKhauMoi] = useState<string | null>(null);
   const Panel = useRef<HTMLDivElement>(null);
   const LanYeuCau = useRef(0);
+  const HuyYeuCau = useCallback(() => { LanYeuCau.current++; }, []);
   const Tai = useCallback(async () => {
     const Lan = ++LanYeuCau.current;
     try {
@@ -83,8 +84,8 @@ export default function HoSoHocSinhChiTiet({ Id, LaAdmin, Dong, CapNhat }: { Id:
       await Tai();
       if (!Huy) { Panel.current?.focus(); Panel.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
     });
-    return () => { Huy = true; LanYeuCau.current++; };
-  }, [Tai]);
+    return () => { Huy = true; HuyYeuCau(); };
+  }, [Tai, HuyYeuCau]);
   async function Luu(Event: FormEvent<HTMLFormElement>, Loai: 'ho_so' | 'suc_khoe' | 'trang_thai') {
     Event.preventDefault(); const F = DuLieu(Event);
     SetDangLuu(true); SetLoi(''); SetTin('');

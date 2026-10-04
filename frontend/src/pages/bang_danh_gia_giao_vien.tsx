@@ -15,7 +15,7 @@ interface HocSinh {
 interface Bang {
   lop_hoc: LopHoc; dot_danh_gia: { id: number; ten_dot: string };
   mon_hoc: Array<{ id: number; ten_mon_hoc: string; duoc_nhap: boolean }>;
-  cau_hinh_diem: Array<{ id: number; ten_hien_thi: string; cach_nhap: string }>;
+  cau_hinh_diem: Array<{ id: number; mon_hoc_id: number; ten_hien_thi: string; cach_nhap: string }>;
   tieu_chi: Array<{ id: number; ten_tieu_chi: string; nhom_danh_gia: string }>;
   duoc_nhap_nang_luc: boolean; danh_sach: HocSinh[];
 }
@@ -80,6 +80,7 @@ export default function BangDanhGiaGiaoVien() {
   const [Trang, SetTrang] = useState(1);
   const [SoDong, SetSoDong] = useState(25);
   const Lan = useRef(0);
+  const HuyYeuCau = useCallback(() => { Lan.current++; }, []);
   useEffect(() => {
     let Huy = false;
     void Api.get<{ lop_hoc: LopHoc[] }>('/ho_so_hoc_sinh/danh_muc').then(R => {
@@ -101,20 +102,20 @@ export default function BangDanhGiaGiaoVien() {
     SetDangTai(true);
     try {
       const R = await Api.get<Bang>('/danh_gia_hoc_tap/bang_danh_gia', {
-        params: { lop_hoc_id: LopId, dot_danh_gia_id: DotId, mon_hoc_id: MonId || undefined },
+        params: { lop_hoc_id: LopId, dot_danh_gia_id: DotId },
       });
       if (Ma !== Lan.current) return;
       SetData(R.data);
-      if (!MonId && R.data.mon_hoc.length) SetMonId(String(R.data.mon_hoc.find(M => M.duoc_nhap)?.id ?? R.data.mon_hoc[0].id));
-      if (!TieuChiId && R.data.tieu_chi.length) SetTieuChiId(String(R.data.tieu_chi[0].id));
+      SetMonId(Cu => R.data.mon_hoc.some(M => String(M.id) === Cu) ? Cu : String(R.data.mon_hoc.find(M => M.duoc_nhap)?.id ?? R.data.mon_hoc[0]?.id ?? ''));
+      SetTieuChiId(Cu => R.data.tieu_chi.some(T => String(T.id) === Cu) ? Cu : String(R.data.tieu_chi[0]?.id ?? ''));
     } catch (E) { if (Ma === Lan.current) SetLoi(LayThongBaoLoi(E)); }
     finally { if (Ma === Lan.current) SetDangTai(false); }
-  }, [LopId, DotId, MonId, TieuChiId]);
+  }, [LopId, DotId]);
   useEffect(() => {
     let Huy = false;
     void Promise.resolve().then(() => { if (!Huy) return Tai(); });
-    return () => { Huy = true; Lan.current++; };
-  }, [Tai]);
+    return () => { Huy = true; HuyYeuCau(); };
+  }, [Tai, HuyYeuCau]);
   function Chuyen(Work: () => void) {
     if (Object.keys(Nhap).length && !window.confirm('Các nhận xét chưa lưu sẽ bị bỏ khi đổi bộ lọc. Tiếp tục?')) return;
     SetNhap({}); SetLoiDong({}); SetTinDong({}); Work();
@@ -152,7 +153,7 @@ export default function BangDanhGiaGiaoVien() {
   const NamHoc = [...new Map(Lop.map(L => [L.nam_hoc.id, L.nam_hoc])).values()];
   const KhoiHoc = [...new Map(Lop.filter(L => String(L.nam_hoc_id) === Nam).map(L => [L.khoi.id, L.khoi])).values()];
   const LopLoc = Lop.filter(L => String(L.nam_hoc_id) === Nam && (!Khoi || String(L.khoi_id) === Khoi));
-  const DuocNhap = !!Data && (Tab === 'MON' ? Data.mon_hoc.find(M => M.id === Number(MonId))?.duoc_nhap : Data.duoc_nhap_nang_luc);
+  const DuocNhap = !!Data && (Tab === 'MON' ? Data.mon_hoc.find(M => M.id === Number(MonId))?.duoc_nhap : Data.duoc_nhap_nang_luc && Data.tieu_chi.some(T => T.id === Number(TieuChiId)));
   const SoTrang = Math.max(1, Math.ceil((Data?.danh_sach.length ?? 0) / SoDong));
   return <div className="min-w-0">
     <h1 className="text-2xl font-bold text-slate-800">Đánh giá học tập</h1>
@@ -175,7 +176,7 @@ export default function BangDanhGiaGiaoVien() {
         {Tab === 'MON' && <p className="mb-3 text-xs text-slate-500">Mỗi cột điểm có nút lưu riêng. Điểm đã có sẽ ghi thêm lần kiểm tra lại; điểm tự tính chỉ hiển thị.</p>}
         <div className="max-h-[650px] overflow-auto rounded border">
           <table aria-label="Bảng đánh giá học sinh" className="min-w-[950px] w-full border-collapse text-sm">
-            <thead className="sticky top-0 z-10 bg-sky-700 text-left text-white"><tr>{['STT', 'Học sinh', 'Ngày sinh', 'Mức đạt được', 'Nhận xét', 'Lưu nhận xét'].map(T => <th key={T} className="border-r border-sky-600 p-3">{T}</th>)}{Tab === 'MON' && Data.cau_hinh_diem.map(C => <th key={C.id} className="border-r border-sky-600 p-3">{C.ten_hien_thi}</th>)}</tr></thead>
+            <thead className="sticky top-0 z-10 bg-sky-700 text-left text-white"><tr>{['STT', 'Học sinh', 'Ngày sinh', 'Mức đạt được', 'Nhận xét', 'Lưu nhận xét'].map(T => <th key={T} className="border-r border-sky-600 p-3">{T}</th>)}{Tab === 'MON' && Data.cau_hinh_diem.filter(C => C.mon_hoc_id === Number(MonId)).map(C => <th key={C.id} className="border-r border-sky-600 p-3">{C.ten_hien_thi}</th>)}</tr></thead>
             <tbody>{Data.danh_sach.slice((Trang - 1) * SoDong, Trang * SoDong).map((HS, I) => {
               const GiaTri = Nhap[HS.id] ?? DaLuu(HS);
               return <tr key={HS.id} data-testid={'danh-gia-hs-' + HS.id} className="border-b odd:bg-white even:bg-slate-50">
@@ -183,7 +184,7 @@ export default function BangDanhGiaGiaoVien() {
                 <td className="min-w-48 p-3 align-top"><select aria-label={'Mức đánh giá của ' + HS.ho_ten} disabled={!DuocNhap || DangLuu} value={GiaTri.muc} onChange={E => Sua(HS, 'muc', E.target.value)} className={O}><option value="">Chưa đánh giá</option>{(Tab === 'MON' ? MucMon : MucNang).map(([Key, Ten]) => <option key={Key} value={Key}>{Ten}</option>)}</select></td>
                 <td className="min-w-72 p-3 align-top"><textarea aria-label={'Nhận xét của ' + HS.ho_ten} disabled={!DuocNhap || DangLuu} rows={3} value={GiaTri.nhan} onChange={E => Sua(HS, 'nhan', E.target.value)} className={O} /></td>
                 <td className="min-w-32 p-3 align-top"><button disabled={!DuocNhap || DangLuu || !Nhap[HS.id]} onClick={() => { void Luu([HS]); }} className={Nut}>Lưu nhận xét</button>{LoiDong[HS.id] && <p role="alert" className="mt-2 text-red-700">{LoiDong[HS.id]}</p>}{TinDong[HS.id] && <p role="status" className="mt-2 text-green-700">{TinDong[HS.id]}</p>}</td>
-                {Tab === 'MON' && Data.cau_hinh_diem.map(CH => <td key={CH.id} className="p-3 align-top"><DiemForm key={HS.id + '/' + CH.id + '/' + DotId} HS={HS} CH={CH} DaCo={HS.diem_dinh_ky.find(D => D.cau_hinh_diem_id === CH.id)} DuocNhap={!!DuocNhap} /></td>)}
+                {Tab === 'MON' && Data.cau_hinh_diem.filter(C => C.mon_hoc_id === Number(MonId)).map(CH => <td key={CH.id} className="p-3 align-top"><DiemForm key={HS.id + '/' + CH.id + '/' + DotId} HS={HS} CH={CH} DaCo={HS.diem_dinh_ky.find(D => D.cau_hinh_diem_id === CH.id)} DuocNhap={!!DuocNhap} /></td>)}
               </tr>;
             })}</tbody>
           </table>{!Data.danh_sach.length && <p className="p-4">Lớp chưa có học sinh đang học.</p>}

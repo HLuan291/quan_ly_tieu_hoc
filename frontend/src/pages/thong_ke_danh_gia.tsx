@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Api from '../api/api';
 import { LayThongBaoLoi } from '../utils/loi_api';
 import type { LopHoc } from './hoc_sinh_types';
@@ -19,6 +19,7 @@ export default function ThongKeDanhGia() {
   const [Loi, SetLoi] = useState('');
   const [DangTai, SetDangTai] = useState(false);
   const Lan = useRef(0);
+  const HuyYeuCau = useCallback(() => { Lan.current++; }, []);
   useEffect(() => {
     let Huy = false;
     void Api.get<{ lop_hoc: LopHoc[] }>('/ho_so_hoc_sinh/danh_muc').then(R => {
@@ -48,8 +49,8 @@ export default function ThongKeDanhGia() {
       } catch (E) { if (Ma === Lan.current) SetLoi(LayThongBaoLoi(E)); }
       finally { if (Ma === Lan.current) SetDangTai(false); }
     });
-    return () => { Lan.current++; };
-  }, [DotId, Khoi, LopId]);
+    return () => { HuyYeuCau(); };
+  }, [DotId, Khoi, LopId, HuyYeuCau]);
   const NamHoc = [...new Map(Lop.map(L => [L.nam_hoc.id, L.nam_hoc])).values()];
   const KhoiHoc = [...new Map(Lop.filter(L => String(L.nam_hoc_id) === Nam).map(L => [L.khoi.id, L.khoi])).values()];
   const LopLoc = Lop.filter(L => String(L.nam_hoc_id) === Nam && (!Khoi || String(L.khoi_id) === Khoi));

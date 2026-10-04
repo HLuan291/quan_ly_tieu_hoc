@@ -20,6 +20,7 @@ export default function DanhSachHocSinh({ LanTai, LaAdmin }: { LanTai: number; L
   const [DangTai, SetDangTai] = useState(false);
   const [DangXoa, SetDangXoa] = useState(false);
   const LanYeuCau = useRef(0);
+  const HuyYeuCau = useCallback(() => { LanYeuCau.current++; }, []);
   useEffect(() => {
     let Huy = false;
     void Api.get<{ lop_hoc: LopHoc[] }>('/ho_so_hoc_sinh/danh_muc').then(R => {
@@ -42,8 +43,8 @@ export default function DanhSachHocSinh({ LanTai, LaAdmin }: { LanTai: number; L
   }, [TuKhoa, TrangThai, Nam, Khoi, LopId]);
   useEffect(() => {
     const Timer = setTimeout(() => { void TaiDanhSach(); }, 150);
-    return () => { clearTimeout(Timer); LanYeuCau.current++; };
-  }, [TaiDanhSach, LanTai]);
+    return () => { clearTimeout(Timer); HuyYeuCau(); };
+  }, [TaiDanhSach, LanTai, HuyYeuCau]);
   async function Xoa(HS: HocSinhTomTat) {
     if (!window.confirm('Xóa ' + HS.ho_ten + ' khỏi danh sách sử dụng? Lịch sử học tập và điểm danh được lưu giữ.')) return;
     SetDangXoa(true);

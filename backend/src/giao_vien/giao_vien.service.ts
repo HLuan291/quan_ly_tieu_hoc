@@ -893,8 +893,14 @@ export class GiaoVienService {
   async XoaGiaoVien(Id: number) {
     const GiaoVien = await this.Prisma.giao_vien.findUnique({ where: { id: Id } });
     if (!GiaoVien) throw new NotFoundException('Không tìm thấy giáo viên');
+    const HomNay = LayNgayNghiepVu();
     await this.Prisma.$transaction([
       this.Prisma.giao_vien.update({ where: { id: Id }, data: { trang_thai: 'DA_XOA' } }),
+      this.Prisma.phan_cong_giao_vien.updateMany({
+        where: { giao_vien_id: Id, ngay_bat_dau: { lte: HomNay },
+          OR: [{ ngay_ket_thuc: null }, { ngay_ket_thuc: { gt: HomNay } }] },
+        data: { ngay_ket_thuc: HomNay },
+      }),
       this.Prisma.tai_khoan.update({ where: { id: GiaoVien.tai_khoan_id }, data: { trang_thai: 'DA_KHOA' } }),
     ]);
     return { thong_bao: 'Đã xóa giáo viên khỏi danh sách sử dụng và khóa tài khoản; lịch sử được giữ lại' };
