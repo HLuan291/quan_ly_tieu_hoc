@@ -14,6 +14,7 @@ const Prisma = new PrismaService();
 const Results = [], Requests = [], PageErrors = [], Screens = [], Viewports = [], Children = [];
 const Root = Path.resolve('..'), Output = Path.join(Root, 'docs/ci-browser');
 Fs.mkdirSync(Output, { recursive: true });
+const RequestContexts = new WeakMap();
 const InitialPassword = 'Browser@Initial123', ResetPassword = 'Browser@Reset123', ChangedPassword = 'Browser@Changed123';
 let Browser, Page, Context, Teacher, BrowserClass, Student, Enrollment, Leave, FormStudent, FormClass, ScoreConfig, Criterion, FormSubject, SubjectAssignment;
 let EvaluationDot = Fixture.dot_id;
@@ -161,9 +162,21 @@ async function Main() {
       void Dialog.accept(PromptValues.shift() ?? Dialog.defaultValue());
     } else void Dialog.accept();
   });
+  Page.on('request', Request => {
+    if (new URL(Request.url()).port !== '3000') return;
+    let TokenRole = 'KHACH';
+    try {
+      const Token = Request.headers().authorization?.replace(/^Bearer /, '');
+      const Payload = JSON.parse(Buffer.from(Token.split('.')[1], 'base64url').toString('utf8'));
+      if (['ADMIN', 'GIAO_VIEN', 'PHU_HUYNH'].includes(Payload.vai_tro)) TokenRole = Payload.vai_tro;
+    } catch {}
+    RequestContexts.set(Request, { vai_tro: TokenRole, phase: Phase });
+  });
   Page.on('response', Response => {
     if (new URL(Response.url()).port !== '3000') return;
-    Requests.push({ method: Response.request().method(), endpoint: new URL(Response.url()).pathname, status: Response.status(), vai_tro: CurrentRole, phase: Phase });
+    const Request = Response.request();
+    Requests.push({ method: Request.method(), endpoint: new URL(Response.url()).pathname, status: Response.status(),
+      ...(RequestContexts.get(Request) || { vai_tro: 'KHACH', phase: Phase }) });
   });
   await Case('Khách bị chuyển tới đăng nhập', async () => {
     await Page.goto('http://localhost:5173/giao_vien'); await Page.waitForURL('**/dang_nhap');

@@ -211,7 +211,7 @@ export default function DonXinNghiPage() {
       }
 
       void KhoiTao();
-      return () => { DaHuy = true; LanTaiDon.current++; };
+      return () => { DaHuy = true; LanTaiDon.current += 1; };
     },
     [
       LaGiaoVien,
