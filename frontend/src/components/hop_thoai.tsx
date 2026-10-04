@@ -18,12 +18,12 @@ export default function HopThoai({ TieuDe, Dong, DangLuu = false, Rong = false, 
       if (FocusCu instanceof HTMLElement && FocusCu.isConnected) FocusCu.focus();
     };
   }, []);
-  return <dialog ref={Ref} aria-labelledby={Id} onCancel={E => { E.preventDefault(); if (!DangLuu) Dong(); }}
+  return <dialog ref={Ref} aria-labelledby={Id} onCancel={E => { E.preventDefault(); E.stopPropagation(); if (!DangLuu) Dong(); }}
     className={'m-auto max-h-[92dvh] w-[calc(100%_-_1rem)] overflow-hidden rounded-lg border-0 p-0 shadow-2xl ' + (Rong ? 'max-w-6xl' : 'max-w-3xl')}>
     <div className="flex items-center justify-between gap-3 bg-sky-700 px-4 py-3 text-white">
       <h2 id={Id} className="text-lg font-semibold">{TieuDe}</h2>
       <button type="button" disabled={DangLuu} aria-label={'Đóng hộp thoại ' + TieuDe} onClick={Dong} className="shrink-0 rounded border border-white/60 px-3 py-1 hover:bg-white/10 disabled:opacity-50">Đóng ×</button>
     </div>
-    <div className="max-h-[calc(92dvh-4rem)] overflow-y-auto overscroll-contain p-4">{children}</div>
+    <div className="max-h-[calc(92dvh_-_4rem)] overflow-y-auto overscroll-contain p-4">{children}</div>
   </dialog>;
 }

@@ -138,7 +138,7 @@ describe('Nghiệp vụ lúc 00:30 tại Việt Nam', () => {
   it('đánh giá học sinh nhận phân công bắt đầu hôm nay', async () => {
     const Prisma = {
       giao_vien: { findUnique: jest.fn().mockResolvedValue({ id: 1, trang_thai: 'HOAT_DONG' }) },
-      phan_cong_giao_vien: { findFirst: jest.fn().mockResolvedValue({ id: 1, trang_thai: 'HOAT_DONG' }) },
+      phan_cong_giao_vien: { findFirst: jest.fn().mockResolvedValue({ id: 1 }), findMany: jest.fn().mockResolvedValue([PC]) },
       lop_hoc: { findUnique: jest.fn().mockResolvedValue({ id: 2 }) },
       xep_lop: { findMany: jest.fn().mockResolvedValue([]) },
     };

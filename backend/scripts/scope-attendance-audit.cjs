@@ -79,6 +79,27 @@ async function Main() {
   Check('Phạm vi ưu tiên lớp chủ nhiệm', Mixed.che_do === 'GVCN' && Mixed.lop_hoc.length === 1 && Mixed.lop_hoc[0].id === F.class_id);
   await Call('GVCN không mở bảng lớp khác bằng query', 'GET', '/danh_gia_hoc_tap/bang_danh_gia?lop_hoc_id=' + Class4.lop_hoc.id + '&dot_danh_gia_id=' + F.dot_id, 'GIAO_VIEN', undefined, 403);
   await Call('GVCN không gọi danh sách đánh giá cũ cho lớp khác', 'GET', '/danh_gia_hoc_tap/lop/' + Class4.lop_hoc.id + '/hoc_sinh', 'GIAO_VIEN', undefined, 403);
+  const ConcurrentTeacher = await Call('Tạo GVCN để thử hai phân công đồng thời', 'POST', '/giao_vien', 'ADMIN', {
+    ho_ten: 'Trần Thị Đồng Thời', ngay_sinh: '1990-01-01', gioi_tinh: 'NU', so_dien_thoai: '0930000003', email: 'concurrent@example.test',
+    dia_chi_lien_he: 'Địa chỉ giả', ngay_vao_truong: '2015-09-01', trinh_do_chuyen_mon: 'Đại học',
+  }, 201);
+  const ConcurrentClass = await Call('Tạo lớp thứ hai cho ca đồng thời', 'POST', '/to_chuc_lop_hoc/lop_hoc', 'ADMIN', {
+    nam_hoc_id: F.year_id, khoi_id: Grade4.id, ten_lop: '4 Concurrent',
+  }, 201);
+  const ConcurrentResults = await Promise.all([Class4.lop_hoc.id, ConcurrentClass.lop_hoc.id].map(async C => {
+    const Response = await fetch(Api + '/phan_cong_giang_day/phan_cong/gvcn', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + Tokens.ADMIN },
+      body: JSON.stringify({ giao_vien_id: ConcurrentTeacher.giao_vien.id, lop_hoc_id: C, ngay_bat_dau: F.today }),
+    });
+    await Response.json();
+    Results.push({ ten: 'GVCN đồng thời lớp ' + C, method: 'POST', endpoint: '/phan_cong_giang_day/phan_cong/gvcn', vai_tro: 'ADMIN',
+      mong_doi: '201 hoặc 409; đúng một yêu cầu được tạo', thuc_te: Response.status, dat: [201, 409].includes(Response.status) });
+    return Response.status;
+  }));
+  Check('Hai yêu cầu chỉ tạo một phân công GVCN', ConcurrentResults.filter(S => S === 201).length === 1 && ConcurrentResults.filter(S => S === 409).length === 1);
+  Check('MySQL chỉ lưu một lớp chủ nhiệm sau ca đồng thời', await Prisma.phan_cong_giao_vien.count({
+    where: { giao_vien_id: ConcurrentTeacher.giao_vien.id, loai_phan_cong: 'GVCN', mon_hoc_id: null },
+  }) === 1);
   const BM = await Call('Tạo tài khoản GVBM', 'POST', '/giao_vien', 'ADMIN', {
     ho_ten: 'Trần Thị Bộ Môn', ngay_sinh: '1990-01-01', gioi_tinh: 'NU', so_dien_thoai: '0930000001', email: 'subject@example.test',
     dia_chi_lien_he: 'Địa chỉ giả', ngay_vao_truong: '2015-09-01', trinh_do_chuyen_mon: 'Đại học',
