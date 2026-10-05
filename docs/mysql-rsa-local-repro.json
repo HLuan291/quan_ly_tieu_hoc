@@ -1,0 +1,15 @@
+{
+  "thoi_diem": "2026-10-05T06:46:06.494Z",
+  "du_lieu": "MySQL kiểm thử riêng, không kết nối DB Windows",
+  "before": {
+    "failed": true,
+    "code": 45044,
+    "cause": "RSA public key is not available client side"
+  },
+  "after": {
+    "passed": true,
+    "mysql": "8.0.46-0ubuntu0.24.04.3",
+    "non_tls": true,
+    "option": true
+  }
+}

@@ -1,13 +1,13 @@
 {
-  "source_commit": "d7816ab99e88d31c67165d9b462a232190b41e22",
-  "workflow_run": 37222525284,
-  "workflow_url": "https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37222525284",
+  "source_commit": "be5b4be07b7dc3222f38f0c9ed88d64a56724898",
+  "workflow_run": 37273527616,
+  "workflow_url": "https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37273527616",
   "conclusion": "success",
   "data": "Dữ liệu giả trên MySQL CI riêng; không kết nối database Windows",
   "backend_unit": {
-    "passed": 96,
-    "total": 96,
-    "suites": 8
+    "passed": 115,
+    "total": 115,
+    "suites": 9
   },
   "e2e": {
     "passed": 1,
@@ -41,7 +41,7 @@
   "browser": {
     "passed": 72,
     "total": 72,
-    "http": 248,
+    "http": 247,
     "http_5xx": 0,
     "javascript_errors": 0,
     "screenshots": [
@@ -134,9 +134,9 @@
     }
   ],
   "artifact": {
-    "id": 11310379484,
-    "url": "https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37222525284/artifacts/11310379484",
-    "expires_at": "2026-10-18T18:00:03Z"
+    "id": 11329801519,
+    "url": "https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37273527616/artifacts/11329801519",
+    "expires_at": "2026-10-19T06:41:51Z"
   },
   "features": {
     "modals": true,
@@ -154,7 +154,9 @@
     "teacher_self_profile": true,
     "assignment_tools_open_on_demand": true,
     "one_homeroom_row": true,
-    "one_homeroom_configuration_badge_per_grade": true
+    "one_homeroom_configuration_badge_per_grade": true,
+    "local_mysql_rsa_authentication": true,
+    "login_connection_error_messages": true
   },
   "limits": [
     "Không kiểm thử DB Windows hiện có",
@@ -162,5 +164,15 @@
     "Chromium headless; viewport điện thoại giả lập",
     "Độ phủ route không xác nhận mọi nhánh nghiệp vụ",
     "Dependency audit còn package bị đánh dấu; chưa nâng version"
-  ]
+  ],
+  "mysql_rsa": {
+    "passed": 3,
+    "total": 3,
+    "mysql": "8.0.46",
+    "scope": "Tài khoản MySQL caching_sha2_password mới, luồng AuthService.DangNhap thật, TCP không TLS"
+  },
+  "frontend_errors": {
+    "passed": 12,
+    "total": 12
+  }
 }

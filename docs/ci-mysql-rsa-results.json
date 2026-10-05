@@ -1,0 +1,22 @@
+{
+  "thoi_diem": "2026-10-05T06:40:30.483Z",
+  "mysql": "8.0.46",
+  "du_lieu": "Giả trên MySQL CI riêng",
+  "tong": 3,
+  "dat": 3,
+  "khong_dat": 0,
+  "ket_qua": [
+    {
+      "ten": "Đăng nhập thật qua MySQL caching_sha2_password chưa có cache RSA",
+      "dat": true
+    },
+    {
+      "ten": "Xác thực bằng tài khoản MySQL riêng qua TCP không có TLS",
+      "dat": true
+    },
+    {
+      "ten": "Mật khẩu ứng dụng sai vẫn bị từ chối bằng 401",
+      "dat": true
+    }
+  ]
+}

@@ -39,8 +39,28 @@ môi trường triển khai; việc lấy khóa từ server không thay thế x�
   phân biệt lỗi mạng/timeout và chuyển lỗi 500 mặc định sang tiếng Việt.
 - Chạy lại bộ kiểm thử chức năng hiện có trên dữ liệu giả trong MySQL CI.
 
-Kết quả CI của commit chứa bản sửa nằm trong artifact `functional-evidence`,
-bao gồm `ci-mysql-rsa-results.json`.
+Kết quả CI: commit `be5b4be07b7dc3222f38f0c9ed88d64a56724898`,
+[run 37273527616](https://github.com/HLuan291/quan_ly_tieu_hoc/actions/runs/37273527616).
+
+| Kiểm thử | Đạt |
+| --- | --- |
+| MySQL RSA với tài khoản mới | 3/3 |
+| Backend unit | 115/115 |
+| E2E GET / | 1/1 |
+| API chức năng | 599/599 |
+| Route có lượt gọi hợp lệ | 78/78 |
+| Ràng buộc MySQL | 15/15 |
+| Thông báo lỗi frontend | 12/12 |
+| Ngày frontend | 16/16 |
+| Chromium | 72/72 |
+
+Backend/frontend lint và build đạt; 0 lỗi JavaScript và 0 HTTP 5xx trong
+247 phản hồi của kiểm thử trình duyệt. Ba cảnh báo lint backend và các cảnh báo
+dependency trước đó vẫn được ghi trong báo cáo; bản sửa không đổi dependency.
+Dữ liệu kiểm thử là dữ liệu giả trong MySQL riêng, không kết nối DB Windows.
+
+Artifact `functional-evidence` bao gồm `ci-mysql-rsa-results.json`; bản tóm tắt
+được lưu trong `ci-functional-summary.json`.
 
 ## Cập nhật Windows
 
