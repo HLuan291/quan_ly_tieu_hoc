@@ -20,20 +20,28 @@ const OriginalUrl = process.env.DATABASE_URL;
 process.env.DATABASE_URL = ColdUrl.href;
 const Cold = new PrismaService();
 process.env.DATABASE_URL = OriginalUrl;
-const Results = [];
+const Results = [], Secrets = [];
+function Redact(Text) {
+  let Value = String(Text);
+  for (const Secret of Secrets) Value = Value.replaceAll(Secret, '[REDACTED]');
+  return Value;
+}
 let Account, Version;
 
 async function Main() {
   const Password = 'Audit@Rsa' + RandomBytes(8).toString('hex');
+  const Hash = await Argon2.hash(Password);
+  Secrets.push(Password, Hash);
   Account = await Seed.tai_khoan.create({ data: {
     ten_dang_nhap: 'rsa_audit_' + process.pid + '_' + RandomBytes(4).toString('hex'),
-    mat_khau_bam: await Argon2.hash(Password), vai_tro: 'ADMIN', phai_doi_mat_khau: false,
+    so_dien_thoai: '0999990999', mat_khau_bam: Hash, vai_tro: 'ADMIN', phai_doi_mat_khau: false,
   } });
   const Jwt = new JwtService({ secret: process.env.JWT_SECRET });
   const Auth = new AuthService(Cold, Jwt);
 
   // Đây là truy vấn đầu tiên của Cold: đọc tai_khoan trong luồng đăng nhập thật.
   const Login = await Auth.DangNhap(Account.ten_dang_nhap, Password);
+  Secrets.push(Login.access_token);
   Assert.equal(Login.tai_khoan.id, Account.id);
   Assert.equal(Jwt.verify(Login.access_token).sub, Account.id);
   const Persisted = await Seed.tai_khoan.findUniqueOrThrow({ where: { id: Account.id } });
@@ -51,8 +59,8 @@ async function Main() {
   Results.push({ ten: 'Mật khẩu ứng dụng sai vẫn bị từ chối bằng 401', dat: true });
 }
 Main().catch(Error => {
-  Results.push({ ten: 'Kiểm thử RSA thất bại', dat: false, thong_bao: String(Error.message) });
-  console.error(Error.message);
+  Results.push({ ten: 'Kiểm thử RSA thất bại', dat: false, thong_bao: Redact(Error.message) });
+  console.error(Redact(Error.message));
   process.exitCode = 1;
 }).finally(async () => {
   if (Account) await Seed.tai_khoan.delete({ where: { id: Account.id } }).catch(() => { process.exitCode = 1; });

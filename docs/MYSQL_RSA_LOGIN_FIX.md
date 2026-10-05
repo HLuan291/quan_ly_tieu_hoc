@@ -30,7 +30,8 @@ môi trường triển khai; việc lấy khóa từ server không thay thế x�
 - Thêm kiểm thử cấu hình local, remote, IPv6, tắt tùy chọn, ký tự đặc biệt và lỗi URL.
 - Tái hiện cục bộ trên MySQL riêng: kết nối TCP bằng tài khoản
   `caching_sha2_password` mới, tắt TLS, cấu hình cũ lỗi thiếu khóa RSA;
-  cấu hình mới đọc được `SELECT 1`.
+  cấu hình mới đọc được `SELECT 1`. Đã xác nhận trên MySQL 8.0.46: mã lỗi
+  cũ là 45044, kết nối mới thành công với TLS tắt.
 - CI tạo `audit_cold_rsa` mới sau khi tạo schema. Truy vấn đầu tiên dùng tài khoản
   này chạy luồng `AuthService.DangNhap` thật với mật khẩu Argon2 và JWT thật.
   Kiểm tra thành công, trạng thái không TLS và mật khẩu ứng dụng sai vẫn trả 401.
