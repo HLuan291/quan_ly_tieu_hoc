@@ -18,7 +18,7 @@ import {
   zodResolver,
 } from '@hookform/resolvers/zod';
 
-import axios from 'axios';
+import { LayThongBaoLoi } from '../utils/loi_api';
 
 import Api from '../api/api';
 
@@ -105,30 +105,7 @@ export default function DangNhapPage() {
         },
       );
     } catch (Error: unknown) {
-      if (
-        axios.isAxiosError(Error)
-      ) {
-        const Message =
-          Error.response?.data
-            ?.message;
-
-        if (
-          Array.isArray(Message)
-        ) {
-          SetLoi(
-            Message.join(', '),
-          );
-        } else {
-          SetLoi(
-            Message ||
-              'Đăng nhập thất bại',
-          );
-        }
-      } else {
-        SetLoi(
-          'Đăng nhập thất bại',
-        );
-      }
+      SetLoi(LayThongBaoLoi(Error));
     } finally {
       SetDangGui(false);
     }

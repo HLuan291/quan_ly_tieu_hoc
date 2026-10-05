@@ -69,6 +69,13 @@ jobs:
           npm run build
           npm run test -- --runInBand
           npm run test:e2e -- --runInBand
+      - name: Cold MySQL 8 RSA authentication
+        working-directory: backend
+        env:
+          AUDIT_MYSQL_RSA_URL: mysql://audit_cold_rsa:audit-cold-rsa-test-only@127.0.0.1:3306/audit_school_ci
+        run: |
+          docker exec -e MYSQL_PWD=audit-root-only "${{ job.services.mysql.id }}" mysql --protocol=socket -u root -e "CREATE USER 'audit_cold_rsa'@'%' IDENTIFIED WITH caching_sha2_password BY 'audit-cold-rsa-test-only'; GRANT SELECT, UPDATE ON audit_school_ci.* TO 'audit_cold_rsa'@'%';"
+          node scripts/mysql-rsa-auth-audit.cjs
       - name: Regenerate endpoint matrix
         working-directory: backend
         run: node scripts/audit-route-map.cjs
@@ -91,6 +98,7 @@ jobs:
         working-directory: frontend
         run: |
           npm run test:dates
+          node scripts/test-loi-api.cjs
           npm run lint
           npm run build
       - name: Dependency audit (all and production)
